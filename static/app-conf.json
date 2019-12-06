@@ -51,6 +51,23 @@
     },
 
     {
+      "type": "VECTOR",
+      "lid": "np_lh_border",
+      "name": "Naturpark Grenze",
+      "url": "./static/data/np_lh_border_4326.geojson",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeColor": "rgba(29, 107, 26, 1)",
+        "strokeWidth": 4
+      }
+    },
+
+
+    {
       "type": "OSM",
       "lid": "osm-bg",
       "name": "OSM",
