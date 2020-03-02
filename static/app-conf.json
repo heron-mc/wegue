@@ -11,7 +11,7 @@
   "footerTextRight": "Geolicious",
   "showCopyrightYear": true,
 
-  "mapCenter": [1116876, 7010921],
+  "mapCenter": [1113871, 7012966],
   "mapZoom": 9,
 
   "mapLayers": [
@@ -20,14 +20,14 @@
       "type": "VECTOR",
       "lid": "Naturwunder",
       "name": "Naturwunder",
-      "url": "./static/data/naturwunder_4326.geojson",
+      "url": "http://staging.nplh.geolicious.de/api/poi_features/1",
       "formatConfig": {
       },
       "format": "GeoJSON",
       "visible": true,
       "selectable": true,
       "style": {
-        "radius": 6,
+        "radius": 7,
         "strokeColor": "white",
         "strokeWidth": 2,
         "fillColor": "rgba(81, 160, 38, 1)"
@@ -36,17 +36,97 @@
 
     {
       "type": "VECTOR",
-      "lid": "heide_erlebnis",
-      "name": "Heide Erlebnis",
-      "url": "./static/data/Heide_Erlebnis_4326.geojson",
+      "lid": "Wanderwegenetz",
+      "name": "Wanderwegenetz",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/1",
       "formatConfig": {
       },
       "format": "GeoJSON",
       "visible": true,
       "selectable": true,
       "style": {
-        "strokeColor": "rgba(226, 0, 122, 1)",
-        "strokeWidth": 4
+        "strokeWidth": 3,
+        "strokeColor": "rgba(0, 147, 230, 1)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "Wanderwege",
+      "name": "Wanderwege",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/2",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgb(86, 175, 226)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "Reitwegenetz",
+      "name": "Reitwegenetz",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/3",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgba(231, 185, 21, 1)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "Reitwege",
+      "name": "Reitwege",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/4",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgba(173, 137, 8, 1)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "Nordic Walking",
+      "name": "Nordic Walking",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/5",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgba(26, 218, 143, 1)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "Heide-Shuttle",
+      "name": "Heide-Shuttle",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/6",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgba(222, 100, 1, 1)"
       }
     },
 
@@ -61,11 +141,27 @@
       "visible": true,
       "selectable": true,
       "style": {
-        "strokeColor": "rgba(29, 107, 26, 1)",
+        "strokeColor": "rgba(226, 0, 122, 1)",
         "strokeWidth": 4
       }
     },
 
+    {
+      "type": "VECTOR",
+      "lid": "heide",
+      "name": "Heide",
+      "url": "./static/data/overpass_natural-heath.geojson",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeColor": "rgb(162, 114, 240)",
+        "strokeWidth": 4,
+        "fillColor": "rgba(162, 114, 240, 0.5)"
+      }
+    },
 
     {
       "type": "OSM",
