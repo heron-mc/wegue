@@ -1,87 +1,165 @@
 {
 
-  "title": "Vue.js / OpenLayers WebGIS",
+  "title": "Naturpark Lüneburger Heide",
 
-  "baseColor": "red darken-3",
+  "baseColor": "rgba(226, 0, 122, 1)",
 
-  "logo": "https://dummyimage.com/100x100/aaa/fff&text=Wegue",
-  "logoSize": "100",
+  "logo": "https://naturpark-lueneburger-heide.de/layouts/default/images/logotype@2.jpg",
+  "logoSize": [50, 100],
 
-  "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a>",
-  "footerTextRight": "meggsimum",
+  "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
+  "footerTextRight": "Geolicious",
   "showCopyrightYear": true,
 
-  "mapZoom": 2,
-  "mapCenter": [0, 0],
+  "mapCenter": [1113871, 7012966],
+  "mapZoom": 9,
 
   "mapLayers": [
 
     {
       "type": "VECTOR",
-      "lid": "Shops",
-      "name": "Shops DaSchau",
-      "url": "./static/data/shops-dannstadt.geojson",
+      "lid": "Naturwunder",
+      "name": "Naturwunder",
+      "url": "http://staging.nplh.geolicious.de/api/poi_features/1",
       "formatConfig": {
       },
       "format": "GeoJSON",
       "visible": true,
       "selectable": true,
       "style": {
-        "radius": 4,
-        "strokeColor": "purple",
+        "radius": 7,
+        "strokeColor": "white",
         "strokeWidth": 2,
-        "fillColor": "rgba(155,153,51,0.5)"
+        "fillColor": "rgba(81, 160, 38, 1)"
       }
     },
 
     {
       "type": "VECTOR",
-      "lid": "earthquakes",
-      "name": "Earthquakes 2012 (Mag 5)",
-      "url": "./static/data/2012_Earthquakes_Mag5.kml",
+      "lid": "Wanderwegenetz",
+      "name": "Wanderwegenetz",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/1",
       "formatConfig": {
-        "extractStyles": false
       },
-      "format": "KML",
+      "format": "GeoJSON",
       "visible": true,
-      "attributions": "U.S. Geological Survey",
       "selectable": true,
-      "hoverable": true,
-      "hoverAttribute": "name",
       "style": {
-        "radius": 4,
-        "strokeColor": "rgb(207, 16, 32)",
-        "strokeWidth": 1,
-        "fillColor": "rgba(207, 16, 32, 0.6)"
+        "strokeWidth": 3,
+        "strokeColor": "rgba(0, 147, 230, 1)"
       }
     },
 
     {
-      "type": "WMS",
-      "lid": "ahocevar-wms",
-      "name": "WMS (ahocevar)",
-      "format": "image/png",
-      "layers": "topp:states",
-      "url": "https://ahocevar.com/geoserver/wms",
-      "transparent": true,
-      "singleTile": false,
-      "projection": "EPSG:3857",
-      "attribution": "",
-      "isBaseLayer": false,
-      "visible": false,
-      "displayInLayerList": true
+      "type": "VECTOR",
+      "lid": "Wanderwege",
+      "name": "Wanderwege",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/2",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgb(86, 175, 226)"
+      }
     },
 
     {
-      "type": "VECTORTILE",
-      "name": "Vector Tile Layer",
-      "url": "https://ahocevar.com/geoserver/gwc/service/tms/1.0.0/ne:ne_10m_admin_0_countries@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-      "format": "MVT",
-      "visible": false,
+      "type": "VECTOR",
+      "lid": "Reitwegenetz",
+      "name": "Reitwegenetz",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/3",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
       "style": {
-        "strokeColor": "gray",
-        "strokeWidth": 1,
-        "fillColor": "rgba(20,20,20,0.1)"
+        "strokeWidth": 3,
+        "strokeColor": "rgba(231, 185, 21, 1)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "Reitwege",
+      "name": "Reitwege",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/4",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgba(173, 137, 8, 1)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "Nordic Walking",
+      "name": "Nordic Walking",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/5",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgba(26, 218, 143, 1)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "Heide-Shuttle",
+      "name": "Heide-Shuttle",
+      "url": "http://staging.nplh.geolicious.de/api/route_features/6",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeWidth": 3,
+        "strokeColor": "rgba(222, 100, 1, 1)"
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "np_lh_border",
+      "name": "Naturpark Grenze",
+      "url": "./static/data/np_lh_border_4326.geojson",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeColor": "rgba(226, 0, 122, 1)",
+        "strokeWidth": 4
+      }
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "heide",
+      "name": "Heide",
+      "url": "./static/data/overpass_natural-heath.geojson",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "strokeColor": "rgb(162, 114, 240)",
+        "strokeWidth": 4,
+        "fillColor": "rgba(162, 114, 240, 0.5)"
       }
     },
 
@@ -89,16 +167,16 @@
       "type": "OSM",
       "lid": "osm-bg",
       "name": "OSM",
-      "isBaseLayer": false,
+      "isBaseLayer": true,
       "visible": true,
-      "displayInLayerList": true
+      "displayInLayerList": false
     }
 
   ],
 
   "modules": {
     "wgu-layerlist": {
-      "target": "menu",
+      "target": "toolbar",
       "win": true,
       "draggable": false
     },
@@ -114,7 +192,7 @@
       "sketchVertexFillColor": "rgba(198,40,40,0.2)"
     },
     "wgu-infoclick": {
-      "target": "menu",
+      "target": "toolbar",
       "win": true,
       "draggable": false,
       "initPos": {
@@ -124,10 +202,10 @@
     },
     "wgu-zoomtomaxextent": {
       "target": "toolbar",
-      "darkLayout": true
+      "darkLayout": false
     },
     "wgu-helpwin": {
-      "target": "toolbar",
+      "target": "menu",
       "darkLayout": true
     }
   }
