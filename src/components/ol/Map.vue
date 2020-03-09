@@ -54,7 +54,7 @@ export default {
       me.setupMapHover();
     }, 200);
   },
-  created () {
+  async created () {
     var me = this;
 
     // make map rotateable according to property
@@ -99,20 +99,51 @@ export default {
     });
 
     // create layers from config and add them to map
-    const layers = me.createLayers();
+    const layers = await me.createLayers();
     me.map.getLayers().extend(layers);
   },
 
   methods: {
+    async getMapLayers () {
+      const response = await (await fetch('http://staging.nplh.geolicious.de/api/layer_list')).json();
+      return response.map(def => {
+        const layer = {
+          type: 'VECTOR',
+          lid: def.name,
+          name: def.name,
+          url: `http://staging.nplh.geolicious.de${def.url}`,
+          format: 'GeoJSON',
+          visible: true,
+          selectable: true
+        };
+        if (def.geometry_type === 'POINT') {
+          layer.style = {
+            radius: 7,
+            strokeColor: 'white',
+            strokeWidth: 2,
+            fillColor: def.color
+          }
+        } else {
+          layer.style = {
+            strokeColor: def.color
+          }
+        }
+        if (def.geometry_type.match('POLYGON')) {
+          layer.style.fillColor = def.color;
+        }
+
+        return layer;
+      });
+    },
     /**
      * Creates the OL layers due to the "mapLayers" array in app config.
      * @return {ol.layer.Base[]} Array of OL layer instances
      */
-    createLayers () {
+    async createLayers () {
       const me = this;
       let layers = [];
       const appConfig = this.$appConfig;
-      const mapLayersConfig = appConfig.mapLayers || [];
+      const mapLayersConfig = [...await this.getMapLayers(), ...appConfig.mapLayers];
       mapLayersConfig.reverse().forEach(function (lConf) {
         let layer = LayerFactory.getInstance(lConf);
         layers.push(layer);
