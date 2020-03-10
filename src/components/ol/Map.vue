@@ -104,70 +104,48 @@ export default {
   },
 
   methods: {
-    async getMapLayers () {
-      const response = await (await fetch('http://staging.nplh.geolicious.de/api/layer_list')).json();
-      return response.map(def => {
-        const layer = {
-          type: 'VECTOR',
-          lid: def.name,
-          name: def.name,
-          url: `http://staging.nplh.geolicious.de${def.url}`,
-          format: 'GeoJSON',
-          visible: true,
-          selectable: true
-        };
-        if (def.geometry_type === 'POINT') {
-          layer.style = {
-            radius: 7,
-            strokeColor: 'white',
-            strokeWidth: 2,
-            fillColor: def.color
-          }
-        } else {
-          layer.style = {
-            strokeColor: def.color
-          }
-        }
-        if (def.geometry_type.match('POLYGON')) {
-          layer.style.fillColor = def.color;
-        }
-
-        return layer;
-      });
-    },
     /**
      * Creates the OL layers due to the "mapLayers" array in app config.
      * @return {ol.layer.Base[]} Array of OL layer instances
      */
     async createLayers () {
+      function addInteraction (layer, lConf) {
+        // if layer is selectable register a select interaction
+        if (!lConf.selectable) {
+          return;
+        }
+        const selectClick = new SelectInteraction({
+          layers: [layer]
+        });
+        // forward an event if feature selection changes
+        selectClick.on('select', function (evt) {
+          // TODO use identifier for layer (once its implemented)
+          WguEventBus.$emit(
+            'map-selectionchange',
+            layer.get('lid'),
+            evt.selected,
+            evt.deselected
+          );
+        });
+        // register/activate interaction on map
+        me.map.addInteraction(selectClick);
+      }
       const me = this;
       let layers = [];
       const appConfig = this.$appConfig;
-      const mapLayersConfig = [...await this.getMapLayers(), ...appConfig.mapLayers];
-      mapLayersConfig.reverse().forEach(function (lConf) {
-        let layer = LayerFactory.getInstance(lConf);
-        layers.push(layer);
-
-        // if layer is selectable register a select interaction
-        if (lConf.selectable) {
-          const selectClick = new SelectInteraction({
-            layers: [layer]
-          });
-          // forward an event if feature selection changes
-          selectClick.on('select', function (evt) {
-            // TODO use identifier for layer (once its implemented)
-            WguEventBus.$emit(
-              'map-selectionchange',
-              layer.get('lid'),
-              evt.selected,
-              evt.deselected
-            );
-          });
-          // register/activate interaction on map
-          me.map.addInteraction(selectClick);
+      const mapLayersConfig = appConfig.mapLayers;
+      await mapLayersConfig.reverse().map(async function (lConf) {
+        let layer = await LayerFactory.getInstance(lConf);
+        console.log('add', layer);
+        if (Array.isArray(layer)) {
+          layers.push(...layer);
+          layer.forEach(l => addInteraction(l, lConf))
+        } else {
+          layers.push(layer);
+          addInteraction(layer, lConf);
         }
       });
-
+      console.log('returning', layers);
       return layers;
     },
     /**
