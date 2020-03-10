@@ -49,7 +49,40 @@
         "strokeColor": "rgba(0, 147, 230, 1)"
       }
     },
-
+    {
+      "type": "VECTOR",
+      "lid": "dutch_windmills",
+      "name": "Dutch Windmills",
+      "url": "https://demo.pygeoapi.io/master/collections/dutch_windmills/items",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "iconUrl": "./static/icon/windmill2.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
+    {
+      "type": "VECTOR",
+      "lid": "dutch_castles",
+      "name": "Dutch Castles",
+      "url": "https://demo.pygeoapi.io/master/collections/dutch_castles/items",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "style": {
+        "iconUrl": "./static/icon/castle2.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
     {
       "type": "VECTOR",
       "lid": "Wanderwege",
@@ -65,7 +98,6 @@
         "strokeColor": "rgb(86, 175, 226)"
       }
     },
-
     {
       "type": "VECTOR",
       "lid": "Reitwegenetz",
@@ -162,7 +194,6 @@
         "fillColor": "rgba(162, 114, 240, 0.5)"
       }
     },
-
     {
       "type": "OSM",
       "lid": "osm-bg",
@@ -171,7 +202,6 @@
       "visible": true,
       "displayInLayerList": false
     }
-
   ],
 
   "modules": {
@@ -207,7 +237,29 @@
     "wgu-helpwin": {
       "target": "menu",
       "darkLayout": true
+    },
+    "wgu-feature-info-window": {
+      "win": true,
+      "draggable": true,
+      "width": 360,
+      "icon": "info",
+      "layers": [
+        {
+          "layerId": "dutch_windmills",
+          "title": "Dutch Windmills",
+          "titleProp": "NAAM",
+          "imageProp": "FOTO_GROOT",
+          "infoUrlProp": "INFOLINK",
+          "imageWidth": 360
+        },
+        {
+          "layerId": "dutch_castles",
+          "title": "Dutch Castles",
+          "titleProp": "naam",
+          "imageProp": "foto_groot",
+          "infoUrlProp": "info_link"
+        }
+      ]
     }
   }
-
 }
