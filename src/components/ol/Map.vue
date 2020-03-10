@@ -134,18 +134,15 @@ export default {
       let layers = [];
       const appConfig = this.$appConfig;
       const mapLayersConfig = appConfig.mapLayers;
-      await mapLayersConfig.reverse().map(async function (lConf) {
-        let layer = await LayerFactory.getInstance(lConf);
-        console.log('add', layer);
-        if (Array.isArray(layer)) {
-          layers.push(...layer);
-          layer.forEach(l => addInteraction(l, lConf))
-        } else {
-          layers.push(layer);
-          addInteraction(layer, lConf);
+      await Promise.all(mapLayersConfig.reverse().map(async lConf => {
+        let layersToAdd = await LayerFactory.getInstance(lConf);
+        // One layer definition can lead to several layers being created
+        if (!Array.isArray(layersToAdd)) {
+          layersToAdd = [layersToAdd];
         }
-      });
-      console.log('returning', layers);
+        layers.push(...layersToAdd);
+        layersToAdd.forEach(layer => addInteraction(layer, lConf));
+      }));
       return layers;
     },
     /**

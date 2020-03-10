@@ -13,9 +13,7 @@
 
   "mapCenter": [1113871, 7012966],
   "mapZoom": 9,
-
   "mapLayers": [
-
     {
       "type": "VECTOR",
       "lid": "np_lh_border",
@@ -31,7 +29,6 @@
         "strokeWidth": 4
       }
     },
-
     {
       "type": "VECTOR",
       "lid": "heide",
@@ -47,15 +44,12 @@
         "strokeWidth": 4,
         "fillColor": "rgba(162, 114, 240, 0.5)"
       }
-    }
-  ,
-  "mapLayers": [
+    },
     {
-      "type": "GEOLICIOUS",
+      "type": "GEOLICIOUSCMS",
       "url": "http://staging.nplh.geolicious.de/api/layer_list",
       "baseUrl": "http://staging.nplh.geolicious.de"
     },
-
     {
       "type": "OSM",
       "lid": "osm-bg",
@@ -64,7 +58,6 @@
       "visible": true,
       "displayInLayerList": false
     }
-
   ],
 
   "modules": {

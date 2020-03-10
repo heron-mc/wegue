@@ -53,8 +53,8 @@ export const LayerFactory = {
       return this.createVectorLayer(lConf);
     } else if (lConf.type === 'VECTORTILE') {
       return this.createVectorTileLayer(lConf);
-    } else if (lConf.type === 'GEOLICIOUS') {
-      return this.createGeoliciousLayers(lConf);
+    } else if (lConf.type === 'GEOLICIOUSCMS') {
+      return this.createGeoliciousCMSLayers(lConf);
     } else {
       return null;
     }
@@ -181,12 +181,9 @@ export const LayerFactory = {
     return vtLayer;
   },
 
-  async createGeoliciousLayers (lConf) {
-    console.log(lConf);
-    debugger;
+  async createGeoliciousCMSLayers (lConf) {
     const response = await (await fetch(lConf.url)).json();
     return Promise.all(response.map(async def => {
-      console.log('def', def);
       const layer = {
         type: 'VECTOR',
         lid: def.name,
@@ -211,10 +208,7 @@ export const LayerFactory = {
       if (def.geometry_type.match('POLYGON')) {
         layer.style.fillColor = def.color;
       }
-      console.log('converting', layer)
       return this.getInstance(layer);
     }));
-    // console.log('returned layers', layers);
-    // return layers;
   }
 }
