@@ -35,7 +35,7 @@ export const LayerFactory = {
    * @param  {Object} lConf  Layer config object
    * @return {ol.layer.Base} OL layer instance
    */
-  getInstance (lConf) {
+  async getInstance (lConf) {
     // apply LID (Layer ID) if not existent
     if (!lConf.lid) {
       var now = new Date();
@@ -53,6 +53,8 @@ export const LayerFactory = {
       return this.createVectorLayer(lConf);
     } else if (lConf.type === 'VECTORTILE') {
       return this.createVectorTileLayer(lConf);
+    } else if (lConf.type === 'GEOLICIOUSCMS') {
+      return this.createGeoliciousCMSLayers(lConf);
     } else {
       return null;
     }
@@ -177,6 +179,36 @@ export const LayerFactory = {
     });
 
     return vtLayer;
-  }
+  },
 
+  async createGeoliciousCMSLayers (lConf) {
+    const response = await (await fetch(lConf.url)).json();
+    return Promise.all(response.map(async def => {
+      const layer = {
+        type: 'VECTOR',
+        lid: def.name,
+        name: def.name,
+        url: lConf.baseUrl + def.url,
+        format: 'GeoJSON',
+        visible: true,
+        selectable: true
+      };
+      if (def.geometry_type === 'POINT') {
+        layer.style = {
+          radius: 7,
+          strokeColor: 'white',
+          strokeWidth: 2,
+          fillColor: def.color
+        }
+      } else {
+        layer.style = {
+          strokeColor: def.color
+        }
+      }
+      if (def.geometry_type.match('POLYGON')) {
+        layer.style.fillColor = def.color;
+      }
+      return this.getInstance(layer);
+    }));
+  }
 }
