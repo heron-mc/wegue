@@ -161,6 +161,11 @@
       }
     },
     {
+      "type": "GEOLICIOUSCMS",
+      "url": "http://staging.nplh.geolicious.de/api/layer_list",
+      "baseUrl": "http://staging.nplh.geolicious.de"
+    },
+    {
       "type": "OSM",
       "lid": "osm-bg",
       "name": "OSM",
@@ -168,6 +173,7 @@
       "visible": true,
       "displayInLayerList": false
     }
+
   ],
 
   "modules": {
@@ -217,8 +223,7 @@
           "imageProp": "image_url",
           "descProp": "description",
           "imageWidth": 360
-        }
-      ]
     }
   }
+
 }
