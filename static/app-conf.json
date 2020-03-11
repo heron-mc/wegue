@@ -51,40 +51,6 @@
     },
     {
       "type": "VECTOR",
-      "lid": "dutch_windmills",
-      "name": "Dutch Windmills",
-      "url": "https://demo.pygeoapi.io/master/collections/dutch_windmills/items",
-      "formatConfig": {
-      },
-      "format": "GeoJSON",
-      "visible": true,
-      "selectable": true,
-      "style": {
-        "iconUrl": "./static/icon/windmill2.png",
-        "anchor": [0.5, 37],
-        "anchorXUnits": "fraction",
-        "anchorYUnits": "pixels"
-      }
-    },
-    {
-      "type": "VECTOR",
-      "lid": "dutch_castles",
-      "name": "Dutch Castles",
-      "url": "https://demo.pygeoapi.io/master/collections/dutch_castles/items",
-      "formatConfig": {
-      },
-      "format": "GeoJSON",
-      "visible": true,
-      "selectable": true,
-      "style": {
-        "iconUrl": "./static/icon/castle2.png",
-        "anchor": [0.5, 37],
-        "anchorXUnits": "fraction",
-        "anchorYUnits": "pixels"
-      }
-    },
-    {
-      "type": "VECTOR",
       "lid": "Wanderwege",
       "name": "Wanderwege",
       "url": "http://staging.nplh.geolicious.de/api/route_features/2",
@@ -245,19 +211,12 @@
       "icon": "info",
       "layers": [
         {
-          "layerId": "dutch_windmills",
-          "title": "Dutch Windmills",
-          "titleProp": "NAAM",
-          "imageProp": "FOTO_GROOT",
-          "infoUrlProp": "INFOLINK",
+          "layerId": "Naturwunder",
+          "title": "Naturwunder",
+          "titleProp": "name",
+          "imageProp": "image_url",
+          "descProp": "description",
           "imageWidth": 360
-        },
-        {
-          "layerId": "dutch_castles",
-          "title": "Dutch Castles",
-          "titleProp": "naam",
-          "imageProp": "foto_groot",
-          "infoUrlProp": "info_link"
         }
       ]
     }
