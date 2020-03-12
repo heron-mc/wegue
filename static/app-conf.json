@@ -23,7 +23,7 @@
       },
       "format": "GeoJSON",
       "visible": true,
-      "selectable": true,
+      "selectable": false,
       "style": {
         "strokeColor": "rgba(226, 0, 122, 1)",
         "strokeWidth": 4
@@ -38,7 +38,7 @@
       },
       "format": "GeoJSON",
       "visible": true,
-      "selectable": true,
+      "selectable": false,
       "style": {
         "strokeColor": "rgb(162, 114, 240)",
         "strokeWidth": 4,
@@ -48,7 +48,8 @@
     {
       "type": "GEOLICIOUSCMS",
       "url": "http://staging.nplh.geolicious.de/api/layer_list",
-      "baseUrl": "http://staging.nplh.geolicious.de"
+      "baseUrl": "http://staging.nplh.geolicious.de",
+      "selectable": true
     },
     {
       "type": "OSM",
@@ -93,6 +94,22 @@
     "wgu-helpwin": {
       "target": "menu",
       "darkLayout": true
+    },
+    "wgu-feature-info-window": {
+      "win": true,
+      "draggable": true,
+      "width": 360,
+      "icon": "info",
+      "layers": [
+        {
+          "layerId": "Naturwunder",
+          "title": "Naturwunder",
+          "titleProp": "name",
+          "imageProp": "image_url",
+          "descProp": "description",
+          "imageWidth": 360
+        }
+      ]
     }
   }
 
