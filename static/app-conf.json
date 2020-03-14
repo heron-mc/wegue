@@ -46,10 +46,8 @@
       }
     },
     {
-      "type": "GEOLICIOUSCMS",
-      "url": "http://staging.nplh.geolicious.de/api/layer_list",
-      "baseUrl": "http://staging.nplh.geolicious.de",
-      "selectable": true
+      "type": "LAYERCOLLECTION",
+      "url": "http://staging.nplh.geolicious.de/api/layer_list"
     },
     {
       "type": "OSM",
