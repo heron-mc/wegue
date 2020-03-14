@@ -30,6 +30,15 @@ export const LayerFactory = {
   },
 
   /**
+   * Create a random id string.
+   *
+   * @return {String} random string
+   */
+  randomId () {
+    return Math.random().toString(36).substr(2, 5);
+  },
+
+  /**
    * Returns an OpenLayers layer instance due to given config.
    *
    * @param  {Object} lConf  Layer config object
@@ -38,8 +47,7 @@ export const LayerFactory = {
   async getInstance (lConf) {
     // apply LID (Layer ID) if not existent
     if (!lConf.lid) {
-      var now = new Date();
-      lConf.lid = now.getTime();
+      lConf.lid = this.randomId();
     }
 
     // create correct layer type
@@ -195,6 +203,8 @@ export const LayerFactory = {
   async createLayersFromCollection (lConf) {
     const response = await (await fetch(lConf.url)).json();
     return Promise.all(response.map(async layerDef => {
+      // Always git it a random id
+      layerDef.lid = layerDef.name;
       return this.getInstance(layerDef);
     }));
   }
