@@ -1,11 +1,10 @@
 {
 
-  "title": "Naturpark Lüneburger Heide",
+  "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'>Naturpark Lüneburger Heide</a>",
 
   "baseColor": "rgba(226, 0, 122, 1)",
-
-  "logo": "./static/media/nplh-logo@2.jpg",
-  "logoSize": "100px",
+  
+  "logoText": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo'</a>",
 
   "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
   "footerTextRight": "Geolicious",
