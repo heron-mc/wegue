@@ -4,8 +4,8 @@
 
   "baseColor": "rgba(226, 0, 122, 1)",
 
-  "logo": "https://naturpark-lueneburger-heide.de/layouts/default/images/logotype@2.jpg",
-  "logoSize": [50, 100],
+  "logo": "./static/media/nplh-logo@2.jpg",
+  "logoSize": "100px",
 
   "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
   "footerTextRight": "Geolicious",
@@ -46,10 +46,8 @@
       }
     },
     {
-      "type": "GEOLICIOUSCMS",
-      "url": "http://staging.nplh.geolicious.de/api/layer_list",
-      "baseUrl": "http://staging.nplh.geolicious.de",
-      "selectable": true
+      "type": "LAYERCOLLECTION",
+      "url": "http://staging.nplh.geolicious.de/api/layer_list_wegue_format"
     },
     {
       "type": "OSM",
