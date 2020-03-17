@@ -30,6 +30,15 @@ export const LayerFactory = {
   },
 
   /**
+   * Create a random id string.
+   *
+   * @return {String} random string
+   */
+  randomId () {
+    return Math.random().toString(36).substr(2, 5);
+  },
+
+  /**
    * Returns an OpenLayers layer instance due to given config.
    *
    * @param  {Object} lConf  Layer config object
@@ -38,8 +47,7 @@ export const LayerFactory = {
   async getInstance (lConf) {
     // apply LID (Layer ID) if not existent
     if (!lConf.lid) {
-      var now = new Date();
-      lConf.lid = now.getTime();
+      lConf.lid = this.randomId();
     }
 
     // create correct layer type
@@ -53,8 +61,8 @@ export const LayerFactory = {
       return this.createVectorLayer(lConf);
     } else if (lConf.type === 'VECTORTILE') {
       return this.createVectorTileLayer(lConf);
-    } else if (lConf.type === 'GEOLICIOUSCMS') {
-      return this.createGeoliciousCMSLayers(lConf);
+    } else if (lConf.type === 'LAYERCOLLECTION') {
+      return this.createLayersFromCollection(lConf);
     } else {
       return null;
     }
@@ -71,6 +79,7 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       extent: lConf.extent,
       visible: lConf.visible,
       opacity: lConf.opacity,
@@ -99,6 +108,7 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       visible: lConf.visible,
       opacity: lConf.opacity,
       source: new XyzSource({
@@ -120,6 +130,7 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       visible: lConf.visible,
       opacity: lConf.opacity,
       source: new OsmSource()
@@ -139,6 +150,7 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       extent: lConf.extent,
       visible: lConf.visible,
       opacity: lConf.opacity,
@@ -167,6 +179,7 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       visible: lConf.visible,
       opacity: lConf.opacity,
       source: new VectorTileSource({
@@ -182,34 +195,18 @@ export const LayerFactory = {
     return vtLayer;
   },
 
-  async createGeoliciousCMSLayers (lConf) {
+  /**
+   * Returns an array of Wegue Layer objects from given config.
+   *
+   * @param  {Object} lConf Wegue Layer list config object
+   * @return {Array} array of layer instances
+   */
+  async createLayersFromCollection (lConf) {
     const response = await (await fetch(lConf.url)).json();
-    return Promise.all(response.map(async def => {
-      const layer = {
-        type: 'VECTOR',
-        lid: def.name,
-        name: def.name,
-        url: lConf.baseUrl + def.url,
-        format: 'GeoJSON',
-        visible: true,
-        selectable: true
-      };
-      if (def.geometry_type === 'POINT') {
-        layer.style = {
-          radius: 7,
-          strokeColor: 'white',
-          strokeWidth: 2,
-          fillColor: def.color
-        }
-      } else {
-        layer.style = {
-          strokeColor: def.color
-        }
-      }
-      if (def.geometry_type.match('POLYGON')) {
-        layer.style.fillColor = def.color;
-      }
-      return this.getInstance(layer);
+    return Promise.all(response.map(async layerDef => {
+      // Always git it a random id
+      layerDef.lid = layerDef.name;
+      return this.getInstance(layerDef);
     }));
   }
 }
