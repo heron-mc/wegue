@@ -10,7 +10,7 @@
     <!-- slot to inject components at the beginning (before title) -->
     <slot name="wgu-tb-start"></slot>
 
-    <v-toolbar-title>{{title}}</v-toolbar-title>
+    <v-toolbar-title><span v-html="title"/></v-toolbar-title>
 
     <!-- slot to inject components after the title text -->
     <slot name="wgu-tb-after-title"></slot>
@@ -59,10 +59,12 @@ import HelpWinToggleButton from './helpwin/ToggleButton'
 import MeasureToolToggleButton from './measuretool/ToggleButton'
 import InfoClickButton from './infoclick/ToggleButton'
 import ZoomToMaxExtentButton from './maxextentbutton/ZoomToMaxExtentButton'
+import Geocoder from './geocoder/Geocoder'
 
 export default {
   name: 'wgu-app-header',
   components: {
+    'wgu-geocoder-btn': Geocoder,
     'wgu-zoomtomaxextent-btn': ZoomToMaxExtentButton,
     'wgu-layerlist-btn': LayerListToggleButton,
     'wgu-helpwin-btn': HelpWinToggleButton,
