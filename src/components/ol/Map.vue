@@ -115,7 +115,8 @@ export default {
           return;
         }
         const selectClick = new SelectInteraction({
-          layers: [layer]
+          layers: [layer],
+          style: layer.get('styleSelected') || undefined
         });
         // forward an event if feature selection changes
         selectClick.on('select', function (evt) {
