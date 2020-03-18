@@ -81,7 +81,7 @@
       'wgu-layerlist-win': LayerListWin,
       'wgu-infoclick-win': InfoClickWin,
       'wgu-maploading-status': MapLoadingStatus,
-      'wgu-feature-info-window-win': FeatureInfoWindow
+      'wgu-feature-info-window-win': FeatureInfoWindow,
       'wgu-routing-panel': RoutingPanel
     },
     data () {

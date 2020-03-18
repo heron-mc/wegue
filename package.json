@@ -19,6 +19,7 @@
     "init:app": "node util/init-app.js"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "ol": "6.2.1",
     "proj4": "2.5.0",
     "vue": "2.6.11",
