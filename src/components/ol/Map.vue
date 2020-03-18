@@ -120,8 +120,6 @@ export default {
       this.permalinkController.setup();
     }
     window.map = this.map; //TODO remove
-    const layers = await me.createLayers();
-    me.map.getLayers().extend(layers);
   },
 
   methods: {
