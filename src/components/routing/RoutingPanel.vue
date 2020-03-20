@@ -11,12 +11,19 @@
                   :items="transportModes"
                   v-model="transportMode"
                   label="Mode"
-                ></v-select>
+                ></v-select>                
                 <v-select
                   :items="routeTargets"
                   v-model="from"
                   label="From"
                 ></v-select>
+                <v-select v-for="(waypoint, i) in waypoints"
+                  :items="routeTargets"
+                  v-model="waypoints[i]"
+                  label="via"
+                ></v-select>
+                <v-btn color="primary" flat small v-if="from && to && (waypoints.length === 0 || waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">Add stop</v-btn>
+                <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
                 <v-select
                   :items="routeTargets"
                   v-model="to"
@@ -28,8 +35,16 @@
                     v-model="timeMode"
                     label="Select time"
                   ></v-select>
-                  <v-time-picker v-model="time" v-if="timeMode">
-                  </v-time-picker>
+                  <v-text-field 
+                    mask="time" 
+                    v-model="rawTime" 
+                    :label="timeMode === 'arrival' ? 'Arrival time': 'Departure time'">
+                  </v-text-field>
+                  <div v-if="timeIsInvalid && rawTime.length > 2">
+                    <v-icon color="red lighten-1">error</v-icon>
+                    Time is not valid
+                  </div>
+                  <!-- <v-time-picker v-model="time" v-if="timeMode"> </v-time-picker> -->
 
                 </div>
                 <!-- <v-text-field
@@ -41,14 +56,14 @@
                     label="End"
                 /> -->
                 <v-container justify-center="true">
-                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && (transportMode === 'car' || true || time)">
+                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !timeIsInvalid && (transportMode === 'car' || dev || time)">
                     Get directions
                   </v-btn>
                 </v-container>
                 <!-- <v-simple-table v-show="instructions">
                   <template v-slot:default> -->
                     <!-- <div> {{ errorMessage }}</div> -->
-                <v-alert :value="errorMessage" outline type="error" >
+                <v-alert :value="errorMessage" outline type="error" class="ma-3">
                   {{ errorMessage }}
                 </v-alert>
                 <div v-if="actions" id="actions">
@@ -66,6 +81,10 @@
                       <tr>
                         <th>Time:</th>
                         <td>{{ publicTransportDuration }}</td>
+                      </tr>
+                      <tr v-if="publicTransportStartTime">
+                        <th>Start:</th>
+                        <td>{{ publicTransportStartTime }}</td>
                       </tr>
                       <tr>
                         <th>Distance:</th>
@@ -123,6 +142,7 @@ export default {
       routeTargets: undefined,
       from: undefined,
       to: undefined,
+      waypoints: [],
       publicTransportLegs: undefined,
       publicTransportRoute: undefined,
       transportMode: 'publicTransport',
@@ -135,8 +155,10 @@ export default {
       }],
       timeMode: undefined,
       timeModes: [{ text: 'Arrive by', value: 'arrival' }, { text: 'Depart at', value: 'departure' }],
+      rawTime: '',
       time: undefined,
-      errorMessage: undefined
+      errorMessage: undefined,
+      dev: location.hash.match(/dev/)
     }
   },
   async mounted () {
@@ -161,6 +183,12 @@ export default {
     },
     publicTransportDistance () {
       return this.publicTransportRoute && `${Math.round(this.publicTransportRoute.summary.distance * 10 / 1000) / 10} km`;
+    },
+    publicTransportStartTime () {
+      return this.publicTransportRoute && this.publicTransportRoute.summary.departure.slice(11, 19);
+    },
+    timeIsInvalid () {
+      return this.rawTime.length <= 2 || !(Number(this.rawTime.slice(0, 2)) < 24 && Number(this.rawTime.slice(2, 4)) < 60);
     }
   },
   watch: {
@@ -168,6 +196,9 @@ export default {
       this.actions = undefined;
       this.publicTransportLegs = undefined;
       this.publicTransportRoute = undefined;
+    },
+    rawTime () {
+      this.time = this.rawTime.slice(0, 2) + ':' + this.rawTime.slice(-2);
     }
   },
   methods: {
@@ -218,11 +249,19 @@ export default {
           const date = `${now.getFullYear()}-${('0' + (now.getMonth() + 1)).slice(-2)}-${('0' + (now.getDay() + 1)).slice([-2])}`;
           timeParam = {[this.timeMode]: `${date}T${this.time}:00`};
         }
+        const toGeo = point => `geo!${point.geometry.coordinates[1]},${point.geometry.coordinates[0]}`;
+        const waypointParams = {
+          waypoint0: toGeo(this.from)
+        };
+        this.waypoints.forEach((waypoint, i) => {
+          waypointParams[`waypoint${i + 1}`] = toGeo(waypoint)
+        });
+        waypointParams[`waypoint${this.waypoints.length + 1}`] = toGeo(this.to);
+
         result = await axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
           params: {
             apiKey: hereApiKey,
-            waypoint0: `geo!${this.from.geometry.coordinates[1]},${this.from.geometry.coordinates[0]}`,
-            waypoint1: `geo!${this.to.geometry.coordinates[1]},${this.to.geometry.coordinates[0]}`,
+            ...waypointParams,
             mode: this.time ? 'fastest;publicTransportTimeTable' : 'fastest;publicTransport',
             lineattributes: 'all',
             maneuverattributes: 'all',
@@ -322,6 +361,11 @@ function polylineToGeoJSON (polyline) {
   color: #555;
   vertical-align: top;
   font-style:italic;
+}
+
+.selected-time {
+  font-size:16px;
+  padding:6px 10px;
 }
 
 </style>
