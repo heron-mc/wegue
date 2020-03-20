@@ -24,7 +24,7 @@
                 ></v-select>
                 <div v-if="transportMode === 'publicTransport'">
                   <v-select
-                    :items="[{ text: 'Arrive by', value:'arrive' }, { text: 'Depart at', value: 'depart' }]"
+                    :items="timeModes"
                     v-model="timeMode"
                     label="Select time"
                   ></v-select>
@@ -62,34 +62,27 @@
                 </div>
                 <div v-if="publicTransportLegs">
                   <h2>Public transport directions</h2>
-                    <v-list>
-                      <v-list-tile>
-                        <v-list-tile-content class="bold">Time:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ publicTransportDuration }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="bold">Distance:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ publicTransportDistance }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="bold" style="min-width:4em">Routes:</v-list-tile-content>
-                        <v-list-tile-content class="">
-                          <!-- <v-card> -->
-                          <div style="padding:1em; text-align:right">
-                            <span v-for="line of publicTransportRoute.publicTransportLine">
-                            <!-- <v-chip label outline v-for="line of publicTransportRoute.publicTransportLine"> -->
-                              {{ line.lineName }} 
-                            </span>                           
-                          </div>
-                          <!-- </v-card> -->
-                        </v-list-tile-content>
-                      </v-list-tile>
-                    </v-list>
+                    <table class="route-summary">
+                      <tr>
+                        <th>Time:</th>
+                        <td>{{ publicTransportDuration }}</td>
+                      </tr>
+                      <tr>
+                        <th>Distance:</th>
+                        <td>{{ publicTransportDistance }}</td>
+                      </tr>
+                      <tr>
+                        <th>Routes:</th>
+                        <td>{{ publicTransportRoute.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
+                      </tr>
+                    </table>
+                          
                   <h3>Instructions</h3>
                   <div v-for="leg of publicTransportLegs">
                     <table id="maneuvers">
                       <!-- <h4>Start: {{ leg.start.label }}</h4> -->
                       <tr v-for="maneuver of leg.maneuver">
+                        <td class="time" v-if="maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
                         <td v-html="maneuver.instruction">{{maneuver.instruction}}</td>
                       </tr>
                     </table>
@@ -132,7 +125,7 @@ export default {
       to: undefined,
       publicTransportLegs: undefined,
       publicTransportRoute: undefined,
-      transportMode: 'car',
+      transportMode: 'publicTransport',
       transportModes: [{
         text: 'Car',
         value: 'car'
@@ -141,6 +134,7 @@ export default {
         value: 'publicTransport'
       }],
       timeMode: undefined,
+      timeModes: [{ text: 'Arrive by', value: 'arrival' }, { text: 'Depart at', value: 'departure' }],
       time: undefined,
       errorMessage: undefined
     }
@@ -151,6 +145,11 @@ export default {
     const pois = (await axios.get('http://staging.nplh.geolicious.de/api/poi_features/1')).data;
     console.log(pois);
     this.routeTargets = pois.features.map(poi => ({ text: poi.properties.name, value: poi }));
+    if (window.location.hash.match(/dev/)) {
+      this.from = pois.features[4];
+      console.log(this.from, pois.features);
+      this.to = pois.features[5];
+    }
     window.RoutingPanel = this;
   },
   computed: {
@@ -216,21 +215,21 @@ export default {
         let timeParam = {};
         if (this.time) {
           const now = (new Date());
-          const date = `${now.getYear() + 1900}-${now.getMonth() + 1}-${now.getDay() + 1}`;
-          timeParam = {[this.timeMode]: `${date}T${this.time}`};
+          const date = `${now.getFullYear()}-${('0' + (now.getMonth() + 1)).slice(-2)}-${('0' + (now.getDay() + 1)).slice([-2])}`;
+          timeParam = {[this.timeMode]: `${date}T${this.time}:00`};
         }
         result = await axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
           params: {
             apiKey: hereApiKey,
             waypoint0: `geo!${this.from.geometry.coordinates[1]},${this.from.geometry.coordinates[0]}`,
             waypoint1: `geo!${this.to.geometry.coordinates[1]},${this.to.geometry.coordinates[0]}`,
-            mode: 'fastest;publicTransport',
+            mode: this.time ? 'fastest;publicTransportTimeTable' : 'fastest;publicTransport',
             lineattributes: 'all',
             maneuverattributes: 'all',
             routeattributes: 'all',
             combineChange: true, // avoid separate "enter" and "leave" steps for interchanges
-            ...timeParam,
-            language: 'de-de'
+            ...timeParam
+            // language: 'de-de'
             // consider using maneuver groups (routeAttributes=group?)
           }
         });
@@ -241,7 +240,9 @@ export default {
         } else {
           this.errorMessage = 'Sorry, we can\'t provide directions at this time.'
         }
-        console.log(e.response);
+        if (e.response && e.response.data && e.response.data.details) {
+          console.log(e.response.data.details, e.response.data.additionalData);
+        }
         window.e = e;
         return;
       }
@@ -307,6 +308,20 @@ function polylineToGeoJSON (polyline) {
 
 .bold {
   font-weight: bold;
+}
+
+.route-summary th {
+  text-align: right;
+}
+.route-summary th,
+.route-summary td {
+  padding:0.5em;
+}
+
+.time {
+  color: #555;
+  vertical-align: top;
+  font-style:italic;
 }
 
 </style>
