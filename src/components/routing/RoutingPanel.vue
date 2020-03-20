@@ -24,7 +24,7 @@
                 ></v-select>
                 <div v-if="transportMode === 'publicTransport'">
                   <v-select
-                    :items="[{ label: 'Arrive by', value:'arrive' }, { label: 'Depart at', value: 'depart' }]"
+                    :items="[{ text: 'Arrive by', value:'arrive' }, { text: 'Depart at', value: 'depart' }]"
                     v-model="timeMode"
                     label="Select time"
                   ></v-select>
