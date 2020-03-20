@@ -24,7 +24,7 @@
                 ></v-select>
                 <div v-if="transportMode === 'publicTransport'">
                   <v-select
-                    :items="['Arrive by', 'Depart at']"
+                    :items="[{ label: 'Arrive by', value:'arrive' }, { label: 'Depart at', value: 'depart' }]"
                     v-model="timeMode"
                     label="Select time"
                   ></v-select>
@@ -40,11 +40,17 @@
                     v-model="end"
                     label="End"
                 /> -->
-                <v-btn color="primary" @click="search" v-if="from && to && (transportMode === 'car' || time)">
-                  Get directions
+                <v-container justify-center="true">
+                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && (transportMode === 'car' || true || time)">
+                    Get directions
                   </v-btn>
+                </v-container>
                 <!-- <v-simple-table v-show="instructions">
                   <template v-slot:default> -->
+                    <!-- <div> {{ errorMessage }}</div> -->
+                <v-alert :value="errorMessage" outline type="error" >
+                  {{ errorMessage }}
+                </v-alert>
                 <div v-if="actions" id="actions">
                   <h2>Driving directions</h2>
 
@@ -56,10 +62,30 @@
                 </div>
                 <div v-if="publicTransportLegs">
                   <h2>Public transport directions</h2>
-
-                    Routes:
-                    <span v-for="line of publicTransportRoute.publicTransportLine"> {{ line.lineName }} </span>
-
+                    <v-list>
+                      <v-list-tile>
+                        <v-list-tile-content class="bold">Time:</v-list-tile-content>
+                        <v-list-tile-content class="align-end">{{ publicTransportDuration }}</v-list-tile-content>
+                      </v-list-tile>
+                      <v-list-tile>
+                        <v-list-tile-content class="bold">Distance:</v-list-tile-content>
+                        <v-list-tile-content class="align-end">{{ publicTransportDistance }}</v-list-tile-content>
+                      </v-list-tile>
+                      <v-list-tile>
+                        <v-list-tile-content class="bold" style="min-width:4em">Routes:</v-list-tile-content>
+                        <v-list-tile-content class="">
+                          <!-- <v-card> -->
+                          <div style="padding:1em; text-align:right">
+                            <span v-for="line of publicTransportRoute.publicTransportLine">
+                            <!-- <v-chip label outline v-for="line of publicTransportRoute.publicTransportLine"> -->
+                              {{ line.lineName }} 
+                            </span>                           
+                          </div>
+                          <!-- </v-card> -->
+                        </v-list-tile-content>
+                      </v-list-tile>
+                    </v-list>
+                  <h3>Instructions</h3>
                   <div v-for="leg of publicTransportLegs">
                     <table id="maneuvers">
                       <!-- <h4>Start: {{ leg.start.label }}</h4> -->
@@ -87,6 +113,7 @@ import axios from 'axios';
 // import flexpolyline from 'flexpolyline/javascript';
 import flexpolyline from './flexpolyline';
 import { WguEventBus } from '../../WguEventBus.js';
+import humanizeDuration from 'humanize-duration';
 
 export default {
   name: 'wgu-routing-panel',
@@ -114,7 +141,8 @@ export default {
         value: 'publicTransport'
       }],
       timeMode: undefined,
-      time: undefined
+      time: undefined,
+      errorMessage: undefined
     }
   },
   async mounted () {
@@ -128,6 +156,12 @@ export default {
   computed: {
     everything () {
       return this.from + this.to + this.transportMode + this.timeMode + this.time + Date.now();
+    },
+    publicTransportDuration () {
+      return this.publicTransportRoute && humanizeDuration(this.publicTransportRoute.summary.baseTime * 1000, { round: true, units: ['h', 'm'] });
+    },
+    publicTransportDistance () {
+      return this.publicTransportRoute && `${Math.round(this.publicTransportRoute.summary.distance * 10 / 1000) / 10} km`;
     }
   },
   watch: {
@@ -141,6 +175,7 @@ export default {
     async search () {
       this.publicTransportLegs = undefined;
       this.actions = undefined;
+      this.errorMessage = undefined;
       if (this.transportMode === 'car') {
         return this.getCarDirections();
       } else if (this.transportMode === 'publicTransport') {
@@ -176,19 +211,40 @@ export default {
     },
     async getPublicTransportDirections () {
       // test: from Hamboern to Allee Timmerloh
-      const result = await axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
-        params: {
-          apiKey: hereApiKey,
-          waypoint0: `geo!${this.from.geometry.coordinates[1]},${this.from.geometry.coordinates[0]}`,
-          waypoint1: `geo!${this.to.geometry.coordinates[1]},${this.to.geometry.coordinates[0]}`,
-          mode: 'fastest;publicTransport',
-          lineattributes: 'all',
-          maneuverattributes: 'all',
-          routeattributes: 'all',
-          combineChange: true // avoid separate "enter" and "leave" steps for interchanges
-          // consider using maneuver groups (routeAttributes=group?)
+      let result;
+      try {
+        let timeParam = {};
+        if (this.time) {
+          const now = (new Date());
+          const date = `${now.getYear() + 1900}-${now.getMonth() + 1}-${now.getDay() + 1}`;
+          timeParam = {[this.timeMode]: `${date}T${this.time}`};
         }
-      });
+        result = await axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
+          params: {
+            apiKey: hereApiKey,
+            waypoint0: `geo!${this.from.geometry.coordinates[1]},${this.from.geometry.coordinates[0]}`,
+            waypoint1: `geo!${this.to.geometry.coordinates[1]},${this.to.geometry.coordinates[0]}`,
+            mode: 'fastest;publicTransport',
+            lineattributes: 'all',
+            maneuverattributes: 'all',
+            routeattributes: 'all',
+            combineChange: true, // avoid separate "enter" and "leave" steps for interchanges
+            ...timeParam,
+            language: 'de-de'
+            // consider using maneuver groups (routeAttributes=group?)
+          }
+        });
+      } catch (e) {
+        console.log(e.response, e.response.status, e.response.responseText, e.response.data.subtype);
+        if (e.response && e.response.status === 400 && e.response.data.subtype === 'NoRouteFound') {
+          this.errorMessage = 'No public transport route was found.';
+        } else {
+          this.errorMessage = 'Sorry, we can\'t provide directions at this time.'
+        }
+        console.log(e.response);
+        window.e = e;
+        return;
+      }
       const route = result.data.response.route[0];
       this.publicTransportLegs = route.leg;
       this.publicTransportRoute = route;
@@ -249,5 +305,8 @@ function polylineToGeoJSON (polyline) {
   font-weight:bold;
 }
 
+.bold {
+  font-weight: bold;
+}
 
 </style>

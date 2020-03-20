@@ -123,6 +123,10 @@
           "imageWidth": 360
         }
       ]
+    },
+    "wgu-routing": {
+      "transportModes": ["car", "publicTransport"]
+
     }
   }
 
