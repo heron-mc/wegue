@@ -4,7 +4,7 @@
         v-model="drawer"
         absolute
     >
-        <v-card>
+        <v-card class="pa-2">
             
             <v-form v-if="routeTargets">
                 <v-select
@@ -36,7 +36,7 @@
                     label="Select time"
                   ></v-select>
                   <v-text-field 
-                    mask="time" 
+                    mask="time"  
                     v-model="rawTime" 
                     :label="timeMode === 'arrival' ? 'Arrival time': 'Departure time'">
                   </v-text-field>
@@ -56,7 +56,7 @@
                     label="End"
                 /> -->
                 <v-container justify-center="true">
-                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !timeIsInvalid && (transportMode === 'car' || dev || time)">
+                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(rawTime && timeIsInvalid) && (transportMode === 'car' || dev || time)">
                     Get directions
                   </v-btn>
                 </v-container>
@@ -315,7 +315,8 @@ export default {
         stopsGeometry: {
           type: 'FeatureCollection',
           features: stops
-        }
+        },
+        boundingBox: [route.boundingBox.topLeft.longitude, route.boundingBox.bottomRight.latitude, route.boundingBox.bottomRight.longitude, route.boundingBox.topLeft.latitude]
       });
     }
   }

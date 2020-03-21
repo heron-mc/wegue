@@ -2,6 +2,7 @@ import { WguEventBus } from '../../WguEventBus.js';
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import GeoJSON from 'ol/format/GeoJSON';
+import LineString from 'ol/geom/LineString';
 // import Feature from 'ol/Feature';
 // import LineString from 'ol/geom/LineString';
 import { Style, Stroke, RegularShape, Fill, Text } from 'ol/style';
@@ -9,46 +10,12 @@ export function routingLayers (routingOptions, map) {
   if (!routingOptions) {
     return;
   }
-  const startSource = new VectorSource({ });
-  const startLayer = new VectorLayer({
-    name: 'route-start',
-    displayInLayerList: false,
-    style: new Style({
-      image: new RegularShape({
-        fill: new Fill({ color: 'green' }),
-        stroke: new Stroke({ color: 'black', width: 2 }),
-        points: 5,
-        radius: 10,
-        radius2: 4,
-        angle: 0
-      })
-    }),
-    source: startSource
-  });
-  const endSource = new VectorSource({ });
-  const endLayer = new VectorLayer({
-    name: 'route-end',
-    displayInLayerList: false,
-    style: new Style({
-      image: new RegularShape({
-        fill: new Fill({ color: 'red' }),
-        stroke: new Stroke({ color: 'black', width: 2 }),
-        points: 5,
-        radius: 10,
-        radius2: 4,
-        angle: 0
-      })
-    }),
-    source: endSource
-  });
-
   const stopsSource = new VectorSource({ });
   const labelStyle = new Style({
     text: new Text({
       font: 'bold 14px "Open Sans", "Arial Unicode MS", "sans-serif"',
       textAlign: 'left',
       offsetX: 10,
-      // placement: point?
       fill: new Fill({
         color: 'white'
       }),
@@ -74,9 +41,60 @@ export function routingLayers (routingOptions, map) {
     displayInLayerList: false,
     style: feature => {
       labelStyle.getText().setText(feature.get('name'));
-      return [stopStyle, labelStyle];
+      return [stopStyle]; // /* , labelStyle */
     },
     source: stopsSource
+  });
+  const endpointLabelStyle = new Style({
+    text: new Text({
+      font: 'bold 18px "Open Sans", "Arial Unicode MS", "sans-serif"',
+      // offsetY: -15,
+      textAlign: 'left',
+      offsetX: 12,
+      fill: new Fill({
+        color: 'white'
+      }),
+      stroke: new Stroke({
+        color: 'black',
+        width: 2
+      })
+    })
+  });
+  const startSource = new VectorSource({ });
+  const startLayer = new VectorLayer({
+    name: 'route-start',
+    displayInLayerList: false,
+    style: feature => [
+      new Style({
+        image: new RegularShape({
+          fill: new Fill({ color: 'hsl(120,80%,40%)' }),
+          stroke: new Stroke({ color: 'black', width: 2 }),
+          points: 40,
+          radius: 10,
+          angle: 3.14159 / 4
+        })
+      }),
+      (endpointLabelStyle.getText().setText('Start'), endpointLabelStyle)
+    ],
+    source: startSource
+  });
+  const endSource = new VectorSource({ });
+  const endLayer = new VectorLayer({
+    name: 'route-end',
+    displayInLayerList: false,
+    source: endSource,
+    style: feature => [
+      new Style({
+        image: new RegularShape({
+          fill: new Fill({ color: 'hsl(0,80%,40%)' }),
+          stroke: new Stroke({ color: 'black', width: 2 }),
+          points: 4,
+          radius: 12,
+          angle: 3.14159 / 4
+        })
+      }),
+      (endpointLabelStyle.getText().setText('Finish'), endpointLabelStyle)
+    ]
   });
 
   const routeSource = new VectorSource({ });
@@ -109,7 +127,8 @@ export function routingLayers (routingOptions, map) {
     routeGeometry,
     startGeometry,
     endGeometry,
-    stopsGeometry
+    stopsGeometry,
+    boundingBox
   }) => {
     const featureProjection = map.getView().getProjection();
     const geojson = (new GeoJSON({ featureProjection }));
@@ -128,6 +147,14 @@ export function routingLayers (routingOptions, map) {
       console.log(stopsGeometry);
       stopsSource.addFeatures(geojson.readFeatures(stopsGeometry));
     }
+    if (boundingBox) {
+      // map.zoomToExtent(new OpenLayers.Bounds(...boundingBox).transform('EPSG:4326', featureProjection);
+      const line = new LineString([[boundingBox[0], boundingBox[1]], [boundingBox[2], boundingBox[3]]]);
+      map.getView().fit(line.transform('EPSG:4326', featureProjection), {
+        padding: [50, 80, 80, 350],
+        maxZoom: 14
+      });
+    }
   });
-  return [routeLayer, startLayer, endLayer, stopsLayer];
+  return [routeLayer, stopsLayer, startLayer, endLayer];
 }
