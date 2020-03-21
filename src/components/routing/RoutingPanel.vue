@@ -78,7 +78,7 @@
                   </table>
                 </div>
                 <div v-if="publicTransportLegs">
-                  <h2>Public transport directions</h2>
+                  <h2>{{ responseTransportMode }} directions</h2>
                     <table class="route-summary">
                       <tr>
                         <th>Time:</th>
@@ -92,7 +92,7 @@
                         <th>Distance:</th>
                         <td>{{ publicTransportDistance }}</td>
                       </tr>
-                      <tr>
+                      <tr v-if="publicTransportRoute.publicTransportLine">
                         <th>Routes:</th>
                         <td>{{ publicTransportRoute.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
                       </tr>
@@ -103,7 +103,8 @@
                     <table id="maneuvers">
                       <!-- <h4>Start: {{ leg.start.label }}</h4> -->
                       <tr v-for="maneuver of leg.maneuver">
-                        <td class="time" v-if="maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
+                        <td class="time" v-if="responseTransportMode === 'publicTransportTimeTable' && maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
+                        <td class="time" v-if="responseTransportMode !== 'publicTransportTimeTable' && maneuver.cumulative"> {{ maneuver.cumulative }} </td>
                         <td v-html="maneuver.instruction">{{maneuver.instruction}}</td>
                       </tr>
                     </table>
@@ -147,13 +148,16 @@ export default {
       waypoints: [],
       publicTransportLegs: undefined,
       publicTransportRoute: undefined,
-      transportMode: 'publicTransport',
+      transportMode: 'bicycle',
       transportModes: [{
         text: 'Car',
         value: 'car'
       }, {
         text: 'Public transport',
         value: 'publicTransport'
+      }, {
+        text: 'Bicycle',
+        value: 'bicycle'
       }],
       timeMode: undefined,
       timeModes: [{ text: 'Arrive by', value: 'arrival' }, { text: 'Depart at', value: 'departure' }],
@@ -187,11 +191,19 @@ export default {
       return this.publicTransportRoute && `${Math.round(this.publicTransportRoute.summary.distance * 10 / 1000) / 10} km`;
     },
     publicTransportStartTime () {
-      return this.publicTransportRoute && this.publicTransportRoute.summary.departure.slice(11, 19);
+      return this.publicTransportRoute && this.publicTransportRoute.summary.departure && this.publicTransportRoute.summary.departure.slice(11, 19);
     },
     timeIsInvalid () {
       return this.rawTime.length <= 2 || !(Number(this.rawTime.slice(0, 2)) < 24 && Number(this.rawTime.slice(2, 4)) < 60);
+    },
+    responseTransportMode () {
+      return this.publicTransportRoute && {
+        'publicTransport': 'Public transport',
+        'publicTransportTimeTable': 'Public transport',
+        'bicycle': 'Bicycle'
+      }[this.publicTransportRoute.mode.transportModes[0]]
     }
+
   },
   watch: {
     everything () {
@@ -209,12 +221,12 @@ export default {
       this.actions = undefined;
       this.errorMessage = undefined;
       if (this.transportMode === 'car') {
-        return this.getCarDirections();
-      } else if (this.transportMode === 'publicTransport') {
-        return this.getPublicTransportDirections();
+        return this.getRouteV8();
+      } else /* if (this.transportMode === 'publicTransport') */{
+        return this.getRouteV7();
       }
     },
-    async getCarDirections () {
+    async getRouteV8 () {
       // https://developer.here.com/documentation/routing-api/api-reference-swagger.html
       // https://developer.here.com/documentation/routing/dev_guide/topics/resource-calculate-route.html
       const result = await axios.get(`https://router.hereapi.com/v8/routes`, {
@@ -241,7 +253,7 @@ export default {
       });
       //   await (await fetch(lConf.url)).json()
     },
-    async getPublicTransportDirections () {
+    async getRouteV7 () {
       // test: from Hamboern to Allee Timmerloh
       let result;
       try {
@@ -260,11 +272,12 @@ export default {
         });
         waypointParams[`waypoint${this.waypoints.length + 1}`] = toGeo(this.to);
 
+        const mode = 'fastest;' + (this.transportMode === 'publicTransport' && this.time ? 'publicTransportTimeTable' : this.transportMode);
         result = await axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
           params: {
             apiKey: hereApiKey,
             ...waypointParams,
-            mode: this.time ? 'fastest;publicTransportTimeTable' : 'fastest;publicTransport',
+            mode,
             lineattributes: 'all',
             maneuverattributes: 'all',
             routeattributes: 'all',
@@ -288,11 +301,21 @@ export default {
         return;
       }
       const route = result.data.response.route[0];
+      route.leg.forEach(leg => {
+        let total = 0;
+        for (const maneuver of leg.maneuver) {
+          maneuver.cumulative = `${('0' + Math.floor(total / 3600)).slice(-2)}:${('0' + Math.floor(total / 60) % 60).slice(-2)}`; // humanizeDuration(total * 1000);
+          if (!Number.isFinite(maneuver.baseTime)) {
+            console.log(maneuver.baseTime, maneuver);
+          }
+          total += (maneuver.travelTime || 0);// + (maneuver.waitTime || 0); // (maneuver.baseTime || 0);
+        }
+      });
       this.publicTransportLegs = route.leg;
       this.publicTransportRoute = route;
       console.log(route);
       const stops = [];
-      for (const line of route.publicTransportLine) {
+      for (const line of (route.publicTransportLine || [])) {
         // stops.push(...line.stop.map(stop => [stop.position.longitude, stop.position.latitude])) // add all stops
         stops.push(...[line.stop[0], ...line.stop.slice(-1)].map(stop => ({
           type: 'Feature',
@@ -355,12 +378,18 @@ function polylineToGeoJSON (polyline) {
   font-weight: bold;
 }
 
+.route-summary {
+  margin-bottom:1em;
+}
+
 .route-summary th {
   text-align: right;
 }
-.route-summary th,
+.route-summary th {
+  /* padding: 0.5em 0; */
+}
 .route-summary td {
-  padding:0.5em;
+  padding:0 0.25em;
 }
 
 .time {
