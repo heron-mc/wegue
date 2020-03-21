@@ -12,25 +12,25 @@
                   v-model="transportMode"
                   label="Mode"
                 ></v-select>                
-                <v-select
+                <v-combobox
                   :items="routeTargets"
                   v-model="from"
                   label="From"
-                ></v-select>
-                <v-select v-for="(waypoint, i) in waypoints"
+                ></v-combobox>
+                <v-combobox v-for="(waypoint, i) in waypoints"
                   :items="routeTargets"
                   clearable
                   v-model="waypoints[i]"
                   label="via"
-                ></v-select>
                   @click:clear="clearWaypoint(i)"
+                ></v-combobox>
                 <v-btn color="primary" flat small v-if="from && to && (waypoints.length === 0 || waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">Add stop</v-btn>
                 <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
-                <v-select
+                <v-combobox
                   :items="routeTargets"
                   v-model="to"
                   label="to"
-                ></v-select>
+                ></v-combobox>
                 <div v-if="transportMode === 'publicTransport'">
                   <v-select
                     :items="timeModes"
@@ -170,9 +170,9 @@ export default {
     console.log(pois);
     this.routeTargets = pois.features.map(poi => ({ text: poi.properties.name, value: poi }));
     if (window.location.hash.match(/dev/)) {
-      this.from = pois.features[4];
+      this.from = { text: pois.features[4].properties.name, value: pois.features[4] };
       console.log(this.from, pois.features);
-      this.to = pois.features[5];
+      this.to = { text: pois.features[5].properties.name, value: pois.features[5] };
     }
     window.RoutingPanel = this;
   },
@@ -251,7 +251,7 @@ export default {
           const date = `${now.getFullYear()}-${('0' + (now.getMonth() + 1)).slice(-2)}-${('0' + (now.getDay() + 1)).slice([-2])}`;
           timeParam = {[this.timeMode]: `${date}T${this.time}:00`};
         }
-        const toGeo = point => `geo!${point.geometry.coordinates[1]},${point.geometry.coordinates[0]}`;
+        const toGeo = item => `geo!${item.value.geometry.coordinates[1]},${item.value.geometry.coordinates[0]}`;
         const waypointParams = {
           waypoint0: toGeo(this.from)
         };
