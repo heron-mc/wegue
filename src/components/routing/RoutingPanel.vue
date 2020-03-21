@@ -222,9 +222,8 @@ export default {
       const result = await axios.get(`https://router.hereapi.com/v8/routes`, {
         params: {
           transportMode: 'car',
-          // note lat,lon
-          origin: flip(this.from.geometry.coordinates).join(','), // '53.549,10', // [52.5308, 13.3847].join(','),
-          destination: flip(this.to.geometry.coordinates).join(','), // [52.5323, 13.3789].join(','),
+          origin: flip(this.from.geometry.coordinates).join(','),
+          destination: flip(this.to.geometry.coordinates).join(','),
           return: ['summary', 'polyline', 'instructions', 'actions'].join(','),
           apiKey: hereApiKey
         }
@@ -234,19 +233,15 @@ export default {
       this.actions = route.sections[0].actions
 
       console.log(result.data);
-      console.log();
       const routeGeometry = polylineToGeoJSON(route.sections[0].polyline);
       WguEventBus.$emit('route-update', {
         routeGeometry,
         startGeometry: { type: 'Point', coordinates: routeGeometry.coordinates[0] },
         endGeometry: { type: 'Point', coordinates: routeGeometry.coordinates.slice(-1)[0] }
       });
-      //   await (await fetch(lConf.url)).json()
     },
     async getRouteV7 () {
-      // test: from Hamboern to Allee Timmerloh
-      let result;
-      try {
+      const makeRequest = () => {
         let timeParam = {};
         if (this.time) {
           const now = (new Date());
@@ -263,69 +258,82 @@ export default {
         waypointParams[`waypoint${this.waypoints.length + 1}`] = toGeo(this.to);
 
         const mode = 'fastest;' + (this.transportMode === 'publicTransport' && this.time ? 'publicTransportTimeTable' : this.transportMode);
-        result = await axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
+        return axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
           params: {
             apiKey: hereApiKey,
             ...waypointParams,
             mode,
             lineattributes: 'all',
-            maneuverattributes: 'all',
+            maneuverattributes: 'all', // TODO strip down to the ones we need.
             routeattributes: 'all',
             combineChange: true, // avoid separate "enter" and "leave" steps for interchanges
             ...timeParam
             // language: 'de-de'
-            // consider using maneuver groups (routeAttributes=group?)
           }
         });
-      } catch (e) {
-        console.log(e.response, e.response.status, e.response.responseText, e.response.data.subtype);
-        if (e.response && e.response.status === 400 && e.response.data.subtype === 'NoRouteFound') {
-          this.errorMessage = 'No route was found.';
-        } else {
-          this.errorMessage = 'Sorry, we can\'t provide directions at this time.'
-        }
-        if (e.response && e.response.data && e.response.data.details) {
-          console.log(e.response.data.details, e.response.data.additionalData);
-        }
-        window.e = e;
-        return;
       }
-      const route = result.data.response.route[0];
-      route.leg.forEach(leg => {
+
+      function stopsGeometryFromRoute (route) {
+        const stops = [];
+        for (const line of (route.publicTransportLine || [])) {
+          stops.push(...[line.stop[0], ...line.stop.slice(-1)].map(stop => ({
+            type: 'Feature',
+            properties: {
+              name: stop.stopName
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: [stop.position.longitude, stop.position.latitude]
+            }
+          })));
+        }
+        return {
+          type: 'FeatureCollection',
+          features: stops
+        }
+      }
+
+      function routeGeometryFromRoute (route) {
+        return {
+          type: 'LineString',
+          coordinates: route.shape.map(coordString => flip(coordString.split(',').map(Number)))
+        };
+      }
+
+      function addCumulativeTimes (leg) {
         let total = 0;
         for (const maneuver of leg.maneuver) {
           maneuver.cumulative = `${('0' + Math.floor(total / 3600)).slice(-2)}:${('0' + Math.floor(total / 60) % 60).slice(-2)}`;
           total += (maneuver.travelTime || 0);
         }
-      });
-      this.route = route;
-      console.log(route);
-      const stops = [];
-      for (const line of (route.publicTransportLine || [])) {
-        stops.push(...[line.stop[0], ...line.stop.slice(-1)].map(stop => ({
-          type: 'Feature',
-          properties: {
-            name: stop.stopName
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: [stop.position.longitude, stop.position.latitude]
-          }
-        })));
       }
 
-      const routeGeometry = {
-        type: 'LineString',
-        coordinates: route.shape.map(coordString => flip(coordString.split(',').map(Number)))
-      };
+      let result;
+      try {
+        result = await makeRequest();
+      } catch (e) {
+        console.log(e);
+        console.log(e.response, e.response.status, e.response.responseText, e.response.data.subtype);
+        if (e.response && e.response.status === 400 && e.response.data.subtype === 'NoRouteFound') {
+          this.errorMessage = 'No route was found.';
+        } else {
+          this.errorMessage = 'Sorry, directions are currently unavailable.'
+        }
+        if (e.response && e.response.data && e.response.data.details) {
+          console.log(e.response.data.details, e.response.data.additionalData);
+        }
+        return;
+      }
+      const route = result.data.response.route[0];
+      route.leg.forEach(addCumulativeTimes);
+      this.route = route;
+      console.log(route);
+      const routeGeometry = routeGeometryFromRoute(route);
       WguEventBus.$emit('route-update', {
         routeGeometry,
+        stopsGeometry: stopsGeometryFromRoute(route),
         startGeometry: { type: 'Point', coordinates: routeGeometry.coordinates[0] },
         endGeometry: { type: 'Point', coordinates: routeGeometry.coordinates.slice(-1)[0] },
-        stopsGeometry: {
-          type: 'FeatureCollection',
-          features: stops
-        },
         boundingBox: [route.boundingBox.topLeft.longitude, route.boundingBox.bottomRight.latitude, route.boundingBox.bottomRight.longitude, route.boundingBox.topLeft.latitude]
       });
     },
