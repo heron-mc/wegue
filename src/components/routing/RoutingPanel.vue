@@ -11,11 +11,13 @@
                   :items="transportModes"
                   v-model="transportMode"
                   label="Mode"
+                  outline
                 ></v-select>                
                 <v-select
                   :items="routeTargets"
                   v-model="from"
                   label="From"
+                  solo
                 ></v-select>
                 <v-select v-for="(waypoint, i) in waypoints"
                   :items="routeTargets"
@@ -23,13 +25,18 @@
                   v-model="waypoints[i]"
                   label="via"
                   @click:clear="clearWaypoint(i)"
+                  solo
                 ></v-select>
-                <v-btn color="primary" flat small v-if="from && to && (waypoints.length === 0 || waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">Add stop</v-btn>
+                <v-btn color="primary" flat small 
+                  v-if="from && to && (waypoints.length === 0 || waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
+                  Add stop
+                </v-btn>
                 <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
                 <v-select
                   :items="routeTargets"
                   v-model="to"
                   label="to"
+                  solo
                 ></v-select>
                 <div v-if="transportMode === 'publicTransport'">
                   <v-select
@@ -58,7 +65,7 @@
                     label="End"
                 /> -->
                 <v-container justify-center="true">
-                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(rawTime && timeIsInvalid) && (transportMode === 'car' || dev || time)">
+                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(rawTime && timeIsInvalid) && (transportMode !== 'publicTransport' || dev || time)">
                     Get directions
                   </v-btn>
                 </v-container>
@@ -77,29 +84,29 @@
                     </tr>
                   </table>
                 </div>
-                <div v-if="publicTransportLegs">
+                <div v-if="routeLegs">
                   <h2>{{ responseTransportMode }} directions</h2>
                     <table class="route-summary">
                       <tr>
                         <th>Time:</th>
-                        <td>{{ publicTransportDuration }}</td>
+                        <td>{{ routeDuration }}</td>
                       </tr>
-                      <tr v-if="publicTransportStartTime">
+                      <tr v-if="routeStartTime">
                         <th>Start:</th>
-                        <td>{{ publicTransportStartTime }}</td>
+                        <td>{{ routeStartTime }}</td>
                       </tr>
                       <tr>
                         <th>Distance:</th>
-                        <td>{{ publicTransportDistance }}</td>
+                        <td>{{ routeDistance }}</td>
                       </tr>
-                      <tr v-if="publicTransportRoute.publicTransportLine">
+                      <tr v-if="route.publicTransportLine">
                         <th>Routes:</th>
-                        <td>{{ publicTransportRoute.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
+                        <td>{{ route.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
                       </tr>
                     </table>
                           
                   <h3>Instructions</h3>
-                  <div v-for="leg of publicTransportLegs">
+                  <div v-for="leg of routeLegs">
                     <table id="maneuvers">
                       <!-- <h4>Start: {{ leg.start.label }}</h4> -->
                       <tr v-for="maneuver of leg.maneuver">
@@ -146,8 +153,7 @@ export default {
       from: undefined,
       to: undefined,
       waypoints: [],
-      publicTransportLegs: undefined,
-      publicTransportRoute: undefined,
+      route: undefined,
       transportMode: 'bicycle',
       transportModes: [{
         text: 'Car',
@@ -184,32 +190,34 @@ export default {
     everything () {
       return this.from + this.to + this.transportMode + this.timeMode + this.time + Date.now();
     },
-    publicTransportDuration () {
-      return this.publicTransportRoute && humanizeDuration(this.publicTransportRoute.summary.baseTime * 1000, { round: true, units: ['h', 'm'] });
+    routeDuration () {
+      return this.route && humanizeDuration(this.route.summary.baseTime * 1000, { round: true, units: ['h', 'm'] });
     },
-    publicTransportDistance () {
-      return this.publicTransportRoute && `${Math.round(this.publicTransportRoute.summary.distance * 10 / 1000) / 10} km`;
+    routeDistance () {
+      return this.route && `${Math.round(this.route.summary.distance * 10 / 1000) / 10} km`;
     },
-    publicTransportStartTime () {
-      return this.publicTransportRoute && this.publicTransportRoute.summary.departure && this.publicTransportRoute.summary.departure.slice(11, 19);
+    routeStartTime () {
+      return this.route && this.route.summary.departure && this.route.summary.departure.slice(11, 19);
     },
     timeIsInvalid () {
       return this.rawTime.length <= 2 || !(Number(this.rawTime.slice(0, 2)) < 24 && Number(this.rawTime.slice(2, 4)) < 60);
     },
     responseTransportMode () {
-      return this.publicTransportRoute && {
+      return this.route && {
         'publicTransport': 'Public transport',
         'publicTransportTimeTable': 'Public transport',
         'bicycle': 'Bicycle'
-      }[this.publicTransportRoute.mode.transportModes[0]]
+      }[this.route.mode.transportModes[0]]
+    },
+    routeLegs () {
+      return this.route && this.route.leg;
     }
 
   },
   watch: {
     everything () {
       this.actions = undefined;
-      this.publicTransportLegs = undefined;
-      this.publicTransportRoute = undefined;
+      this.route = undefined;
     },
     rawTime () {
       this.time = this.rawTime.slice(0, 2) + ':' + this.rawTime.slice(-2);
@@ -217,7 +225,6 @@ export default {
   },
   methods: {
     async search () {
-      this.publicTransportLegs = undefined;
       this.actions = undefined;
       this.errorMessage = undefined;
       if (this.transportMode === 'car') {
@@ -290,7 +297,7 @@ export default {
       } catch (e) {
         console.log(e.response, e.response.status, e.response.responseText, e.response.data.subtype);
         if (e.response && e.response.status === 400 && e.response.data.subtype === 'NoRouteFound') {
-          this.errorMessage = 'No public transport route was found.';
+          this.errorMessage = 'No route was found.';
         } else {
           this.errorMessage = 'Sorry, we can\'t provide directions at this time.'
         }
@@ -304,19 +311,14 @@ export default {
       route.leg.forEach(leg => {
         let total = 0;
         for (const maneuver of leg.maneuver) {
-          maneuver.cumulative = `${('0' + Math.floor(total / 3600)).slice(-2)}:${('0' + Math.floor(total / 60) % 60).slice(-2)}`; // humanizeDuration(total * 1000);
-          if (!Number.isFinite(maneuver.baseTime)) {
-            console.log(maneuver.baseTime, maneuver);
-          }
-          total += (maneuver.travelTime || 0);// + (maneuver.waitTime || 0); // (maneuver.baseTime || 0);
+          maneuver.cumulative = `${('0' + Math.floor(total / 3600)).slice(-2)}:${('0' + Math.floor(total / 60) % 60).slice(-2)}`;
+          total += (maneuver.travelTime || 0);
         }
       });
-      this.publicTransportLegs = route.leg;
-      this.publicTransportRoute = route;
+      this.route = route;
       console.log(route);
       const stops = [];
       for (const line of (route.publicTransportLine || [])) {
-        // stops.push(...line.stop.map(stop => [stop.position.longitude, stop.position.latitude])) // add all stops
         stops.push(...[line.stop[0], ...line.stop.slice(-1)].map(stop => ({
           type: 'Feature',
           properties: {
