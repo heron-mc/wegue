@@ -60,6 +60,7 @@ import MeasureToolToggleButton from './measuretool/ToggleButton'
 import InfoClickButton from './infoclick/ToggleButton'
 import ShareButton from './sharebutton/ShareButton'
 import ZoomToMaxExtentButton from './maxextentbutton/ZoomToMaxExtentButton'
+import RoutingToggleButton from './routing/RoutingToggleButton'
 import Geocoder from './geocoder/Geocoder'
 
 export default {
@@ -71,7 +72,8 @@ export default {
     'wgu-layerlist-btn': LayerListToggleButton,
     'wgu-helpwin-btn': HelpWinToggleButton,
     'wgu-measuretool-btn': MeasureToolToggleButton,
-    'wgu-infoclick-btn': InfoClickButton
+    'wgu-infoclick-btn': InfoClickButton,
+    'wgu-routing-btn': RoutingToggleButton
   },
   props: {
     color: {type: String, required: false, default: 'red darken-3'}
@@ -121,6 +123,7 @@ export default {
       const appConfig = Vue.prototype.$appConfig || {};
       const modulesConfs = appConfig.modules || {};
       let moduleWins = [];
+
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
         if (moduleOpts.target === 'toolbar') {

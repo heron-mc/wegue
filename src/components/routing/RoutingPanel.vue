@@ -1,7 +1,8 @@
 /* eslint-disable */
 <template>
     <v-navigation-drawer
-        v-model="drawer"
+        v-model="drawerOpen"
+        hide-overlay
         absolute
     >
         <v-card class="pa-2">
@@ -56,22 +57,11 @@
                   <!-- <v-time-picker v-model="time" v-if="timeMode"> </v-time-picker> -->
 
                 </div>
-                <!-- <v-text-field
-                    v-model="start"
-                    label="Start"
-                />
-                <v-text-field
-                    v-model="end"
-                    label="End"
-                /> -->
                 <v-container justify-center="true">
                   <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(rawTime && timeIsInvalid) && (transportMode !== 'publicTransport' || dev || time)">
                     Get directions
                   </v-btn>
                 </v-container>
-                <!-- <v-simple-table v-show="instructions">
-                  <template v-slot:default> -->
-                    <!-- <div> {{ errorMessage }}</div> -->
                 <v-alert :value="errorMessage" outline type="error" class="ma-3">
                   {{ errorMessage }}
                 </v-alert>
@@ -108,7 +98,6 @@
                   <h3>Instructions</h3>
                   <div v-for="leg of routeLegs">
                     <table id="maneuvers">
-                      <!-- <h4>Start: {{ leg.start.label }}</h4> -->
                       <tr v-for="maneuver of leg.maneuver">
                         <td class="time" v-if="responseTransportMode === 'publicTransportTimeTable' && maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
                         <td class="time" v-if="responseTransportMode !== 'publicTransportTimeTable' && maneuver.cumulative"> {{ maneuver.cumulative }} </td>
@@ -125,14 +114,8 @@
 </template>
 
 <script>
-
-// import { WguEventBus } from '../WguEventBus.js';
-// import { DraggableWin } from '../directives/DraggableWin.js';
-
-// const hereAppID = 'xHdoxVIuQwHUJuGQF47q';
 const hereApiKey = 'x9SeCvwikNOtxoPoDbhI8qhRSWP1Gxmz_op6V7ovguE';
 import axios from 'axios';
-// import flexpolyline from 'flexpolyline/javascript';
 import flexpolyline from './flexpolyline';
 import { WguEventBus } from '../../WguEventBus.js';
 import humanizeDuration from 'humanize-duration';
@@ -145,9 +128,7 @@ export default {
   },
   data () {
     return {
-      drawer: undefined,
-      // start: undefined,
-      // end: undefined,
+      drawerOpen: undefined,
       actions: undefined,
       routeTargets: undefined,
       from: undefined,
@@ -174,7 +155,6 @@ export default {
     }
   },
   async mounted () {
-    // var me = this;
     // TODO integrate this with layer loading
     const pois = (await axios.get('http://staging.nplh.geolicious.de/api/poi_features/1')).data;
     console.log(pois);
@@ -185,6 +165,9 @@ export default {
       this.to = pois.features[5];
     }
     window.RoutingPanel = this;
+    WguEventBus.$on('toggle-routing-panel', state => {
+      this.drawerOpen = state === undefined ? !this.drawerOpen : state;
+    });
   },
   computed: {
     everything () {

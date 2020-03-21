@@ -125,8 +125,10 @@
       ]
     },
     "wgu-routing": {
-      "transportModes": ["car", "publicTransport"]
-
+      "transportModes": ["car", "publicTransport"],
+      "panel": true,
+      "target": "toolbar",
+      "icon": "info"
     }
   }
 
