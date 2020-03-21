@@ -22,8 +22,8 @@
                   clearable
                   v-model="waypoints[i]"
                   label="via"
-                ></v-select>
                   @click:clear="clearWaypoint(i)"
+                ></v-select>
                 <v-btn color="primary" flat small v-if="from && to && (waypoints.length === 0 || waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">Add stop</v-btn>
                 <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
                 <v-select
