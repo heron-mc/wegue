@@ -325,6 +325,8 @@ export default {
         console.log(e.response, e.response.status, e.response.responseText, e.response.data.subtype);
         if (e.response && e.response.status === 400 && e.response.data.subtype === 'NoRouteFound') {
           this.errorMessage = 'No route was found.';
+        } else if (e.response && e.response.data && e.response.data.details === 'Time Table Transit Routing is only supported for two StopOver waypoints') {
+          this.errorMessage = 'Sorry, you can specify a time, or multiple waypoints, but not both.';
         } else {
           this.errorMessage = 'Sorry, directions are currently unavailable.'
         }
