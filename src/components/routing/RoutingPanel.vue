@@ -58,7 +58,7 @@
 
                 </div>
                 <v-container justify-center="true">
-                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(rawTime && timeIsInvalid) && (transportMode !== 'publicTransport' || dev || time)">
+                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(rawTime && timeIsInvalid)">
                     Get directions
                   </v-btn>
                 </v-container>
@@ -102,6 +102,7 @@
                         <td class="time" v-if="responseTransportMode === 'publicTransportTimeTable' && maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
                         <td class="time" v-if="responseTransportMode !== 'publicTransportTimeTable' && maneuver.cumulative"> {{ maneuver.cumulative }} </td>
                         <td v-html="maneuver.instruction">{{maneuver.instruction}}</td>
+                        <td class="changeId" v-if="hasChangeIds"> <span v-if="maneuver.changeId !== undefined">{{ maneuver.changeId }}</span> </td>
                       </tr>
                     </table>
                   </div>
@@ -194,6 +195,9 @@ export default {
     },
     routeLegs () {
       return this.route && this.route.leg;
+    },
+    hasChangeIds () {
+      return this.route && this.routeLegs.find(l => l.maneuver.find(m => m.changeId));
     }
 
   },
@@ -243,7 +247,7 @@ export default {
     async getRouteV7 () {
       const makeRequest = () => {
         let timeParam = {};
-        if (this.time) {
+        if (this.rawTime) {
           const now = (new Date());
           const date = `${now.getFullYear()}-${('0' + (now.getMonth() + 1)).slice(-2)}-${('0' + (now.getDay() + 1)).slice([-2])}`;
           timeParam = {[this.timeMode]: `${date}T${this.time}:00`};
@@ -275,22 +279,26 @@ export default {
 
       function stopsGeometryFromRoute (route) {
         const stops = [];
-        for (const line of (route.publicTransportLine || [])) {
-          stops.push(...[line.stop[0], ...line.stop.slice(-1)].map(stop => ({
+        for (const leg of route.leg) {
+          const newStops = leg.maneuver
+            .filter(m => ['change', 'enter', 'leave'].indexOf(m.action) >= 0);
+          newStops.forEach((m, i) => { m.changeId = i + 1; });
+          stops.push(...newStops);
+        }
+
+        return {
+          type: 'FeatureCollection',
+          features: stops.map(m => ({
             type: 'Feature',
             properties: {
-              name: stop.stopName
+              changeId: m.changeId
             },
             geometry: {
               type: 'Point',
-              coordinates: [stop.position.longitude, stop.position.latitude]
+              coordinates: [m.position.longitude, m.position.latitude]
             }
-          })));
-        }
-        return {
-          type: 'FeatureCollection',
-          features: stops
-        }
+          }))
+        };
       }
 
       function routeGeometryFromRoute (route) {
@@ -394,6 +402,18 @@ function polylineToGeoJSON (polyline) {
 .selected-time {
   font-size:16px;
   padding:6px 10px;
+}
+
+.changeId {
+  vertical-align: top;
+  padding: 0;
+  margin: 0;
+}
+
+.changeId span {
+  border: 1px solid black;
+  padding: 0px 6px;
+  border-radius:40px;
 }
 
 </style>

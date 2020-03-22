@@ -14,14 +14,8 @@ export function routingLayers (routingOptions, map) {
   const labelStyle = new Style({
     text: new Text({
       font: 'bold 14px "Open Sans", "Arial Unicode MS", "sans-serif"',
-      textAlign: 'left',
-      offsetX: 10,
       fill: new Fill({
-        color: 'white'
-      }),
-      stroke: new Stroke({
-        color: 'black',
-        width: 2
+        color: 'black'
       })
     })
   });
@@ -31,8 +25,7 @@ export function routingLayers (routingOptions, map) {
       fill: new Fill({ color: 'white' }),
       stroke: new Stroke({ color: 'black', width: 2 }),
       points: 20,
-      radius: 8,
-      // radius2: 10,
+      radius: 10,
       angle: 0
     })
   });
@@ -40,8 +33,9 @@ export function routingLayers (routingOptions, map) {
     name: 'route-stops',
     displayInLayerList: false,
     style: feature => {
-      labelStyle.getText().setText(feature.get('name'));
-      return [stopStyle]; // /* , labelStyle */
+      labelStyle.getText().setText('' + feature.get('changeId'));
+      // return [stopStyle]; // /* , labelStyle */
+      return [stopStyle, labelStyle];
     },
     source: stopsSource
   });
