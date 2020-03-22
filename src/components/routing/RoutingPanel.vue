@@ -214,6 +214,7 @@ export default {
     async search () {
       this.actions = undefined;
       this.errorMessage = undefined;
+      this.route = undefined;
       if (this.transportMode === 'car') {
         return this.getRouteV8();
       } else /* if (this.transportMode === 'publicTransport') */{
