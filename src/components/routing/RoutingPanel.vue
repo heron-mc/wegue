@@ -21,6 +21,7 @@
                   solo
                 ></v-select>
                 <v-select v-for="(waypoint, i) in waypoints"
+                  :key="i"
                   :items="routeTargets"
                   clearable
                   v-model="waypoints[i]"
