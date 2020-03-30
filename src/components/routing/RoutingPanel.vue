@@ -79,7 +79,7 @@
 
                   <v-date-picker 
                     v-if="timeMode && travelDay !== 'Today'"
-                    v-model="date"
+                    v-model="rawDate"
                     label="Date"
 
                   ></v-date-picker>
@@ -112,7 +112,7 @@
                       </tr>
                       <tr v-if="routeStartTime">
                         <th>Start:</th>
-                        <td>{{ routeStartTime }}</td>
+                        <td>{{ routeStartDate }} {{ routeStartTime }}</td>
                       </tr>
                       <tr>
                         <th>Distance:</th>
@@ -152,6 +152,10 @@ import humanizeDuration from 'humanize-duration';
 // Note: you must create this file, following the format of routingConfig.js.example
 import routingConfig from './routingConfig.js';
 
+function pad2 (x) {
+  return ('0' + x).slice(-2);
+}
+
 export default {
   name: 'wgu-routing-panel',
   directives: {
@@ -187,7 +191,7 @@ export default {
       hour: undefined,
       minute: undefined,
       travelDay: 'Today',
-      date: undefined
+      rawDate: undefined
     }
   },
   created () {
@@ -195,7 +199,7 @@ export default {
       this.hourItems.push(i);
     }
     for (let i = 0; i < 60; i++) {
-      this.minuteItems.push(('0' + i).slice(-2));
+      this.minuteItems.push(pad2(i));
     }
   },
   async mounted () {
@@ -214,6 +218,16 @@ export default {
     },
     routeDistance () {
       return this.route && `${Math.round(this.route.summary.distance * 10 / 1000) / 10} km`;
+    },
+    routeStartDate () {
+      if (!this.isDateSpecified) {
+        return '';
+      }
+      if (!this.route || !this.route.summary.departure) {
+        return '';
+      }
+      const date = new Date(this.route.summary.departure.slice(0, 10));
+      return `${pad2(date.getDate() + 1)}.${pad2(date.getMonth() + 1)}.${date.getFullYear()}`;
     },
     routeStartTime () {
       return this.route && this.route.summary.departure && this.route.summary.departure.slice(11, 19);
@@ -235,12 +249,22 @@ export default {
       return this.route && this.routeLegs.find(l => l.maneuver.find(m => m.changeId));
     },
     time () {
-      if (!this.hour || !this.minute) {
+      if (this.hour === undefined || this.minute === undefined) {
         return undefined;
       }
-      return ('0' + this.hour).slice(-2) + ':' + ('0' + this.minute).slice(-2);
+      return ('0' + this.hour).slice(-2) + ':' + pad2(this.minute);
+    },
+    date () {
+      if (!this.isDateSpecified) {
+        const now = (new Date());
+        const todayDate = `${now.getFullYear()}-${pad2(now.getMonth())}-${pad2(now.getDay() + 1)}`;
+        return todayDate;
+      }
+      return this.rawDate;
+    },
+    isDateSpecified () {
+      return this.travelDay !== 'Today' && this.rawDate;
     }
-
   },
   watch: {
     everything () {
@@ -297,9 +321,7 @@ export default {
       const makeRequest = () => {
         let timeParam = {};
         if (this.time) {
-          const now = (new Date());
-          const date = `${now.getFullYear()}-${('0' + (now.getMonth() + 1)).slice(-2)}-${('0' + (now.getDay() + 1)).slice([-2])}`;
-          timeParam = {[this.timeMode]: `${date}T${this.time}:00`};
+          timeParam = {[this.timeMode]: `${this.date}T${this.time}:00`};
         }
         const toGeo = point => `geo!${point.geometry.coordinates[1]},${point.geometry.coordinates[0]}`;
         const waypointParams = {
@@ -360,7 +382,7 @@ export default {
       function addCumulativeTimes (leg) {
         let total = 0;
         for (const maneuver of leg.maneuver) {
-          maneuver.cumulative = `${('0' + Math.floor(total / 3600)).slice(-2)}:${('0' + Math.floor(total / 60) % 60).slice(-2)}`;
+          maneuver.cumulative = `${pad2(Math.floor(total / 3600))}:${pad2(Math.floor(total / 60) % 60)}`;
           total += (maneuver.travelTime || 0);
         }
       }
