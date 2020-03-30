@@ -6,7 +6,6 @@
         absolute
     >
         <v-card class="pa-2">
-            
             <v-form v-if="routeTargets">
                 <v-select
                   :items="transportModes"
@@ -16,6 +15,7 @@
                 ></v-select>                
                 <v-select
                   :items="routeTargets"
+                  :disabled="routeTargets.length < 1"
                   v-model="from"
                   label="From"
                   solo
@@ -23,6 +23,7 @@
                 <v-select v-for="(waypoint, i) in waypoints"
                   :key="i"
                   :items="routeTargets"
+                  :disabled="routeTargets.length < 1"
                   clearable
                   v-model="waypoints[i]"
                   label="via"
@@ -36,30 +37,42 @@
                 <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
                 <v-select
                   :items="routeTargets"
+                  :disabled="routeTargets.length < 1"
                   v-model="to"
                   label="to"
                   solo
                 ></v-select>
-                <div v-if="transportMode === 'publicTransport'">
+                <div v-if="transportMode === 'publicTransport' && from && to">
                   <v-select
                     :items="timeModes"
                     v-model="timeMode"
-                    label="Select time"
+                    label="Select arrival or departure"
                   ></v-select>
-                  <v-text-field 
-                    mask="time"  
-                    v-model="rawTime" 
-                    :label="timeMode === 'arrival' ? 'Arrival time': 'Departure time'">
-                  </v-text-field>
-                  <div v-if="timeIsInvalid && rawTime.length > 2">
-                    <v-icon color="red lighten-1">error</v-icon>
-                    Time is not valid
-                  </div>
-                  <!-- <v-time-picker v-model="time" v-if="timeMode"> </v-time-picker> -->
+                  <v-layout row v-if="timeMode">
+                    <v-flex col xs3>
+                      <v-autocomplete
+                        id="hour"
+                        style="text-align: right"
+                        v-model="hour"
+                        label="Hour"
+                        :items="hourItems"
+                      ></v-autocomplete>
+                    </v-flex>
+                    <v-flex col xs1 class="colon">
+                    :
+                    </v-flex>
+                    <v-flex col xs3>
+                      <v-autocomplete
+                        v-model="minute"
+                        label="Minute"
+                        :items="minuteItems"
+                      ></v-autocomplete>
+                    </v-flex>
+                  </v-layout>
 
                 </div>
                 <v-container justify-center="true">
-                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(rawTime && timeIsInvalid)">
+                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(time && timeIsInvalid)">
                     Get directions
                   </v-btn>
                 </v-container>
@@ -152,10 +165,20 @@ export default {
       }],
       timeMode: undefined,
       timeModes: [{ text: 'Arrive by', value: 'arrival' }, { text: 'Depart at', value: 'departure' }],
-      rawTime: '',
-      time: undefined,
       errorMessage: undefined,
-      dev: location.hash.match(/dev/)
+      dev: location.hash.match(/dev/),
+      hourItems: [],
+      minuteItems: [],
+      hour: undefined,
+      minute: undefined
+    }
+  },
+  created () {
+    for (let i = 0; i < 24; i++) {
+      this.hourItems.push(i);
+    }
+    for (let i = 0; i < 60; i++) {
+      this.minuteItems.push(('0' + i).slice(-2));
     }
   },
   async mounted () {
@@ -179,7 +202,7 @@ export default {
       return this.route && this.route.summary.departure && this.route.summary.departure.slice(11, 19);
     },
     timeIsInvalid () {
-      return this.rawTime.length <= 2 || !(Number(this.rawTime.slice(0, 2)) < 24 && Number(this.rawTime.slice(2, 4)) < 60);
+      return this.hour !== undefined && this.minute === undefined;
     },
     responseTransportMode () {
       return this.route && {
@@ -193,6 +216,9 @@ export default {
     },
     hasChangeIds () {
       return this.route && this.routeLegs.find(l => l.maneuver.find(m => m.changeId));
+    },
+    time () {
+      return ('0' + this.hour).slice(-2) + ':' + ('0' + this.minute).slice(-2);
     }
 
   },
@@ -200,9 +226,6 @@ export default {
     everything () {
       this.actions = undefined;
       this.route = undefined;
-    },
-    rawTime () {
-      this.time = this.rawTime.slice(0, 2) + ':' + this.rawTime.slice(-2);
     }
   },
   methods: {
@@ -253,7 +276,7 @@ export default {
     async getRouteV7 () {
       const makeRequest = () => {
         let timeParam = {};
-        if (this.rawTime) {
+        if (this.time) {
           const now = (new Date());
           const date = `${now.getFullYear()}-${('0' + (now.getMonth() + 1)).slice(-2)}-${('0' + (now.getDay() + 1)).slice([-2])}`;
           timeParam = {[this.timeMode]: `${date}T${this.time}:00`};
@@ -423,5 +446,18 @@ function polylineToGeoJSON (polyline) {
   padding: 0px 6px;
   border-radius:40px;
 }
+
+#hour {
+  text-align: right;
+}
+
+.colon {
+  text-align: center;
+  vertical-align: bottom;
+  margin-top:auto;
+  margin-bottom:auto;
+  font-size:20px;
+}
+
 
 </style>
