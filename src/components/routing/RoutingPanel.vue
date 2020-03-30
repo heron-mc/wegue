@@ -48,12 +48,6 @@
                     v-model="timeMode"
                     label="Select arrival or departure"
                   ></v-select>
-                  <v-date-picker 
-                    v-if="timeMode"
-                    v-model="date"
-                    label="Date"
-                  ></v-date-picker>
-
                   <v-layout row v-if="timeMode">
                     <v-flex col xs3>
                       <v-select
@@ -75,6 +69,21 @@
                       ></v-select>
                     </v-flex>
                   </v-layout>
+                  <v-select 
+                    v-if="timeMode && time"
+                    v-model="travelDay"
+                    :items="['Today', 'Another day']"
+                  /></v-select>
+
+
+
+                  <v-date-picker 
+                    v-if="timeMode && travelDay !== 'Today'"
+                    v-model="date"
+                    label="Date"
+
+                  ></v-date-picker>
+
 
                 </div>
                 <v-container justify-center="true">
@@ -158,7 +167,7 @@ export default {
       to: undefined,
       waypoints: [],
       route: undefined,
-      transportMode: 'bicycle',
+      transportMode: 'publicTransport',
       transportModes: [{
         text: 'Car',
         value: 'car'
@@ -177,6 +186,7 @@ export default {
       minuteItems: [],
       hour: undefined,
       minute: undefined,
+      travelDay: 'Today',
       date: undefined
     }
   },
@@ -225,6 +235,9 @@ export default {
       return this.route && this.routeLegs.find(l => l.maneuver.find(m => m.changeId));
     },
     time () {
+      if (!this.hour || !this.minute) {
+        return undefined;
+      }
       return ('0' + this.hour).slice(-2) + ':' + ('0' + this.minute).slice(-2);
     }
 
