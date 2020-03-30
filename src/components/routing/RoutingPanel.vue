@@ -116,11 +116,13 @@
 </template>
 
 <script>
-const hereApiKey = 'x9SeCvwikNOtxoPoDbhI8qhRSWP1Gxmz_op6V7ovguE';
+
 import axios from 'axios';
 import flexpolyline from './flexpolyline';
 import { WguEventBus } from '../../WguEventBus.js';
 import humanizeDuration from 'humanize-duration';
+// Note: you must create this file, following the format of routingConfig.js.example
+import routingConfig from './routingConfig.js';
 
 export default {
   name: 'wgu-routing-panel',
@@ -233,7 +235,7 @@ export default {
           origin: flip(this.from.geometry.coordinates).join(','),
           destination: flip(this.to.geometry.coordinates).join(','),
           return: ['summary', 'polyline', 'instructions', 'actions'].join(','),
-          apiKey: hereApiKey
+          apiKey: routingConfig.hereApiKey
         }
       });
       const route = result.data.routes[0];
@@ -268,7 +270,7 @@ export default {
         const mode = 'fastest;' + (this.transportMode === 'publicTransport' && this.time ? 'publicTransportTimeTable' : this.transportMode);
         return axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
           params: {
-            apiKey: hereApiKey,
+            apiKey: routingConfig.hereApiKey,
             ...waypointParams,
             mode,
             lineattributes: 'all',
