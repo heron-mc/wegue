@@ -18,6 +18,7 @@ import Overlay from 'ol/Overlay';
 import { WguEventBus } from '../../WguEventBus.js';
 import { LayerFactory } from '../../factory/Layer.js';
 import ColorUtil from '../../util/Color';
+import PermalinkController from './PermalinkController';
 
 export default {
   name: 'wgu-map',
@@ -31,7 +32,9 @@ export default {
       zoom: this.$appConfig.mapZoom,
       center: this.$appConfig.mapCenter,
       projection: this.$appConfig.mapProjection,
-      projectionDefs: this.$appConfig.projectionDefs
+      projectionObj: null,
+      projectionDefs: this.$appConfig.projectionDefs,
+      permalink: this.$appConfig.permalink
     }
   },
   mounted () {
@@ -88,22 +91,28 @@ export default {
     if (!this.projection) {
       this.projection = {code: 'EPSG:3857', units: 'm'}
     }
-    const projection = new Projection(this.projection);
 
     this.map = new Map({
       layers: [],
       controls: controls,
       interactions: interactions,
       view: new View({
-        center: this.center || [0, 0],
+        center: this.center,
         zoom: this.zoom,
-        projection: projection
+        projection: new Projection(this.projection)
       })
     });
 
     // create layers from config and add them to map
     const layers = await this.createLayers();
     this.map.getLayers().extend(layers);
+
+    if (this.$appConfig.permalink) {
+      this.permalinkController = this.createPermalinkController();
+      this.map.set('permalinkcontroller', this.permalinkController, true);
+      this.permalinkController.apply();
+      this.permalinkController.setup();
+    }
   },
 
   methods: {
@@ -151,6 +160,16 @@ export default {
       }));
       return layers;
     },
+
+    /**
+     * Creates a PermalinkController, override in subclass for specializations.
+     *
+     * @return {PermalinkController} PermalinkController instance.
+     */
+    createPermalinkController () {
+      return new PermalinkController(this.map, this.$appConfig.permalink);
+    },
+
     /**
      * Sets the background color of the OL buttons to the color property.
      */
