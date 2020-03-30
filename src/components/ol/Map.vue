@@ -121,6 +121,7 @@ export default {
       this.permalinkController.setup();
     }
     window.map = this.map; //TODO remove
+    this.map.once('rendercomplete', () => WguEventBus.$emit('ol-map-rendered'));
   },
 
   methods: {

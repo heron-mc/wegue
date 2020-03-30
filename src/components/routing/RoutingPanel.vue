@@ -132,7 +132,7 @@ export default {
     return {
       drawerOpen: undefined,
       actions: undefined,
-      routeTargets: undefined,
+      routeTargets: [],
       from: undefined,
       to: undefined,
       waypoints: [],
@@ -157,15 +157,7 @@ export default {
     }
   },
   async mounted () {
-    // TODO integrate this with layer loading
-    const pois = (await axios.get('http://staging.nplh.geolicious.de/api/poi_features/1')).data;
-    console.log(pois);
-    this.routeTargets = pois.features.map(poi => ({ text: poi.properties.name, value: poi }));
-    if (window.location.hash.match(/dev/)) {
-      this.from = pois.features[4];
-      console.log(this.from, pois.features);
-      this.to = pois.features[5];
-    }
+    this.initRoutingTargets()
     window.RoutingPanel = this;
     WguEventBus.$on('toggle-routing-panel', state => {
       this.drawerOpen = state === undefined ? !this.drawerOpen : state;
@@ -212,6 +204,16 @@ export default {
     }
   },
   methods: {
+    initRoutingTargets () {
+      WguEventBus.$on('ol-map-rendered', async () => {
+        // Find layers that have been marked 'routable' in app config, and use them as routing targets
+        const layerUrls = this.$map.getLayers().getArray().filter(l => l.getProperties().routable).map(l => l.getSource().getUrl());
+        const featureCollections = await Promise.all(layerUrls.map(axios.get));
+        for (const { data } of featureCollections) {
+          this.routeTargets.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi })));
+        }
+      });
+    },
     async search () {
       this.actions = undefined;
       this.errorMessage = undefined;

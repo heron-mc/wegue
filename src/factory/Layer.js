@@ -144,6 +144,7 @@ export const LayerFactory = {
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
       selectable: lConf.selectable || false,
+      routable: lConf.routable || false,
       extent: lConf.extent,
       visible: lConf.visible,
       opacity: lConf.opacity,
