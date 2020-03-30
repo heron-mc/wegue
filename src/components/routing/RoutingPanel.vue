@@ -48,6 +48,12 @@
                     v-model="timeMode"
                     label="Select arrival or departure"
                   ></v-select>
+                  <v-date-picker 
+                    v-if="timeMode"
+                    v-model="date"
+                    label="Date"
+                  ></v-date-picker>
+
                   <v-layout row v-if="timeMode">
                     <v-flex col xs3>
                       <v-select
@@ -170,7 +176,8 @@ export default {
       hourItems: [],
       minuteItems: [],
       hour: undefined,
-      minute: undefined
+      minute: undefined,
+      date: undefined
     }
   },
   created () {
