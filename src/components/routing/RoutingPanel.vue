@@ -50,23 +50,23 @@
                   ></v-select>
                   <v-layout row v-if="timeMode">
                     <v-flex col xs3>
-                      <v-autocomplete
+                      <v-select
                         id="hour"
                         style="text-align: right"
                         v-model="hour"
                         label="Hour"
                         :items="hourItems"
-                      ></v-autocomplete>
+                      ></v-select>
                     </v-flex>
                     <v-flex col xs1 class="colon">
                     :
                     </v-flex>
                     <v-flex col xs3>
-                      <v-autocomplete
+                      <v-select
                         v-model="minute"
                         label="Minute"
                         :items="minuteItems"
-                      ></v-autocomplete>
+                      ></v-select>
                     </v-flex>
                   </v-layout>
 
