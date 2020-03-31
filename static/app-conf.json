@@ -115,8 +115,8 @@
       "icon": "info",
       "layers": [
         {
-          "layerId": "poi",
-          "title": "POI",
+          "layerId": "layer",
+          "title": "Info",
           "titleProp": "name",
           "imageProp": "image_url",
           "descProp": "description",
