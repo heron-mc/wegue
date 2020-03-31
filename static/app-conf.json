@@ -3,7 +3,7 @@
   "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'>Naturpark Lüneburger Heide</a>",
 
   "baseColor": "rgba(226, 0, 122, 1)",
-  
+
   "logoText": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo'</a>",
 
   "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
@@ -12,6 +12,16 @@
 
   "mapCenter": [1113871, 7012966],
   "mapZoom": 9,
+
+  "permalink": {
+    "location": "search",
+    "layers": true,
+    "extent": true,
+    "projection": "EPSG:4326",
+    "paramPrefix": "",
+    "history": false
+  },
+
   "mapLayers": [
     {
       "type": "VECTOR",
@@ -61,6 +71,7 @@
   "modules": {
     "wgu-layerlist": {
       "target": "toolbar",
+      "darkLayout": true,
       "win": true,
       "draggable": false
     },
@@ -79,6 +90,7 @@
       "target": "toolbar",
       "win": true,
       "draggable": false,
+      "darkLayout": true,
       "initPos": {
         "left": 8,
         "top": 74
@@ -86,10 +98,14 @@
     },
     "wgu-zoomtomaxextent": {
       "target": "toolbar",
-      "darkLayout": false
+      "darkLayout": true
     },
     "wgu-helpwin": {
       "target": "menu",
+      "darkLayout": true
+    },
+    "wgu-share": {
+      "target": "toolbar",
       "darkLayout": true
     },
     "wgu-feature-info-window": {
