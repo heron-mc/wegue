@@ -115,8 +115,8 @@
       "icon": "info",
       "layers": [
         {
-          "layerId": "Naturwunder",
-          "title": "Naturwunder",
+          "layerId": "poi",
+          "title": "POI",
           "titleProp": "name",
           "imageProp": "image_url",
           "descProp": "description",
