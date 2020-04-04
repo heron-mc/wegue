@@ -13,14 +13,14 @@
                   label="Mode"
                   outline
                 ></v-select>                
-                <v-select
+                <v-autocomplete
                   :items="routeTargets"
                   :disabled="routeTargets.length < 1"
                   v-model="from"
                   label="From"
                   solo
-                ></v-select>
-                <v-select v-for="(waypoint, i) in waypoints"
+                ></v-autocomplete>
+                <v-autocomplete v-for="(waypoint, i) in waypoints"
                   :key="i"
                   :items="routeTargets"
                   :disabled="routeTargets.length < 1"
@@ -29,23 +29,24 @@
                   label="via"
                   @click:clear="clearWaypoint(i)"
                   solo
-                ></v-select>
+                ></v-autocomplete>
                 <v-btn color="primary" flat small 
                   v-if="from && to && (waypoints.length === 0 || waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
                   Add stop
                 </v-btn>
                 <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
-                <v-select
+                <v-autocomplete
                   :items="routeTargets"
                   :disabled="routeTargets.length < 1"
                   v-model="to"
                   label="to"
                   solo
-                ></v-select>
+                ></v-autocomplete>
                 <div v-if="transportMode === 'publicTransport' && from && to">
                   <v-select
                     :items="timeModes"
                     v-model="timeMode"
+                    clearable
                     label="Select arrival or departure"
                   ></v-select>
                   <v-layout row v-if="timeMode">
