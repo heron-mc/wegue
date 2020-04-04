@@ -505,7 +505,8 @@ function polylineToGeoJSON (polyline) {
   vertical-align: bottom;
   margin-top:auto;
   margin-bottom:auto;
-  font-size:20px;
+  font-size:26px;
+  padding-bottom:8px;
 }
 
 
