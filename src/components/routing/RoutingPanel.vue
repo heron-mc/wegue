@@ -42,7 +42,7 @@
                   label="to"
                   solo
                 ></v-autocomplete>
-                <div v-if="transportMode === 'publicTransport' && from && to">
+                <div v-if="transportMode === 'fastest;publicTransport' && from && to">
                   <v-select
                     :items="timeModes"
                     v-model="timeMode"
@@ -172,16 +172,22 @@ export default {
       to: undefined,
       waypoints: [],
       route: undefined,
-      transportMode: 'publicTransport',
+      transportMode: 'fastest;publicTransport',
       transportModes: [{
-        text: 'Car',
-        value: 'car'
+        text: 'Car (fastest)',
+        value: 'car-fast'
+      }, {
+        text: 'Car (shortest distance)',
+        value: 'car-short'
       }, {
         text: 'Public transport',
-        value: 'publicTransport'
+        value: 'fastest;publicTransport'
       }, {
-        text: 'Bicycle',
-        value: 'bicycle'
+        text: 'Bicycle (fastest)',
+        value: 'fastest;bicycle'
+      }, {
+        text: 'Bicycle (shortest distance)',
+        value: 'shortest;bicycle'
       }],
       timeMode: undefined,
       timeModes: [{ text: 'Arrive by', value: 'arrival' }, { text: 'Depart at', value: 'departure' }],
@@ -294,7 +300,7 @@ export default {
       this.actions = undefined;
       this.errorMessage = undefined;
       this.route = undefined;
-      if (this.transportMode === 'car') {
+      if (this.transportMode.match(/^car/)) {
         return this.getRouteV8();
       } else /* if (this.transportMode === 'publicTransport') */{
         return this.getRouteV7();
@@ -306,6 +312,7 @@ export default {
       const result = await axios.get(`https://router.hereapi.com/v8/routes`, {
         params: {
           transportMode: 'car',
+          routingMode: this.transportMode.split('-')[1],
           origin: flip(this.from.geometry.coordinates).join(','),
           destination: flip(this.to.geometry.coordinates).join(','),
           return: ['summary', 'polyline', 'instructions', 'actions'].join(','),
@@ -327,7 +334,7 @@ export default {
     async getRouteV7 () {
       const makeRequest = () => {
         let timeParam = {};
-        if (this.time) {
+        if (this.time && this.transportMode.match(/publicTransport/)) {
           timeParam = {[this.timeMode]: `${this.date}T${this.time}:00`};
         }
         const toGeo = point => `geo!${point.geometry.coordinates[1]},${point.geometry.coordinates[0]}`;
@@ -339,7 +346,7 @@ export default {
         });
         waypointParams[`waypoint${this.waypoints.length + 1}`] = toGeo(this.to);
 
-        const mode = 'fastest;' + (this.transportMode === 'publicTransport' && this.time ? 'publicTransportTimeTable' : this.transportMode);
+        const mode = (this.transportMode === 'fastest;publicTransport' && this.time ? 'fastest;publicTransportTimeTable' : this.transportMode);
         return axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
           params: {
             apiKey: routingConfig.hereApiKey,
