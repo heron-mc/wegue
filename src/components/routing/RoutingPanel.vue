@@ -281,6 +281,7 @@ export default {
         for (const { data } of featureCollections) {
           this.routeTargets.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi })));
         }
+        this.routeTargets.sort((a, b) => (a.text < b.text ? -1 : 1));
       });
     },
     async search () {
