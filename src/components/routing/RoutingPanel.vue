@@ -104,26 +104,26 @@
                     </tr>
                   </table>
                 </div>
-                <div v-if="routeLegs">
+                <div id="route" v-if="routeLegs">
                   <h2>{{ responseTransportMode }} directions</h2>
-                    <table class="route-summary">
-                      <tr>
-                        <th>Time:</th>
-                        <td>{{ routeDuration }}</td>
-                      </tr>
-                      <tr v-if="routeStartTime">
-                        <th>Start:</th>
-                        <td>{{ routeStartDate }} {{ routeStartTime }}</td>
-                      </tr>
-                      <tr>
-                        <th>Distance:</th>
-                        <td>{{ routeDistance }}</td>
-                      </tr>
-                      <tr v-if="route.publicTransportLine">
-                        <th>Routes:</th>
-                        <td>{{ route.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
-                      </tr>
-                    </table>
+                  <table class="route-summary">
+                    <tr>
+                      <th>Time:</th>
+                      <td>{{ routeDuration }}</td>
+                    </tr>
+                    <tr v-if="routeStartTime">
+                      <th>Start:</th>
+                      <td>{{ routeStartDate && routeStartDate + ' at '}} {{ routeStartTime }}</td>
+                    </tr>
+                    <tr>
+                      <th>Distance:</th>
+                      <td>{{ routeDistance }}</td>
+                    </tr>
+                    <tr v-if="route.publicTransportLine">
+                      <th>Routes:</th>
+                      <td>{{ route.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
+                    </tr>
+                  </table>
                           
                   <h3>Instructions</h3>
                   <div v-for="leg of routeLegs">
@@ -271,6 +271,11 @@ export default {
     everything () {
       this.actions = undefined;
       this.route = undefined;
+    },
+    route () {
+      if (this.route) {
+        this.$nextTick(() => document.getElementById('route').scrollIntoView({ behavior: 'smooth' }));
+      }
     }
   },
   methods: {
