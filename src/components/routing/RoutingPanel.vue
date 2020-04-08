@@ -188,6 +188,12 @@ export default {
       }, {
         text: 'Bicycle (shortest distance)',
         value: 'shortest;bicycle'
+      }, {
+        text: 'Pedestrian (fastest)',
+        value: 'fastest;pedestrian'
+      }, {
+        text: 'Pedestrian (shortest distance)',
+        value: 'shotest;pedestrian'
       }],
       timeMode: undefined,
       timeModes: [{ text: 'Arrive by', value: 'arrival' }, { text: 'Depart at', value: 'departure' }],
@@ -246,7 +252,8 @@ export default {
       return this.route && {
         'publicTransport': 'Public transport',
         'publicTransportTimeTable': 'Public transport',
-        'bicycle': 'Bicycle'
+        'bicycle': 'Bicycle',
+        'pedestrian': 'Walking'
       }[this.route.mode.transportModes[0]]
     },
     routeLegs () {
