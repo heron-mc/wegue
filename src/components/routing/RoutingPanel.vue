@@ -14,34 +14,63 @@
                   outline
                 ></v-select>                
                 <v-autocomplete
-                  :items="routeTargets"
-                  :disabled="routeTargets.length < 1"
+                  :items="routeTargets.from"
+                  :disabled="!routeTargets.from"
                   v-model="from"
                   label="From"
                   solo
-                ></v-autocomplete>
+                  clearable
+                  @change="changeRouteTarget(from)"
+                  @click:clear="clearCustomTarget(from)"
+                >
+                </v-autocomplete>
+                <v-alert color="info" outline :value="choosingPoint(from)">
+                  <v-icon>location_searching</v-icon>
+                  Click on the map to choose a location.
+                </v-alert>
+
+                    <!-- <v-btn
+                      small
+                      round
+                      v-if="from && from.properties.name === 'Point on map'"
+                      :depressed="selectingPoint"
+                      :color="selectingPoint ? 'cyan' : ''"
+                      @click="clickSelectPoint"
+                      style="margin-top:-20px"
+                    >
+                      <v-icon>location_searching</v-icon>
+                      Select point
+                    </v-btn> -->
                 <v-autocomplete v-for="(waypoint, i) in waypoints"
                   :key="i"
-                  :items="routeTargets"
-                  :disabled="routeTargets.length < 1"
+                  :items="routeTargets[i]"
+                  :disabled="!routeTargets"
                   clearable
                   v-model="waypoints[i]"
                   label="via"
-                  @click:clear="clearWaypoint(i)"
+                  @click:clear="clearCustomTarget(waypoints[i]), clearWaypoint(i)"
+                  @change="changeRouteTarget(waypoints[i])"
                   solo
                 ></v-autocomplete>
                 <v-btn color="primary" flat small 
-                  v-if="from && to && (waypoints.length === 0 || waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
+                  v-if="from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
                   Add stop
                 </v-btn>
                 <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
                 <v-autocomplete
-                  :items="routeTargets"
-                  :disabled="routeTargets.length < 1"
+                  :items="routeTargets.to"
+                  :disabled="!routeTargets.to"
                   v-model="to"
                   label="to"
                   solo
+                  clearable
+                  @change="changeRouteTarget(to)"
+                  @click:clear="clearCustomTarget(to)"
                 ></v-autocomplete>
+                <v-alert color="info" outline :value="choosingPoint(to)">
+                  <v-icon>location_searching</v-icon>
+                  Click on the map to choose a location.
+                </v-alert>
                 <div v-if="transportMode === 'fastest;publicTransport' && from && to">
                   <v-select
                     :items="timeModes"
@@ -95,14 +124,17 @@
                 <v-alert :value="errorMessage" outline type="error" class="ma-3">
                   {{ errorMessage }}
                 </v-alert>
-                <div v-if="actions" id="actions">
-                  <h2>Driving directions</h2>
-
-                  <table v-if="actions">
-                    <tr v-for="action of actions">
-                      <td> {{ action.instruction }}</td>
-                    </tr>
-                  </table>
+                
+                <div v-for="(section, sectionNo) of (sections || [])">
+                  <h2 v-if="sectionNo === 0">Driving directions</h2>
+                  <h3>Section {{ sectionNo + 1 }} ({{ Math.round(section.summary.length/100)/10}} km)</h3>
+                  <div class="actions">
+                    <table>
+                      <tr v-for="action of section.actions">
+                        <td> {{ action.instruction }}</td>
+                      </tr>
+                    </table>
+                  </div>
                 </div>
                 <div id="route" v-if="routeLegs">
                   <h2>{{ responseTransportMode }} directions</h2>
@@ -152,6 +184,7 @@ import { WguEventBus } from '../../WguEventBus.js';
 import humanizeDuration from 'humanize-duration';
 // Note: you must create this file, following the format of routingConfig.js.example
 import routingConfig from './routingConfig.js';
+import { transform } from 'ol/proj';
 
 function pad2 (x) {
   return ('0' + x).slice(-2);
@@ -166,8 +199,8 @@ export default {
   data () {
     return {
       drawerOpen: undefined,
-      actions: undefined,
-      routeTargets: [],
+      sections: undefined,
+      routeTargets: { from: null, to: null, 0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null, 9: null },
       from: undefined,
       to: undefined,
       waypoints: [],
@@ -204,7 +237,9 @@ export default {
       hour: undefined,
       minute: undefined,
       travelDay: 'Today',
-      rawDate: undefined
+      rawDate: undefined,
+      routeGeometry: undefined
+      // selectingPoint: false
     }
   },
   created () {
@@ -216,15 +251,16 @@ export default {
     }
   },
   async mounted () {
-    this.initRoutingTargets()
+    this.initRouteTargets()
     window.RoutingPanel = this;
     WguEventBus.$on('toggle-routing-panel', state => {
       this.drawerOpen = state === undefined ? !this.drawerOpen : state;
     });
   },
   computed: {
-    everything () {
-      return this.from + this.to + this.transportMode + this.timeMode + this.time + Date.now();
+    // when anything changes that was used to calculate the route, we clear the route
+    routeParameters () {
+      return [this.from, this.to, this.waypoints.map(w => w && w.geometry.coordinates), this.transportMode, this.timeMode, this.time, Date.now()];
     },
     routeDuration () {
       return this.route && humanizeDuration(this.route.summary.baseTime * 1000, { round: true, units: ['h', 'm'] });
@@ -278,33 +314,113 @@ export default {
     },
     isDateSpecified () {
       return this.travelDay !== 'Today' && this.rawDate;
+    },
+    selectingPoint () {
+      return this.from && this.from.properties.name === 'Point on map' && this.from.geometry.coordinates === null;
+    },
+    waypointsGeometry () {
+      return this.waypoints.filter(w => w && w.geometry && w.geometry.coordinates);
+    },
+    allGeometry () {
+      return [this.from && this.from.geometry.coordinates, this.waypoints.map(w => w && w.geometry.coordinates), this.to && this.to.geometry.coordinates, this.routeGeometry];
     }
   },
   watch: {
-    everything () {
-      this.actions = undefined;
+    routeParameters () {
+      this.sections = undefined;
       this.route = undefined;
+      this.routeGeometry = undefined;
+    },
+    allGeometry () {
+      WguEventBus.$emit('route-update', {
+        routeGeometry: this.routeGeometry,
+        startGeometry: this.from && this.from.geometry.coordinates ? { type: 'Point', coordinates: this.from.geometry.coordinates } : undefined,
+        waypointsGeometry: {
+          type: 'FeatureCollection',
+          features: this.waypointsGeometry
+        },
+        endGeometry: this.to && this.to.geometry.coordinates ? { type: 'Point', coordinates: this.to.geometry.coordinates } : undefined
+      });
     },
     route () {
       if (this.route) {
         this.$nextTick(() => document.getElementById('route').scrollIntoView({ behavior: 'smooth' }));
+      } else {
+        this.routeGeometry = undefined;
       }
+    },
+    selectingPoint () {
+    //   if (this.selectingPoint) {
+    //     window.map.getViewport().style.cursor = 'crosshair';
+    //     const self = this;
+    //     window.map.on('click', e => {
+    //       // just checking we're still in the same state
+    //       if (self.selectingPoint) {
+    //         const coords = transform(e.coordinate, window.map.getView().getProjection(), 'EPSG:4326');
+    //         console.log(coords);
+    //         window.map.getViewport().style.cursor = '';
+    //         self.from.geometry.coordinates = coords;
+    //       }
+    //     });
+    //   }
     }
   },
   methods: {
-    initRoutingTargets () {
+    initRouteTargets () {
       WguEventBus.$on('ol-map-rendered', async () => {
         // Find layers that have been marked 'routable' in app config, and use them as routing targets
         const layerUrls = this.$map.getLayers().getArray().filter(l => l.getProperties().routable).map(l => l.getSource().getUrl());
         const featureCollections = await Promise.all(layerUrls.map(axios.get));
+        console.log(featureCollections[0].data.features[0]);
+        const routeTargets = []
         for (const { data } of featureCollections) {
-          this.routeTargets.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi })));
+          routeTargets.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi })));
         }
-        this.routeTargets.sort((a, b) => (a.text < b.text ? -1 : 1));
+        routeTargets.sort((a, b) => (a.text < b.text ? -1 : 1));
+
+        ['from', 'to', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(targetSetId => {
+          this.routeTargets[targetSetId] = [{
+            text: 'Point on map',
+            value: {
+              type: 'Feature',
+              properties: {
+                name: 'Point on map'
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: null
+              }
+            }
+          }, ...routeTargets];
+        });
       });
     },
+    clearCustomTarget (targetSet) {
+      targetSet.geometry.coordinates = null;
+    },
+    changeRouteTarget (targetSet) {
+      if (targetSet && targetSet.geometry.coordinates === null) {
+        window.map.getViewport().style.cursor = 'crosshair';
+        // const self = this;
+        window.map.once('click', e => {
+          // just checking we're still in the same state
+          if (targetSet.geometry.coordinates === null) {
+            const coords = transform(e.coordinate, window.map.getView().getProjection(), 'EPSG:4326');
+            console.log(coords);
+            window.map.getViewport().style.cursor = '';
+            targetSet.geometry.coordinates = coords;
+          }
+        });
+      }
+
+      // console.log(targetSet.geometry.coordinates)
+    },
+    choosingPoint (targetSet) {
+      return targetSet && targetSet.properties.name === 'Point on map' && targetSet.geometry.coordinates === null;
+    },
+
     async search () {
-      this.actions = undefined;
+      this.sections = undefined;
       this.errorMessage = undefined;
       this.route = undefined;
       if (this.transportMode.match(/^car/)) {
@@ -316,27 +432,39 @@ export default {
     async getRouteV8 () {
       // https://developer.here.com/documentation/routing-api/api-reference-swagger.html
       // https://developer.here.com/documentation/routing/dev_guide/topics/resource-calculate-route.html
+      const via = this.waypoints
+        .filter(Boolean)
+        .map(w => w.geometry.coordinates)
+        .filter(Boolean)
+        .map(flip)
+        .map(c => c.join(','));
+        // .join(',');
       const result = await axios.get(`https://router.hereapi.com/v8/routes`, {
         params: {
           transportMode: 'car',
           routingMode: this.transportMode.split('-')[1],
           origin: flip(this.from.geometry.coordinates).join(','),
           destination: flip(this.to.geometry.coordinates).join(','),
+          ...(via ? { via } : {}),
           return: ['summary', 'polyline', 'instructions', 'actions'].join(','),
           apiKey: routingConfig.hereApiKey
-        }
+        },
+        // the API wants &via=x,y&via=x,y whereas Axios by default provides &via[]=x,y&via[]=x,y
+        paramsSerializer: params =>
+          Object.keys(params)
+            .map(key => {
+              const vals = Array.isArray(params[key]) ? params[key] : [params[key]];
+              return vals.map(val => `${key}=${val}`).join('&')
+            }).join('&')
       });
       const route = result.data.routes[0];
-      console.log(route.sections[0].actions)
-      this.actions = route.sections[0].actions
+      this.sections = route.sections;
 
       console.log(result.data);
-      const routeGeometry = polylineToGeoJSON(route.sections[0].polyline);
-      WguEventBus.$emit('route-update', {
-        routeGeometry,
-        startGeometry: { type: 'Point', coordinates: routeGeometry.coordinates[0] },
-        endGeometry: { type: 'Point', coordinates: routeGeometry.coordinates.slice(-1)[0] }
-      });
+      this.routeGeometry = {
+        type: 'FeatureCollection',
+        features: route.sections.map(section => polylineToGeoJSON(section.polyline))
+      };
     },
     async getRouteV7 () {
       const makeRequest = () => {
@@ -430,17 +558,14 @@ export default {
       route.leg.forEach(addCumulativeTimes);
       this.route = route;
       console.log(route);
-      const routeGeometry = routeGeometryFromRoute(route);
+      this.routeGeometry = routeGeometryFromRoute(route);
       WguEventBus.$emit('route-update', {
-        routeGeometry,
+        routeGeometry: this.routeGeometry,
         stopsGeometry: stopsGeometryFromRoute(route),
-        startGeometry: { type: 'Point', coordinates: routeGeometry.coordinates[0] },
-        endGeometry: { type: 'Point', coordinates: routeGeometry.coordinates.slice(-1)[0] },
+        startGeometry: { type: 'Point', coordinates: this.routeGeometry.coordinates[0] },
+        endGeometry: { type: 'Point', coordinates: this.routeGeometry.coordinates.slice(-1)[0] },
         boundingBox: [route.boundingBox.topLeft.longitude, route.boundingBox.bottomRight.latitude, route.boundingBox.bottomRight.longitude, route.boundingBox.topLeft.latitude]
       });
-    },
-    clearWaypoint (index) {
-      this.$nextTick(() => this.waypoints.splice(index, 1));
     }
   }
 
@@ -459,7 +584,7 @@ function polylineToGeoJSON (polyline) {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-#maneuvers td, #actions td {
+#maneuvers td, .actions td {
   padding: 0.5em 0.5em;
 }
 

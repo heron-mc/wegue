@@ -90,7 +90,20 @@ export function routingLayers (routingOptions, map) {
       (endpointLabelStyle.getText().setText('Finish'), endpointLabelStyle)
     ]
   });
-
+  const waypointsSource = new VectorSource({ });
+  const waypointsLayer = new VectorLayer({
+    name: 'route-waypoints',
+    displayInLayerList: false,
+    source: waypointsSource,
+    style: new Style({
+      image: new RegularShape({
+        fill: new Fill({ color: 'white' }),
+        stroke: new Stroke({ color: 'black', width: 2 }),
+        points: 40,
+        radius: 6
+      })
+    })
+  });
   const routeSource = new VectorSource({ });
   const routeLayer = new VectorLayer({
     name: 'route',
@@ -120,6 +133,7 @@ export function routingLayers (routingOptions, map) {
   WguEventBus.$on('route-update', ({
     routeGeometry,
     startGeometry,
+    waypointsGeometry,
     endGeometry,
     stopsGeometry,
     boundingBox
@@ -127,12 +141,15 @@ export function routingLayers (routingOptions, map) {
     const featureProjection = map.getView().getProjection();
     const geojson = (new GeoJSON({ featureProjection }));
 
-    [routeSource, startSource, endSource, stopsSource].forEach(s => s.clear());
+    [routeSource, startSource, waypointsSource, endSource, stopsSource].forEach(s => s.clear());
     if (routeGeometry) {
       routeSource.addFeatures(geojson.readFeatures(routeGeometry));
     }
     if (startGeometry) {
       startSource.addFeatures(geojson.readFeatures(startGeometry));
+    }
+    if (waypointsGeometry) {
+      waypointsSource.addFeatures(geojson.readFeatures(waypointsGeometry));
     }
     if (endGeometry) {
       endSource.addFeatures(geojson.readFeatures(endGeometry));
@@ -150,5 +167,5 @@ export function routingLayers (routingOptions, map) {
       });
     }
   });
-  return [routeLayer, stopsLayer, startLayer, endLayer];
+  return [routeLayer, stopsLayer, startLayer, waypointsLayer, endLayer];
 }
