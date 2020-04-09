@@ -168,6 +168,10 @@
                       </tr>
                     </table>
                   </div>
+                  <v-btn flat color="primary" @click="clickSaveGpx">
+                    <v-icon>cloud_download</v-icon> 
+                    &nbsp;&nbsp;Save as GPX file.
+                  </v-btn>
                 </div>
                 
             </v-form>
@@ -185,6 +189,8 @@ import humanizeDuration from 'humanize-duration';
 // Note: you must create this file, following the format of routingConfig.js.example
 import routingConfig from './routingConfig.js';
 import { transform } from 'ol/proj';
+import toGpx from 'togpx';
+import { saveAs } from 'file-saver';
 
 function pad2 (x) {
   return ('0' + x).slice(-2);
@@ -287,12 +293,16 @@ export default {
       return this.hour !== undefined && this.minute === undefined;
     },
     responseTransportMode () {
-      return this.route && {
-        'publicTransport': 'Public transport',
-        'publicTransportTimeTable': 'Public transport',
-        'bicycle': 'Bicycle',
-        'pedestrian': 'Walking'
-      }[this.route.mode.transportModes[0]]
+      if (this.transportMode.match(/^car/)) {
+        return 'Driving';
+      } else {
+        return {
+          'publicTransport': 'Public transport',
+          'publicTransportTimeTable': 'Public transport',
+          'bicycle': 'Bicycle',
+          'pedestrian': 'Walking'
+        }[this.route.mode.transportModes[0]]
+      }
     },
     routeLegs () {
       return this.route && this.route.leg;
@@ -536,7 +546,8 @@ export default {
         return {
           type: 'Feature',
           properties: {
-            type: maneuver._type
+            type: maneuver._type,
+            instruction: maneuver.instruction.replace(/(<([^>]+)>)/g, '')
           },
           geometry: {
             type: 'LineString',
@@ -596,9 +607,27 @@ export default {
       this.boundingBox = [route.boundingBox.topLeft.longitude, route.boundingBox.bottomRight.latitude, route.boundingBox.bottomRight.longitude, route.boundingBox.topLeft.latitude];
       this.routeGeometry = routeGeometryFromRoute(route);
       this.stopsGeometry = stopsGeometryFromRoute(route);
+    },
+    clickSaveGpx () {
+      if (!this.routeGeometry) {
+        return;
+      }
+      const geom = JSON.parse(JSON.stringify(this.routeGeometry));
+      geom.features.forEach(line => {
+        line.properties = {
+          name: line.properties.instruction
+        }
+      });
+      const gpx = toGpx(geom, {
+        creator: 'Wegue',
+        metadata: {
+          name: `${this.responseTransportMode} directions`
+        }
+      });
+      const blob = new Blob([gpx], { type: 'application/gpx+xml' });
+      saveAs(blob, 'route.gpx');
     }
   }
-
 }
 const flip = ([a, b]) => [b, a];
 
