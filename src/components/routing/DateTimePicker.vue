@@ -86,7 +86,7 @@ export default {
       return !(this.hour !== undefined && this.minute === undefined);
     },
     anything () {
-      return [this.time, this.date, this.isDateSpecified, this.isTimeValid];
+      return [this.timeMode, this.time, this.date, this.isDateSpecified, this.isTimeValid];
     }
   },
   watch: {
