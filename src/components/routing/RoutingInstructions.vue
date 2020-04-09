@@ -36,7 +36,7 @@
 
     <h3>Instructions</h3>
     <div v-for="leg of routeLegs">
-      <table id="maneuvers">
+      <table class="maneuvers">
         <tr v-for="maneuver of leg.maneuver">
           <td class="time" v-if="responseTransportMode === 'publicTransportTimeTable' && maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
           <td class="time" v-if="responseTransportMode !== 'publicTransportTimeTable' && maneuver.cumulative"> {{ maneuver.cumulative }} </td>
@@ -104,5 +104,47 @@ export default {
 </script>
 
 <style scoped>
+.time {
+  color: #555;
+  vertical-align: top;
+  font-style:italic;
+}
+
+.route-summary {
+  margin-bottom:1em;
+}
+
+.route-summary th {
+  text-align: right;
+}
+.route-summary th {
+  /* padding: 0.5em 0; */
+}
+.route-summary td {
+  padding:0 0.25em;
+}
+
+.changeId {
+  vertical-align: top;
+  padding: 0;
+  margin: 0;
+}
+
+.changeId span {
+  border: 1px solid black;
+  padding: 0px 6px;
+  border-radius:40px;
+}
+
+.maneuvers td, .actions td {
+  padding: 0.5em 0.5em;
+}
+
+.maneuvers .station,
+.maneuvers .transit,
+.maneuvers .line {
+  font-weight:bold;
+}
+
 
 </style>

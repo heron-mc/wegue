@@ -1,84 +1,45 @@
 /* eslint-disable */
 <template>
-    <v-navigation-drawer
-        v-model="drawerOpen"
-        hide-overlay
-        absolute
-    >
-        <v-card class="pa-2">
-            <v-form>
-                <v-select
-                  :items="transportModes"
-                  v-model="transportMode"
-                  label="Mode"
-                  outline
-                ></v-select>
-                <RoutingTarget label="From" @change="from = $event" :routeTargets="routeTargets"/>
-                <RoutingTarget v-for="(waypoint, i) in waypoints" label="via" @change="$set(waypoints, i, $event)" :routeTargets="routeTargets" :key="i" />
-                <!-- <RoutingTarget v-if="waypoints.length" label="via" @change="waypoints[0] = $event"  :routeTargets="routeTargets"/> -->
-                <v-btn color="primary" flat small
-                  v-if="from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
-                  Add stop
-                </v-btn>
-                <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
-                <RoutingTarget label="to" @change="to = $event"  :routeTargets="routeTargets"/>
-                <div v-if="transportMode === 'fastest;publicTransport' && from && to">
-                  <v-select
-                    :items="timeModes"
-                    v-model="timeMode"
-                    clearable
-                    label="Select arrival or departure"
-                  ></v-select>
-                  <v-layout row v-if="timeMode">
-                    <v-flex col xs3>
-                      <v-select
-                        id="hour"
-                        style="text-align: right"
-                        v-model="hour"
-                        label="Hour"
-                        :items="hourItems"
-                      ></v-select>
-                    </v-flex>
-                    <v-flex col xs1 class="colon">
-                    :
-                    </v-flex>
-                    <v-flex col xs3>
-                      <v-select
-                        v-model="minute"
-                        label="Minute"
-                        :items="minuteItems"
-                      ></v-select>
-                    </v-flex>
-                  </v-layout>
-                  <v-select
-                    v-if="timeMode && time"
-                    v-model="travelDay"
-                    :items="['Today', 'Another day']"
-                  /></v-select>
-
-                  <v-date-picker
-                    v-if="timeMode && travelDay !== 'Today'"
-                    v-model="rawDate"
-                    label="Date"
-
-                  ></v-date-picker>
-                </div>
-                <v-container justify-center="true">
-                  <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(time && timeIsInvalid)">
-                    Get directions
-                  </v-btn>
-                </v-container>
-                <v-alert :value="errorMessage" outline type="error" class="ma-3">
-                  {{ errorMessage }}
-                </v-alert>
-                <RoutingInstructions :route="route" :dateSpecified="isDateSpecified"/>
-                <v-btn v-if="route" flat color="primary" @click="clickSaveGpx">
-                  <v-icon>cloud_download</v-icon>
-                  &nbsp;&nbsp;Save as GPX file.
-                </v-btn>
-            </v-form>
-        </v-card>
-    </v-navigation-drawer>
+  <v-navigation-drawer
+      v-model="drawerOpen"
+      hide-overlay
+      absolute
+  >
+    <v-card class="pa-2">
+      <v-form>
+        <v-select
+          :items="transportModes"
+          v-model="transportMode"
+          label="Mode"
+          outline
+        ></v-select>
+        <RoutingTarget label="From" @change="from = $event" :routeTargets="routeTargets"/>
+        <RoutingTarget v-for="(waypoint, i) in waypoints" label="via" @change="$set(waypoints, i, $event)" :routeTargets="routeTargets" :key="i" />
+        <v-btn color="primary" flat small
+          v-if="from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
+          Add stop
+        </v-btn>
+        <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
+        <RoutingTarget label="to" @change="to = $event"  :routeTargets="routeTargets"/>
+        <div v-if="transportMode === 'fastest;publicTransport' && from && to">
+          <DateTimePicker @change="timeDate=$event"/>
+        </div>
+        <v-container justify-center="true">
+          <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(timeDate.time && timeDate.timeIsInvalid)">
+            Get directions
+          </v-btn>
+        </v-container>
+        <v-alert :value="errorMessage" outline type="error" class="ma-3">
+          {{ errorMessage }}
+        </v-alert>
+        <RoutingInstructions :route="route" :dateSpecified="timeDate.isDateSpecified"/>
+        <v-btn v-if="route" flat color="primary" @click="clickSaveGpx">
+          <v-icon>cloud_download</v-icon>
+          &nbsp;&nbsp;Save as GPX file.
+        </v-btn>
+      </v-form>
+    </v-card>
+  </v-navigation-drawer>
 </template>
 
 <script>
@@ -92,10 +53,7 @@ import toGpx from 'togpx';
 import { saveAs } from 'file-saver';
 import RoutingTarget from './RoutingTarget';
 import RoutingInstructions from './RoutingInstructions';
-
-function pad2 (x) {
-  return ('0' + x).slice(-2);
-}
+import DateTimePicker from './DateTimePicker.vue';
 
 export default {
   name: 'wgu-routing-panel',
@@ -104,8 +62,9 @@ export default {
   props: {
   },
   components: {
-    RoutingTarget,
-    RoutingInstructions
+    RoutingTarget, // The autocomplete component with places to route to/from
+    RoutingInstructions, // Shows the instructions as returned by the routing API
+    DateTimePicker // Allows choosing departure/arrival time and optionally date, for public transit trips
   },
   data () {
     return {
@@ -137,28 +96,13 @@ export default {
         text: 'Pedestrian (shortest distance)',
         value: 'shotest;pedestrian'
       }],
-      timeMode: undefined,
-      timeModes: [{ text: 'Arrive by', value: 'arrival' }, { text: 'Depart at', value: 'departure' }],
       errorMessage: undefined,
       dev: location.hash.match(/dev/),
-      hourItems: [],
-      minuteItems: [],
-      hour: undefined,
-      minute: undefined,
-      travelDay: 'Today',
-      rawDate: undefined,
       routeGeometry: undefined,
       stopsGeometry: undefined,
       boundingBox: undefined,
-      route: undefined
-    }
-  },
-  created () {
-    for (let i = 0; i < 24; i++) {
-      this.hourItems.push(i);
-    }
-    for (let i = 0; i < 60; i++) {
-      this.minuteItems.push(pad2(i));
+      route: undefined,
+      timeDate: {}
     }
   },
   async mounted () {
@@ -171,27 +115,7 @@ export default {
   computed: {
     // when anything changes that was used to calculate the route, we clear the route
     routeParameters () {
-      return [this.from, this.to, this.waypoints.map(w => w && w.geometry.coordinates), this.transportMode, this.timeMode, this.time, Date.now()];
-    },
-    timeIsInvalid () {
-      return this.hour !== undefined && this.minute === undefined;
-    },
-    time () {
-      if (this.hour === undefined || this.minute === undefined) {
-        return undefined;
-      }
-      return ('0' + this.hour).slice(-2) + ':' + pad2(this.minute);
-    },
-    date () {
-      if (!this.isDateSpecified) {
-        const now = (new Date());
-        const todayDate = `${now.getFullYear()}-${pad2(now.getMonth())}-${pad2(now.getDay() + 1)}`;
-        return todayDate;
-      }
-      return this.rawDate;
-    },
-    isDateSpecified () {
-      return this.travelDay !== 'Today' && this.rawDate;
+      return [this.from, this.to, this.waypoints.map(w => w && w.geometry.coordinates), this.transportMode, this.timeDate.timeMode, this.timeDate.time, Date.now()];
     },
     waypointsGeometry () {
       return this.waypoints.filter(w => w && w.geometry && w.geometry.coordinates);
@@ -293,8 +217,8 @@ export default {
         let timeParam = {};
         let walkRadiusParam = {};
         if (this.transportMode.match(/publicTransport/)) {
-          if (this.time) {
-            timeParam = {[this.timeMode]: `${this.date}T${this.time}:00`};
+          if (this.timeDate.time) {
+            timeParam = {[this.timeDate.timeMode]: `${this.timeDate.date}T${this.timeDate.time}:00`};
           }
           walkRadiusParam = { walkRadius: 3000 }
         }
@@ -307,7 +231,7 @@ export default {
         });
         waypointParams[`waypoint${this.waypoints.length + 1}`] = toGeo(this.to);
 
-        const mode = (this.transportMode === 'fastest;publicTransport' && this.time ? 'fastest;publicTransportTimeTable' : this.transportMode);
+        const mode = (this.transportMode === 'fastest;publicTransport' && this.timeDate.time ? 'fastest;publicTransportTimeTable' : this.transportMode);
         return axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
           params: {
             apiKey: routingConfig.hereApiKey,
@@ -431,6 +355,7 @@ export default {
     }
   }
 }
+const pad2 = (x) => ('0' + x).slice(-2);
 const flip = ([a, b]) => [b, a];
 
 function polylineToGeoJSON (polyline) {
@@ -445,69 +370,5 @@ function polylineToGeoJSON (polyline) {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-#maneuvers td, .actions td {
-  padding: 0.5em 0.5em;
-}
-
-#maneuvers .station,
-#maneuvers .transit,
-#maneuvers .line {
-  font-weight:bold;
-}
-
-.bold {
-  font-weight: bold;
-}
-
-.route-summary {
-  margin-bottom:1em;
-}
-
-.route-summary th {
-  text-align: right;
-}
-.route-summary th {
-  /* padding: 0.5em 0; */
-}
-.route-summary td {
-  padding:0 0.25em;
-}
-
-.time {
-  color: #555;
-  vertical-align: top;
-  font-style:italic;
-}
-
-.selected-time {
-  font-size:16px;
-  padding:6px 10px;
-}
-
-.changeId {
-  vertical-align: top;
-  padding: 0;
-  margin: 0;
-}
-
-.changeId span {
-  border: 1px solid black;
-  padding: 0px 6px;
-  border-radius:40px;
-}
-
-#hour {
-  text-align: right;
-}
-
-.colon {
-  text-align: center;
-  vertical-align: bottom;
-  margin-top:auto;
-  margin-bottom:auto;
-  font-size:26px;
-  padding-bottom:8px;
-}
-
 
 </style>
