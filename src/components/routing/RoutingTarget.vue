@@ -22,6 +22,7 @@
 // import { WguEventBus } from '../../WguEventBus.js';
 import { transform } from 'ol/proj';
 export default {
+  name: 'RoutingTarget',
   props: ['label', 'routeTargets'],
   data: () => ({
     target: undefined,

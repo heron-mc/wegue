@@ -71,55 +71,13 @@
                 <v-alert :value="errorMessage" outline type="error" class="ma-3">
                   {{ errorMessage }}
                 </v-alert>
+                <RoutingInstructions :route="route" :dateSpecified="isDateSpecified"/>
+                <v-btn v-if="route" flat color="primary" @click="clickSaveGpx">
+                  <v-icon>cloud_download</v-icon>
+                  &nbsp;&nbsp;Save as GPX file.
+                </v-btn>
 
-                <div v-for="(section, sectionNo) of (sections || [])">
-                  <h2 v-if="sectionNo === 0">Driving directions</h2>
-                  <h3>Section {{ sectionNo + 1 }} ({{ Math.round(section.summary.length/100)/10}} km)</h3>
-                  <div class="actions">
-                    <table>
-                      <tr v-for="action of section.actions">
-                        <td> {{ action.instruction }}</td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-                <div id="route" v-if="routeLegs">
-                  <h2>{{ responseTransportMode }} directions</h2>
-                  <table class="route-summary">
-                    <tr>
-                      <th>Time:</th>
-                      <td>{{ routeDuration }}</td>
-                    </tr>
-                    <tr v-if="routeStartTime">
-                      <th>Start:</th>
-                      <td>{{ routeStartDate && routeStartDate + ' at '}} {{ routeStartTime }}</td>
-                    </tr>
-                    <tr>
-                      <th>Distance:</th>
-                      <td>{{ routeDistance }}</td>
-                    </tr>
-                    <tr v-if="route.publicTransportLine">
-                      <th>Routes:</th>
-                      <td>{{ route.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
-                    </tr>
-                  </table>
 
-                  <h3>Instructions</h3>
-                  <div v-for="leg of routeLegs">
-                    <table id="maneuvers">
-                      <tr v-for="maneuver of leg.maneuver">
-                        <td class="time" v-if="responseTransportMode === 'publicTransportTimeTable' && maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
-                        <td class="time" v-if="responseTransportMode !== 'publicTransportTimeTable' && maneuver.cumulative"> {{ maneuver.cumulative }} </td>
-                        <td v-html="maneuver.instruction">{{maneuver.instruction}}</td>
-                        <td class="changeId" v-if="hasChangeIds"> <span v-if="maneuver.changeId !== undefined">{{ maneuver.changeId }}</span> </td>
-                      </tr>
-                    </table>
-                  </div>
-                  <v-btn flat color="primary" @click="clickSaveGpx">
-                    <v-icon>cloud_download</v-icon>
-                    &nbsp;&nbsp;Save as GPX file.
-                  </v-btn>
-                </div>
 
             </v-form>
 
@@ -132,12 +90,12 @@
 import axios from 'axios';
 import flexpolyline from './flexpolyline';
 import { WguEventBus } from '../../WguEventBus.js';
-import humanizeDuration from 'humanize-duration';
 // Note: you must create this file, following the format of routingConfig.js.example
 import routingConfig from './routingConfig.js';
 import toGpx from 'togpx';
 import { saveAs } from 'file-saver';
 import RoutingTarget from './RoutingTarget';
+import RoutingInstructions from './RoutingInstructions';
 
 function pad2 (x) {
   return ('0' + x).slice(-2);
@@ -150,16 +108,15 @@ export default {
   props: {
   },
   components: {
-    RoutingTarget
+    RoutingTarget,
+    RoutingInstructions
   },
   data () {
     return {
       drawerOpen: undefined,
-      sections: undefined,
       from: undefined,
       to: undefined,
       waypoints: [],
-      route: undefined,
       routeTargets: undefined,
       transportMode: 'fastest;publicTransport',
       transportModes: [{
@@ -196,7 +153,8 @@ export default {
       rawDate: undefined,
       routeGeometry: undefined,
       stopsGeometry: undefined,
-      boundingBox: undefined
+      boundingBox: undefined,
+      route: undefined
     }
   },
   created () {
@@ -219,45 +177,8 @@ export default {
     routeParameters () {
       return [this.from, this.to, this.waypoints.map(w => w && w.geometry.coordinates), this.transportMode, this.timeMode, this.time, Date.now()];
     },
-    routeDuration () {
-      return this.route && humanizeDuration(this.route.summary.baseTime * 1000, { round: true, units: ['h', 'm'] });
-    },
-    routeDistance () {
-      return this.route && `${Math.round(this.route.summary.distance * 10 / 1000) / 10} km`;
-    },
-    routeStartDate () {
-      if (!this.isDateSpecified) {
-        return '';
-      }
-      if (!this.route || !this.route.summary.departure) {
-        return '';
-      }
-      const date = new Date(this.route.summary.departure.slice(0, 10));
-      return `${pad2(date.getDate() + 1)}.${pad2(date.getMonth() + 1)}.${date.getFullYear()}`;
-    },
-    routeStartTime () {
-      return this.route && this.route.summary.departure && this.route.summary.departure.slice(11, 19);
-    },
     timeIsInvalid () {
       return this.hour !== undefined && this.minute === undefined;
-    },
-    responseTransportMode () {
-      if (this.transportMode.match(/^car/)) {
-        return 'Driving';
-      } else {
-        return {
-          'publicTransport': 'Public transport',
-          'publicTransportTimeTable': 'Public transport',
-          'bicycle': 'Bicycle',
-          'pedestrian': 'Walking'
-        }[this.route.mode.transportModes[0]]
-      }
-    },
-    routeLegs () {
-      return this.route && this.route.leg;
-    },
-    hasChangeIds () {
-      return this.route && this.routeLegs.find(l => l.maneuver.find(m => m.changeId));
     },
     time () {
       if (this.hour === undefined || this.minute === undefined) {
@@ -285,7 +206,6 @@ export default {
   },
   watch: {
     routeParameters () {
-      this.sections = undefined;
       this.route = undefined;
       this.routeGeometry = undefined;
       this.stopsGeometry = undefined;
@@ -328,7 +248,6 @@ export default {
       });
     },
     async search () {
-      this.sections = undefined;
       this.errorMessage = undefined;
       this.route = undefined;
       if (this.transportMode.match(/^car/)) {
@@ -366,7 +285,6 @@ export default {
             }).join('&')
       });
       const route = result.data.routes[0];
-      this.sections = route.sections;
 
       console.log(result.data);
       this.routeGeometry = {
@@ -449,10 +367,6 @@ export default {
       }
 
       function routeGeometryFromRoute (route) {
-        // return {
-        //   type: 'LineString',
-        //   coordinates: route.shape.map(coordString => flip(coordString.split(',').map(Number)))
-        // };
         const fc = {
           type: 'FeatureCollection',
           features: []
