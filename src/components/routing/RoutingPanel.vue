@@ -238,7 +238,9 @@ export default {
       minute: undefined,
       travelDay: 'Today',
       rawDate: undefined,
-      routeGeometry: undefined
+      routeGeometry: undefined,
+      stopsGeometry: undefined,
+      boundingBox: undefined
       // selectingPoint: false
     }
   },
@@ -330,6 +332,8 @@ export default {
       this.sections = undefined;
       this.route = undefined;
       this.routeGeometry = undefined;
+      this.stopsGeometry = undefined;
+      this.boundingBox = undefined;
     },
     allGeometry () {
       WguEventBus.$emit('route-update', {
@@ -339,7 +343,9 @@ export default {
           type: 'FeatureCollection',
           features: this.waypointsGeometry
         },
-        endGeometry: this.to && this.to.geometry.coordinates ? { type: 'Point', coordinates: this.to.geometry.coordinates } : undefined
+        endGeometry: this.to && this.to.geometry.coordinates ? { type: 'Point', coordinates: this.to.geometry.coordinates } : undefined,
+        stopsGeometry: this.stopsGeometry,
+        boundingBox: this.boundingBox
       });
     },
     route () {
@@ -446,7 +452,7 @@ export default {
           origin: flip(this.from.geometry.coordinates).join(','),
           destination: flip(this.to.geometry.coordinates).join(','),
           ...(via ? { via } : {}),
-          return: ['summary', 'polyline', 'instructions', 'actions'].join(','),
+          return: 'summary,polyline,instructions,actions',
           apiKey: routingConfig.hereApiKey
         },
         // the API wants &via=x,y&via=x,y whereas Axios by default provides &via[]=x,y&via[]=x,y
@@ -469,8 +475,12 @@ export default {
     async getRouteV7 () {
       const makeRequest = () => {
         let timeParam = {};
-        if (this.time && this.transportMode.match(/publicTransport/)) {
-          timeParam = {[this.timeMode]: `${this.date}T${this.time}:00`};
+        let walkRadiusParam = {};
+        if (this.transportMode.match(/publicTransport/)) {
+          if (this.time) {
+            timeParam = {[this.timeMode]: `${this.date}T${this.time}:00`};
+          }
+          walkRadiusParam = { walkRadius: 3000 }
         }
         const toGeo = point => `geo!${point.geometry.coordinates[1]},${point.geometry.coordinates[0]}`;
         const waypointParams = {
@@ -491,7 +501,8 @@ export default {
             maneuverattributes: 'all', // TODO strip down to the ones we need.
             routeattributes: 'all',
             combineChange: true, // avoid separate "enter" and "leave" steps for interchanges
-            ...timeParam
+            ...timeParam,
+            ...walkRadiusParam
             // language: 'de-de'
           }
         });
@@ -521,11 +532,35 @@ export default {
         };
       }
 
-      function routeGeometryFromRoute (route) {
+      function shapeToLineFeature (shape, maneuver) {
         return {
-          type: 'LineString',
-          coordinates: route.shape.map(coordString => flip(coordString.split(',').map(Number)))
+          type: 'Feature',
+          properties: {
+            type: maneuver._type
+          },
+          geometry: {
+            type: 'LineString',
+            coordinates: shape.map(coordString => flip(coordString.split(',').map(Number)))
+          }
         };
+      }
+
+      function routeGeometryFromRoute (route) {
+        // return {
+        //   type: 'LineString',
+        //   coordinates: route.shape.map(coordString => flip(coordString.split(',').map(Number)))
+        // };
+        const fc = {
+          type: 'FeatureCollection',
+          features: []
+        };
+        for (const leg of route.leg) {
+          const lineFeatures = leg.maneuver
+            .filter(m => m.shape.length > 1)
+            .map(m => shapeToLineFeature(m.shape, m));
+          fc.features.push(...lineFeatures);
+        }
+        return fc;
       }
 
       function addCumulativeTimes (leg) {
@@ -558,14 +593,9 @@ export default {
       route.leg.forEach(addCumulativeTimes);
       this.route = route;
       console.log(route);
+      this.boundingBox = [route.boundingBox.topLeft.longitude, route.boundingBox.bottomRight.latitude, route.boundingBox.bottomRight.longitude, route.boundingBox.topLeft.latitude];
       this.routeGeometry = routeGeometryFromRoute(route);
-      WguEventBus.$emit('route-update', {
-        routeGeometry: this.routeGeometry,
-        stopsGeometry: stopsGeometryFromRoute(route),
-        startGeometry: { type: 'Point', coordinates: this.routeGeometry.coordinates[0] },
-        endGeometry: { type: 'Point', coordinates: this.routeGeometry.coordinates.slice(-1)[0] },
-        boundingBox: [route.boundingBox.topLeft.longitude, route.boundingBox.bottomRight.latitude, route.boundingBox.bottomRight.longitude, route.boundingBox.topLeft.latitude]
-      });
+      this.stopsGeometry = stopsGeometryFromRoute(route);
     }
   }
 

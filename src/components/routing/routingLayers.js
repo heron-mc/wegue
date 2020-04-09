@@ -108,26 +108,47 @@ export function routingLayers (routingOptions, map) {
   const routeLayer = new VectorLayer({
     name: 'route',
     displayInLayerList: false,
-    style: [
-      new Style({
-        stroke: new Stroke({
-          width: 12,
-          color: 'hsla(250,50%,20%,0.4)'
-        })
-      }),
-      new Style({
-        stroke: new Stroke({
-          width: 8,
-          color: 'hsla(250,100%,20%,0.9)'
-        })
-      }),
-      new Style({
-        stroke: new Stroke({
-          width: 4,
-          color: 'white'
-        })
-      })
-    ],
+    style: feature => {
+      if (feature.getProperties().type === 'PrivateTransportManeuverType') {
+        return [
+          new Style({
+            stroke: new Stroke({
+              width: 8,
+              color: 'hsla(250,100%,20%,0.9)',
+              lineDash: [2, 10]
+            })
+          }),
+          new Style({
+            stroke: new Stroke({
+              width: 4,
+              color: 'white',
+              lineDash: [2, 10]
+            })
+          })
+        ];
+      } else {
+        return [
+          new Style({
+            stroke: new Stroke({
+              width: 12,
+              color: 'hsla(250,50%,20%,0.4)'
+            })
+          }),
+          new Style({
+            stroke: new Stroke({
+              width: 8,
+              color: 'hsla(250,100%,20%,0.9)'
+            })
+          }),
+          new Style({
+            stroke: new Stroke({
+              width: 4,
+              color: 'white'
+            })
+          })
+        ]
+      }
+    },
     source: routeSource
   });
   WguEventBus.$on('route-update', ({
