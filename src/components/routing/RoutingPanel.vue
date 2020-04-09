@@ -76,11 +76,7 @@
                   <v-icon>cloud_download</v-icon>
                   &nbsp;&nbsp;Save as GPX file.
                 </v-btn>
-
-
-
             </v-form>
-
         </v-card>
     </v-navigation-drawer>
 </template>
@@ -284,12 +280,12 @@ export default {
               return vals.map(val => `${key}=${val}`).join('&')
             }).join('&')
       });
-      const route = result.data.routes[0];
+      this.route = result.data.routes[0];
 
       console.log(result.data);
       this.routeGeometry = {
         type: 'FeatureCollection',
-        features: route.sections.map(section => polylineToGeoJSON(section.polyline))
+        features: this.route.sections.map(section => polylineToGeoJSON(section.polyline))
       };
     },
     async getRouteV7 () {

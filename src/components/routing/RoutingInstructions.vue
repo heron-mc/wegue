@@ -1,5 +1,6 @@
 <<template>
-<div v-if="route">
+<div id="route"v-if="route">
+  <!-- v8 response -->
   <div v-for="(section, sectionNo) of (route.sections || [])">
     <h2 v-if="sectionNo === 0">Driving directions</h2>
     <h3>Section {{ sectionNo + 1 }} ({{ Math.round(section.summary.length/100)/10}} km)</h3>
@@ -11,7 +12,8 @@
       </table>
     </div>
   </div>
-  <div id="route" v-if="routeLegs">
+  <!-- v7 response -->
+  <div v-if="routeLegs">
     <h2>{{ responseTransportMode }} directions</h2>
     <table class="route-summary">
       <tr>
