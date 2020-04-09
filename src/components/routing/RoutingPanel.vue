@@ -6,71 +6,22 @@
         absolute
     >
         <v-card class="pa-2">
-            <v-form v-if="routeTargets">
+            <v-form>
                 <v-select
                   :items="transportModes"
                   v-model="transportMode"
                   label="Mode"
                   outline
-                ></v-select>                
-                <v-autocomplete
-                  :items="routeTargets.from"
-                  :disabled="!routeTargets.from"
-                  v-model="from"
-                  label="From"
-                  solo
-                  clearable
-                  @change="changeRouteTarget(from)"
-                  @click:clear="clearCustomTarget(from)"
-                >
-                </v-autocomplete>
-                <v-alert color="info" outline :value="choosingPoint(from)">
-                  <v-icon>location_searching</v-icon>
-                  Click on the map to choose a location.
-                </v-alert>
-
-                    <!-- <v-btn
-                      small
-                      round
-                      v-if="from && from.properties.name === 'Point on map'"
-                      :depressed="selectingPoint"
-                      :color="selectingPoint ? 'cyan' : ''"
-                      @click="clickSelectPoint"
-                      style="margin-top:-20px"
-                    >
-                      <v-icon>location_searching</v-icon>
-                      Select point
-                    </v-btn> -->
-                <v-autocomplete v-for="(waypoint, i) in waypoints"
-                  :key="i"
-                  :items="routeTargets[i]"
-                  :disabled="!routeTargets"
-                  clearable
-                  v-model="waypoints[i]"
-                  label="via"
-                  @click:clear="clearCustomTarget(waypoints[i]), clearWaypoint(i)"
-                  @change="changeRouteTarget(waypoints[i])"
-                  solo
-                ></v-autocomplete>
-                <v-btn color="primary" flat small 
+                ></v-select>
+                <RoutingTarget label="From" @change="from = $event" :routeTargets="routeTargets"/>
+                <RoutingTarget v-for="(waypoint, i) in waypoints" label="via" @change="$set(waypoints, i, $event)" :routeTargets="routeTargets" :key="i" />
+                <!-- <RoutingTarget v-if="waypoints.length" label="via" @change="waypoints[0] = $event"  :routeTargets="routeTargets"/> -->
+                <v-btn color="primary" flat small
                   v-if="from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
                   Add stop
                 </v-btn>
                 <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
-                <v-autocomplete
-                  :items="routeTargets.to"
-                  :disabled="!routeTargets.to"
-                  v-model="to"
-                  label="to"
-                  solo
-                  clearable
-                  @change="changeRouteTarget(to)"
-                  @click:clear="clearCustomTarget(to)"
-                ></v-autocomplete>
-                <v-alert color="info" outline :value="choosingPoint(to)">
-                  <v-icon>location_searching</v-icon>
-                  Click on the map to choose a location.
-                </v-alert>
+                <RoutingTarget label="to" @change="to = $event"  :routeTargets="routeTargets"/>
                 <div v-if="transportMode === 'fastest;publicTransport' && from && to">
                   <v-select
                     :items="timeModes"
@@ -99,22 +50,18 @@
                       ></v-select>
                     </v-flex>
                   </v-layout>
-                  <v-select 
+                  <v-select
                     v-if="timeMode && time"
                     v-model="travelDay"
                     :items="['Today', 'Another day']"
                   /></v-select>
 
-
-
-                  <v-date-picker 
+                  <v-date-picker
                     v-if="timeMode && travelDay !== 'Today'"
                     v-model="rawDate"
                     label="Date"
 
                   ></v-date-picker>
-
-
                 </div>
                 <v-container justify-center="true">
                   <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(time && timeIsInvalid)">
@@ -124,7 +71,7 @@
                 <v-alert :value="errorMessage" outline type="error" class="ma-3">
                   {{ errorMessage }}
                 </v-alert>
-                
+
                 <div v-for="(section, sectionNo) of (sections || [])">
                   <h2 v-if="sectionNo === 0">Driving directions</h2>
                   <h3>Section {{ sectionNo + 1 }} ({{ Math.round(section.summary.length/100)/10}} km)</h3>
@@ -156,7 +103,7 @@
                       <td>{{ route.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
                     </tr>
                   </table>
-                          
+
                   <h3>Instructions</h3>
                   <div v-for="leg of routeLegs">
                     <table id="maneuvers">
@@ -169,11 +116,11 @@
                     </table>
                   </div>
                   <v-btn flat color="primary" @click="clickSaveGpx">
-                    <v-icon>cloud_download</v-icon> 
+                    <v-icon>cloud_download</v-icon>
                     &nbsp;&nbsp;Save as GPX file.
                   </v-btn>
                 </div>
-                
+
             </v-form>
 
         </v-card>
@@ -188,9 +135,9 @@ import { WguEventBus } from '../../WguEventBus.js';
 import humanizeDuration from 'humanize-duration';
 // Note: you must create this file, following the format of routingConfig.js.example
 import routingConfig from './routingConfig.js';
-import { transform } from 'ol/proj';
 import toGpx from 'togpx';
 import { saveAs } from 'file-saver';
+import RoutingTarget from './RoutingTarget';
 
 function pad2 (x) {
   return ('0' + x).slice(-2);
@@ -202,15 +149,18 @@ export default {
   },
   props: {
   },
+  components: {
+    RoutingTarget
+  },
   data () {
     return {
       drawerOpen: undefined,
       sections: undefined,
-      routeTargets: { from: null, to: null, 0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null, 9: null },
       from: undefined,
       to: undefined,
       waypoints: [],
       route: undefined,
+      routeTargets: undefined,
       transportMode: 'fastest;publicTransport',
       transportModes: [{
         text: 'Car (fastest)',
@@ -247,7 +197,6 @@ export default {
       routeGeometry: undefined,
       stopsGeometry: undefined,
       boundingBox: undefined
-      // selectingPoint: false
     }
   },
   created () {
@@ -327,9 +276,6 @@ export default {
     isDateSpecified () {
       return this.travelDay !== 'Today' && this.rawDate;
     },
-    selectingPoint () {
-      return this.from && this.from.properties.name === 'Point on map' && this.from.geometry.coordinates === null;
-    },
     waypointsGeometry () {
       return this.waypoints.filter(w => w && w.geometry && w.geometry.coordinates);
     },
@@ -364,21 +310,6 @@ export default {
       } else {
         this.routeGeometry = undefined;
       }
-    },
-    selectingPoint () {
-    //   if (this.selectingPoint) {
-    //     window.map.getViewport().style.cursor = 'crosshair';
-    //     const self = this;
-    //     window.map.on('click', e => {
-    //       // just checking we're still in the same state
-    //       if (self.selectingPoint) {
-    //         const coords = transform(e.coordinate, window.map.getView().getProjection(), 'EPSG:4326');
-    //         console.log(coords);
-    //         window.map.getViewport().style.cursor = '';
-    //         self.from.geometry.coordinates = coords;
-    //       }
-    //     });
-    //   }
     }
   },
   methods: {
@@ -393,48 +324,9 @@ export default {
           routeTargets.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi })));
         }
         routeTargets.sort((a, b) => (a.text < b.text ? -1 : 1));
-
-        ['from', 'to', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(targetSetId => {
-          this.routeTargets[targetSetId] = [{
-            text: 'Point on map',
-            value: {
-              type: 'Feature',
-              properties: {
-                name: 'Point on map'
-              },
-              geometry: {
-                type: 'Point',
-                coordinates: null
-              }
-            }
-          }, ...routeTargets];
-        });
+        this.routeTargets = routeTargets;
       });
     },
-    clearCustomTarget (targetSet) {
-      targetSet.geometry.coordinates = null;
-    },
-    changeRouteTarget (targetSet) {
-      if (targetSet && targetSet.geometry.coordinates === null) {
-        window.map.getViewport().style.cursor = 'crosshair';
-        // const self = this;
-        window.map.once('click', e => {
-          // just checking we're still in the same state
-          if (targetSet.geometry.coordinates === null) {
-            const coords = transform(e.coordinate, window.map.getView().getProjection(), 'EPSG:4326');
-            console.log(coords);
-            window.map.getViewport().style.cursor = '';
-            targetSet.geometry.coordinates = coords;
-          }
-        });
-      }
-
-      // console.log(targetSet.geometry.coordinates)
-    },
-    choosingPoint (targetSet) {
-      return targetSet && targetSet.properties.name === 'Point on map' && targetSet.geometry.coordinates === null;
-    },
-
     async search () {
       this.sections = undefined;
       this.errorMessage = undefined;
