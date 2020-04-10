@@ -4,7 +4,7 @@
     :items="timeModes"
     v-model="timeMode"
     clearable
-    label="Select arrival or departure"
+    label="Arrival or departure time"
   ></v-select>
   <v-layout row v-if="timeMode">
     <v-flex col xs3>

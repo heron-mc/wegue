@@ -172,7 +172,7 @@ export default {
       this.route = undefined;
       if (this.transportMode.match(/^car/)) {
         return this.getRouteV8();
-      } else /* if (this.transportMode === 'publicTransport') */{
+      } else {
         return this.getRouteV7();
       }
     },
