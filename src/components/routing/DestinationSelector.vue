@@ -10,6 +10,10 @@
     @click:clear="clearCustomTarget"
     :search-input.sync="searchQuery"
   >
+    <template v-slot:item="data">
+        <v-icon class="nav-icon" v-if="data.item.value.properties.source === 'custom'" >location_searching</v-icon>
+        <span  :class="{ local: data.item.source === 'local', geocode: data.item.source === 'geocode', custom: data.item.value.properties.source === 'custom' }">{{ data.item.text }}</span>
+    </template>
   </v-autocomplete>
   <v-alert color="info" outline :value="choosingPoint">
     <v-icon>location_searching</v-icon>
@@ -32,7 +36,7 @@ export default {
     searchQuery: undefined,
     customPoint: {
       text: 'Point on map',
-      value: feature({ name: 'Point on map', _customPoint: true }, point(null))
+      value: feature({ name: 'Point on map', source: 'custom' }, point(null))
     }
   }),
   watch: {
@@ -54,14 +58,15 @@ export default {
       });
       const results = result.items.map(item => ({
         text: item.title,
-        value: feature({ source: 'geocode' }, point([item.position.lng, item.position.lat]))
+        source: 'geocode',
+        value: feature({}, point([item.position.lng, item.position.lat]))
       }));
       this.geocodeSuggestions = results;
     }
   },
   computed: {
     choosingPoint () {
-      return this.target && this.target.properties._customPoint && this.target.geometry.coordinates === null;
+      return this.target && this.target.properties.source === 'custom' && this.target.geometry.coordinates === null;
     }
   },
   methods: {
@@ -69,11 +74,12 @@ export default {
       return transform(coord, this.$map.getView().getProjection(), 'EPSG:4326');
     },
     changeRouteTarget () {
-      if (this.target && this.target.properties._customPoint) {
+      console.log(this.target);
+      if (this.target && this.target.properties.source === 'custom') {
         this.$map.getViewport().style.cursor = 'crosshair';
         this.$map.once('click', e => {
           // just checking we're still in the same state
-          if (this.target.properties._customPoint) {
+          if (this.target.properties.source === 'custom') {
             const coords = this.toEpsg4326(e.coordinate);
             this.$map.getViewport().style.cursor = '';
             this.target.geometry.coordinates = coords;
@@ -89,5 +95,13 @@ export default {
 </script>
 
 <style scoped>
+.local {
+  color: rgb(226, 0, 122);
+  font-weight:bold;
+}
+.nav-icon {
+  margin-left:-6px;
+  margin-right: 10px;
+}
 
 </style>
