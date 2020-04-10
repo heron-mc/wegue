@@ -48,7 +48,7 @@ import RoutingInstructions from './RoutingInstructions';
 import DateTimePicker from './DateTimePicker';
 import DownloadGPX from './DownloadGPX'
 import { getRouteV7, getRouteV8 } from './hereRoutingApi';
-
+import { featureCollection } from './routingUtils';
 export default {
   name: 'wgu-routing-panel',
   directives: {
@@ -142,10 +142,7 @@ export default {
       WguEventBus.$emit('route-update', {
         routeGeometry: this.routeGeometry,
         startGeometry: this.from && this.from.geometry.coordinates ? { type: 'Point', coordinates: this.from.geometry.coordinates } : undefined,
-        waypointsGeometry: {
-          type: 'FeatureCollection',
-          features: this.waypointsGeometry
-        },
+        waypointsGeometry: featureCollection(this.waypointsGeometry),
         endGeometry: this.to && this.to.geometry.coordinates ? { type: 'Point', coordinates: this.to.geometry.coordinates } : undefined,
         stopsGeometry: this.stopsGeometry,
         boundingBox: this.boundingBox

@@ -21,6 +21,7 @@
 <script>
 // import { WguEventBus } from '../../WguEventBus.js';
 import { transform } from 'ol/proj';
+import { flip, feature, point } from './routingUtils';
 export default {
   name: 'RoutingTarget',
   props: ['label', 'routeTargets'],
@@ -36,16 +37,7 @@ export default {
       handler () {
         const customPoint = {
           text: 'Point on map',
-          value: {
-            type: 'Feature',
-            properties: {
-              name: 'Point on map'
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: null
-            }
-          }
+          value: feature({ name: 'Point on map' }, point(null))
         };
         if (this.routeTargets) {
           this.localSuggestions = [customPoint, ...this.routeTargets];
@@ -60,13 +52,16 @@ export default {
     }
   },
   methods: {
+    toEpsg4326 (coord) {
+      return transform(coord, this.$map.getView().getProjection(), 'EPSG:4326');
+    },
     changeRouteTarget () {
       if (this.target && this.target.geometry.coordinates === null) {
         this.$map.getViewport().style.cursor = 'crosshair';
         this.$map.once('click', e => {
           // just checking we're still in the same state
           if (this.target.geometry.coordinates === null) {
-            const coords = transform(e.coordinate, this.$map.getView().getProjection(), 'EPSG:4326');
+            const coords = this.toEpsg4326(e.coordinate);
             console.log(coords);
             this.$map.getViewport().style.cursor = '';
             this.target.geometry.coordinates = coords;

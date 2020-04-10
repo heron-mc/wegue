@@ -2,9 +2,7 @@
 import routingConfig from './routingConfig.js';
 import axios from 'axios';
 import flexpolyline from './flexpolyline';
-
-const pad2 = (x) => ('0' + x).slice(-2);
-const flip = ([a, b]) => [b, a];
+import { flip, pad2, featureCollection, feature, point, lineString } from './routingUtils';
 
 export async function getRouteV7 ({
   from,
@@ -57,40 +55,20 @@ export async function getRouteV7 ({
       stops.push(...newStops);
     }
 
-    return {
-      type: 'FeatureCollection',
-      features: stops.map(m => ({
-        type: 'Feature',
-        properties: {
-          changeId: m.changeId
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [m.position.longitude, m.position.latitude]
-        }
-      }))
-    };
+    return featureCollection(stops.map(m =>
+      feature({ changeId: m.changeId }, point([m.position.longitude, m.position.latitude]))))
   }
 
   function shapeToLineFeature (shape, maneuver) {
-    return {
-      type: 'Feature',
-      properties: {
-        type: maneuver._type,
-        instruction: maneuver.instruction.replace(/(<([^>]+)>)/g, '')
-      },
-      geometry: {
-        type: 'LineString',
-        coordinates: shape.map(coordString => flip(coordString.split(',').map(Number)))
-      }
-    };
+    return feature({
+      type: maneuver._type,
+      instruction: maneuver.instruction.replace(/(<([^>]+)>)/g, '')
+    }, lineString(shape.map(coordString => flip(coordString.split(',').map(Number))))
+    );
   }
 
   function routeGeometryFromRoute (route) {
-    const fc = {
-      type: 'FeatureCollection',
-      features: []
-    };
+    const fc = featureCollection([]);
     for (const leg of route.leg) {
       const lineFeatures = leg.maneuver
         .filter(m => m.shape.length > 1)
@@ -138,10 +116,7 @@ export async function getRouteV7 ({
 
 function polylineToGeoJSON (polyline) {
   const points = flexpolyline.decode(polyline).polyline
-  return {
-    type: 'LineString',
-    coordinates: points.map(([a, b]) => [b, a])
-  }
+  return lineString(points.map(flip))
 }
 
 export async function getRouteV8 ({
