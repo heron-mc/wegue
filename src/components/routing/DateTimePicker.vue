@@ -43,7 +43,7 @@
 </template>
 
 <script>
-const pad2 = (x) => ('0' + x).slice(-2);
+import { pad2 } from './routingUtils';
 
 export default {
   data: () => ({
@@ -66,7 +66,7 @@ export default {
   },
   computed: {
     time () {
-      if (this.hour === undefined || this.minute === undefined) {
+      if (!this.timeMode || this.hour === undefined || this.minute === undefined) {
         return undefined;
       }
       return ('0' + this.hour).slice(-2) + ':' + pad2(this.minute);
@@ -80,7 +80,7 @@ export default {
       return this.rawDate;
     },
     isDateSpecified () {
-      return this.travelDay !== 'Today' && this.rawDate;
+      return this.timeMode && this.travelDay !== 'Today' && this.rawDate;
     },
     isTimeValid () {
       return !(this.hour !== undefined && this.minute === undefined);
