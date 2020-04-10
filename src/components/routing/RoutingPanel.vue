@@ -13,14 +13,14 @@
           label="Mode"
           outline
         ></v-select>
-        <RoutingTarget label="From" @change="from = $event" :routeTargets="routeTargets"/>
-        <RoutingTarget v-for="(waypoint, i) in waypoints" label="via" @change="$set(waypoints, i, $event)" :routeTargets="routeTargets" :key="i" />
+        <DestinationSelector label="From" @change="from = $event" :localSuggestions="localSuggestions"/>
+        <DestinationSelector v-for="(waypoint, i) in waypoints" label="via" @change="$set(waypoints, i, $event)" :localSuggestions="localSuggestions" :key="i" />
         <v-btn color="primary" flat small
           v-if="from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
           Add stop
         </v-btn>
         <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
-        <RoutingTarget label="to" @change="to = $event"  :routeTargets="routeTargets"/>
+        <DestinationSelector label="to" @change="to = $event"  :localSuggestions="localSuggestions"/>
         <div v-if="transportMode === 'fastest;publicTransport' && from && to">
           <DateTimePicker @change="timeDate=$event"/>
         </div>
@@ -43,12 +43,12 @@
 
 import axios from 'axios';
 import { WguEventBus } from '../../WguEventBus.js';
-import RoutingTarget from './RoutingTarget';
+import DestinationSelector from './DestinationSelector';
 import RoutingInstructions from './RoutingInstructions';
 import DateTimePicker from './DateTimePicker';
 import DownloadGPX from './DownloadGPX'
 import { getRouteV7, getRouteV8 } from './hereRoutingApi';
-import { featureCollection } from './routingUtils';
+import { featureCollection, point } from './routingUtils';
 export default {
   name: 'wgu-routing-panel',
   directives: {
@@ -56,7 +56,7 @@ export default {
   props: {
   },
   components: {
-    RoutingTarget, // The autocomplete component with places to route to/from
+    DestinationSelector, // The autocomplete component with places to route to/from
     RoutingInstructions, // Shows the instructions as returned by the routing API
     DateTimePicker, // Allows choosing departure/arrival time and optionally date, for public transit trips
     DownloadGPX
@@ -67,7 +67,7 @@ export default {
       from: undefined,
       to: undefined,
       waypoints: [],
-      routeTargets: undefined,
+      localSuggestions: undefined,
       transportMode: 'fastest;publicTransport',
       transportModes: [{
         text: 'Car (fastest)',
@@ -101,7 +101,7 @@ export default {
     }
   },
   async mounted () {
-    this.initRouteTargets()
+    this.loadLocalSuggestions()
     window.RoutingPanel = this;
     WguEventBus.$on('toggle-routing-panel', state => {
       this.drawerOpen = state === undefined ? !this.drawerOpen : state;
@@ -141,9 +141,9 @@ export default {
     allGeometry () {
       WguEventBus.$emit('route-update', {
         routeGeometry: this.routeGeometry,
-        startGeometry: this.from && this.from.geometry.coordinates ? { type: 'Point', coordinates: this.from.geometry.coordinates } : undefined,
+        startGeometry: this.from && this.from.geometry.coordinates ? point(this.from.geometry.coordinates) : undefined,
         waypointsGeometry: featureCollection(this.waypointsGeometry),
-        endGeometry: this.to && this.to.geometry.coordinates ? { type: 'Point', coordinates: this.to.geometry.coordinates } : undefined,
+        endGeometry: this.to && this.to.geometry.coordinates ? point(this.to.geometry.coordinates) : undefined,
         stopsGeometry: this.stopsGeometry,
         boundingBox: this.boundingBox
       });
@@ -157,18 +157,18 @@ export default {
     }
   },
   methods: {
-    initRouteTargets () {
+    loadLocalSuggestions () {
       WguEventBus.$on('ol-map-rendered', async () => {
         // Find layers that have been marked 'routable' in app config, and use them as routing targets
         const layerUrls = this.$map.getLayers().getArray().filter(l => l.getProperties().routable).map(l => l.getSource().getUrl());
         const featureCollections = await Promise.all(layerUrls.map(axios.get));
         console.log(featureCollections[0].data.features[0]);
-        const routeTargets = []
+        const localSuggestions = []
         for (const { data } of featureCollections) {
-          routeTargets.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi })));
+          localSuggestions.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi })));
         }
-        routeTargets.sort((a, b) => (a.text < b.text ? -1 : 1));
-        this.routeTargets = routeTargets;
+        localSuggestions.sort((a, b) => (a.text < b.text ? -1 : 1));
+        this.localSuggestions = localSuggestions;
       });
     },
     async search () {

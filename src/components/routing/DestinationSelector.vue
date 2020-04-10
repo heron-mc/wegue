@@ -1,8 +1,7 @@
 <template>
 <div class="routing-target">
   <v-autocomplete
-    :items="[...localSuggestions, ...geocodeSuggestions]"
-    :disabled="!localSuggestions"
+    :items="[customPoint, ...localSuggestions, ...geocodeSuggestions]"
     v-model="target"
     :label="label"
     solo
@@ -26,30 +25,21 @@ import { transform } from 'ol/proj';
 import axios from 'axios';
 import { flip, feature, point } from './routingUtils';
 export default {
-  name: 'RoutingTarget',
-  props: ['label', 'routeTargets'],
+  name: 'DestinationSelector',
+  props: ['label', 'localSuggestions'],
   data: () => ({
     target: undefined,
-    localSuggestions: [],
     geocodeSuggestions: [],
-    searchQuery: undefined
+    searchQuery: undefined,
+    customPoint: {
+      text: 'Point on map',
+      value: feature({ name: 'Point on map', _customPoint: true }, point(null))
+    }
   }),
   watch: {
     target () {
       console.log({ target: this.target });
       this.$emit('change', this.target);
-    },
-    routeTargets: {
-      handler () {
-        const customPoint = {
-          text: 'Point on map',
-          value: feature({ name: 'Point on map' }, point(null))
-        };
-        if (this.routeTargets) {
-          this.localSuggestions = [customPoint, ...this.routeTargets];
-        }
-      },
-      immediate: true
     },
     async searchQuery () {
       this.geocodeSuggestions = [];
@@ -75,7 +65,7 @@ export default {
   },
   computed: {
     choosingPoint () {
-      return this.target && this.target.properties.name === 'Point on map' && this.target.geometry.coordinates === null;
+      return this.target && this.target.properties._customPoint && this.target.geometry.coordinates === null;
     }
   },
   methods: {
@@ -83,11 +73,12 @@ export default {
       return transform(coord, this.$map.getView().getProjection(), 'EPSG:4326');
     },
     changeRouteTarget () {
-      if (this.target && this.target.geometry.coordinates === null) {
+      console.log(this.target);
+      if (this.target && this.target.properties._customPoint) {
         this.$map.getViewport().style.cursor = 'crosshair';
         this.$map.once('click', e => {
           // just checking we're still in the same state
-          if (this.target.geometry.coordinates === null) {
+          if (this.target.properties._customPoint) {
             const coords = this.toEpsg4326(e.coordinate);
             console.log(coords);
             this.$map.getViewport().style.cursor = '';
