@@ -32,11 +32,8 @@
         <v-alert :value="errorMessage" outline type="error" class="ma-3">
           {{ errorMessage }}
         </v-alert>
-        <RoutingInstructions :route="route" :dateSpecified="timeDate.isDateSpecified"/>
-        <v-btn v-if="route" flat color="primary" @click="clickSaveGpx">
-          <v-icon>cloud_download</v-icon>
-          &nbsp;&nbsp;Save as GPX file.
-        </v-btn>
+        <RoutingInstructions v-if="route" :route="route" :dateSpecified="timeDate.isDateSpecified" :transportModeTitle="responseTransportMode"/>
+        <DownloadGPX :routeGeometry="routeGeometry" :transportMode="transportMode" />
       </v-form>
     </v-card>
   </v-navigation-drawer>
@@ -46,11 +43,10 @@
 
 import axios from 'axios';
 import { WguEventBus } from '../../WguEventBus.js';
-import toGpx from 'togpx';
-import { saveAs } from 'file-saver';
 import RoutingTarget from './RoutingTarget';
 import RoutingInstructions from './RoutingInstructions';
-import DateTimePicker from './DateTimePicker.vue';
+import DateTimePicker from './DateTimePicker';
+import DownloadGPX from './DownloadGPX'
 import { getRouteV7, getRouteV8 } from './hereRoutingApi';
 
 export default {
@@ -62,7 +58,8 @@ export default {
   components: {
     RoutingTarget, // The autocomplete component with places to route to/from
     RoutingInstructions, // Shows the instructions as returned by the routing API
-    DateTimePicker // Allows choosing departure/arrival time and optionally date, for public transit trips
+    DateTimePicker, // Allows choosing departure/arrival time and optionally date, for public transit trips
+    DownloadGPX
   },
   data () {
     return {
@@ -120,6 +117,18 @@ export default {
     },
     allGeometry () {
       return [this.from && this.from.geometry.coordinates, this.waypoints.map(w => w && w.geometry.coordinates), this.to && this.to.geometry.coordinates, this.routeGeometry];
+    },
+    responseTransportMode () {
+      if (!this.route.mode || !this.route.mode.transportModes) {
+        return 'Driving';
+      } else {
+        return {
+          'publicTransport': 'Public transport',
+          'publicTransportTimeTable': 'Public transport',
+          'bicycle': 'Bicycle',
+          'pedestrian': 'Walking'
+        }[this.route.mode.transportModes[0]]
+      }
     }
   },
   watch: {
@@ -201,25 +210,6 @@ export default {
         this.routeGeometry = response.routeGeometry;
         this.stopsGeometry = response.stopsGeometry;
       }
-    },
-    clickSaveGpx () {
-      if (!this.routeGeometry) {
-        return;
-      }
-      const geom = JSON.parse(JSON.stringify(this.routeGeometry));
-      geom.features.forEach(line => {
-        line.properties = {
-          name: line.properties.instruction
-        }
-      });
-      const gpx = toGpx(geom, {
-        creator: 'Wegue',
-        metadata: {
-          name: `${this.responseTransportMode} directions`
-        }
-      });
-      const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-      saveAs(blob, 'route.gpx');
     }
   }
 }

@@ -74,7 +74,7 @@ export default {
     date () {
       if (!this.isDateSpecified) {
         const now = (new Date());
-        const todayDate = `${now.getFullYear()}-${pad2(now.getMonth())}-${pad2(now.getDay() + 1)}`;
+        const todayDate = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
         return todayDate;
       }
       return this.rawDate;

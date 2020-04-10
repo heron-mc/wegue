@@ -14,7 +14,7 @@
   </div>
   <!-- v7 response -->
   <div v-if="routeLegs">
-    <h2>{{ responseTransportMode }} directions</h2>
+    <h2>{{ transportModeTitle }} directions</h2>
     <table class="route-summary">
       <tr>
         <th>Time:</th>
@@ -38,8 +38,8 @@
     <div v-for="leg of routeLegs">
       <table class="maneuvers">
         <tr v-for="maneuver of leg.maneuver">
-          <td class="time" v-if="responseTransportMode === 'publicTransportTimeTable' && maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
-          <td class="time" v-if="responseTransportMode !== 'publicTransportTimeTable' && maneuver.cumulative"> {{ maneuver.cumulative }} </td>
+          <td class="time" v-if="isScheduled && maneuver.time"> {{ maneuver.time.slice(11, 19) }} </td>
+          <td class="time" v-if="!isScheduled && maneuver.cumulative"> {{ maneuver.cumulative }} </td>
           <td v-html="maneuver.instruction">{{maneuver.instruction}}</td>
           <td class="changeId" v-if="hasChangeIds"> <span v-if="maneuver.changeId !== undefined">{{ maneuver.changeId }}</span> </td>
         </tr>
@@ -55,7 +55,7 @@ function pad2 (x) {
   return ('0' + x).slice(-2);
 }
 export default {
-  props: ['route', 'dateSpecified'],
+  props: ['route', 'dateSpecified', 'transportModeTitle'],
   data: () => ({
   }),
   name: 'RoutingInstructions',
@@ -80,23 +80,14 @@ export default {
       return this.route && this.route.summary.departure && this.route.summary.departure.slice(11, 19);
     },
 
-    responseTransportMode () {
-      if (!this.route.mode || !this.route.mode.transportModes) {
-        return 'Driving';
-      } else {
-        return {
-          'publicTransport': 'Public transport',
-          'publicTransportTimeTable': 'Public transport',
-          'bicycle': 'Bicycle',
-          'pedestrian': 'Walking'
-        }[this.route.mode.transportModes[0]]
-      }
-    },
     routeLegs () {
       return this.route && this.route.leg;
     },
     hasChangeIds () {
       return this.route && this.routeLegs.find(l => l.maneuver.find(m => m.changeId));
+    },
+    isScheduled () {
+      return this.route.mode && this.route.mode.transportModes[0] === 'publicTransportTimeTable';
     }
   }
 
