@@ -1,7 +1,7 @@
 <template>
 <div class="routing-target">
   <v-autocomplete
-    :items="localSuggestions"
+    :items="[...localSuggestions, ...geocodeSuggestions]"
     :disabled="!localSuggestions"
     v-model="target"
     :label="label"
@@ -9,6 +9,7 @@
     clearable
     @change="changeRouteTarget"
     @click:clear="clearCustomTarget"
+    :search-input.sync="searchQuery"
   >
   </v-autocomplete>
   <v-alert color="info" outline :value="choosingPoint">
@@ -20,17 +21,22 @@
 
 <script>
 // import { WguEventBus } from '../../WguEventBus.js';
+import routingConfig from './routingConfig';
 import { transform } from 'ol/proj';
+import axios from 'axios';
 import { flip, feature, point } from './routingUtils';
 export default {
   name: 'RoutingTarget',
   props: ['label', 'routeTargets'],
   data: () => ({
     target: undefined,
-    localSuggestions: []
+    localSuggestions: [],
+    geocodeSuggestions: [],
+    searchQuery: undefined
   }),
   watch: {
     target () {
+      console.log({ target: this.target });
       this.$emit('change', this.target);
     },
     routeTargets: {
@@ -44,6 +50,27 @@ export default {
         }
       },
       immediate: true
+    },
+    async searchQuery () {
+      this.geocodeSuggestions = [];
+      if (!this.searchQuery || !this.searchQuery.trim()) {
+        return;
+      }
+      const { data: result } = await axios.get('https://autosuggest.search.hereapi.com/v1/autosuggest', {
+        params: {
+          at: flip(this.toEpsg4326(this.$map.getView().getCenter())).join(','),
+          limit: 5,
+          q: this.searchQuery,
+          apiKey: routingConfig.hereApiKey
+        }
+      });
+      const results = result.items.map(item => ({
+        text: item.title,
+        value: feature({}, point([item.position.lng, item.position.lat]))
+      }));
+      this.geocodeSuggestions = results;
+      console.log(results);
+      // console.log(this.searchQuery);
     }
   },
   computed: {
