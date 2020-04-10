@@ -45,15 +45,13 @@
 <script>
 
 import axios from 'axios';
-import flexpolyline from './flexpolyline';
 import { WguEventBus } from '../../WguEventBus.js';
-// Note: you must create this file, following the format of routingConfig.js.example
-import routingConfig from './routingConfig.js';
 import toGpx from 'togpx';
 import { saveAs } from 'file-saver';
 import RoutingTarget from './RoutingTarget';
 import RoutingInstructions from './RoutingInstructions';
 import DateTimePicker from './DateTimePicker.vue';
+import { getRouteV7, getRouteV8 } from './hereRoutingApi';
 
 export default {
   name: 'wgu-routing-panel',
@@ -177,162 +175,32 @@ export default {
       }
     },
     async getRouteV8 () {
-      // https://developer.here.com/documentation/routing-api/api-reference-swagger.html
-      // https://developer.here.com/documentation/routing/dev_guide/topics/resource-calculate-route.html
-      const via = this.waypoints
-        .filter(Boolean)
-        .map(w => w.geometry.coordinates)
-        .filter(Boolean)
-        .map(flip)
-        .map(c => c.join(','));
-        // .join(',');
-      const result = await axios.get(`https://router.hereapi.com/v8/routes`, {
-        params: {
-          transportMode: 'car',
-          routingMode: this.transportMode.split('-')[1],
-          origin: flip(this.from.geometry.coordinates).join(','),
-          destination: flip(this.to.geometry.coordinates).join(','),
-          ...(via ? { via } : {}),
-          return: 'summary,polyline,instructions,actions',
-          apiKey: routingConfig.hereApiKey
-        },
-        // the API wants &via=x,y&via=x,y whereas Axios by default provides &via[]=x,y&via[]=x,y
-        paramsSerializer: params =>
-          Object.keys(params)
-            .map(key => {
-              const vals = Array.isArray(params[key]) ? params[key] : [params[key]];
-              return vals.map(val => `${key}=${val}`).join('&')
-            }).join('&')
+      const response = await getRouteV8({
+        from: this.from,
+        waypoints: this.waypoints,
+        to: this.to,
+        transportMode: this.transportMode
       });
-      this.route = result.data.routes[0];
 
-      console.log(result.data);
-      this.routeGeometry = {
-        type: 'FeatureCollection',
-        features: this.route.sections.map(section => polylineToGeoJSON(section.polyline))
-      };
+      this.route = response.route;
+      this.routeGeometry = response.routeGeometry;
     },
     async getRouteV7 () {
-      const makeRequest = () => {
-        let timeParam = {};
-        let walkRadiusParam = {};
-        if (this.transportMode.match(/publicTransport/)) {
-          if (this.timeDate.time) {
-            timeParam = {[this.timeDate.timeMode]: `${this.timeDate.date}T${this.timeDate.time}:00`};
-          }
-          walkRadiusParam = { walkRadius: 3000 }
-        }
-        const toGeo = point => `geo!${point.geometry.coordinates[1]},${point.geometry.coordinates[0]}`;
-        const waypointParams = {
-          waypoint0: toGeo(this.from)
-        };
-        this.waypoints.forEach((waypoint, i) => {
-          waypointParams[`waypoint${i + 1}`] = toGeo(waypoint)
-        });
-        waypointParams[`waypoint${this.waypoints.length + 1}`] = toGeo(this.to);
-
-        const mode = (this.transportMode === 'fastest;publicTransport' && this.timeDate.time ? 'fastest;publicTransportTimeTable' : this.transportMode);
-        return axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
-          params: {
-            apiKey: routingConfig.hereApiKey,
-            ...waypointParams,
-            mode,
-            lineattributes: 'all',
-            maneuverattributes: 'all', // TODO strip down to the ones we need.
-            routeattributes: 'all',
-            combineChange: true, // avoid separate "enter" and "leave" steps for interchanges
-            ...timeParam,
-            ...walkRadiusParam
-            // language: 'de-de'
-          }
-        });
+      const response = await getRouteV7({
+        from: this.from,
+        waypoints: this.waypoints,
+        to: this.to,
+        transportMode: this.transportMode,
+        timeDate: this.timeDate
+      });
+      if (response.errorMessage) {
+        this.errorMessage = response.errorMessage;
+      } else {
+        this.route = response.route;
+        this.boundingBox = response.boundingBox;
+        this.routeGeometry = response.routeGeometry;
+        this.stopsGeometry = response.stopsGeometry;
       }
-
-      function stopsGeometryFromRoute (route) {
-        const stops = [];
-        for (const leg of route.leg) {
-          const newStops = leg.maneuver
-            .filter(m => ['change', 'enter', 'leave'].indexOf(m.action) >= 0);
-          newStops.forEach((m, i) => { m.changeId = i + 1; });
-          stops.push(...newStops);
-        }
-
-        return {
-          type: 'FeatureCollection',
-          features: stops.map(m => ({
-            type: 'Feature',
-            properties: {
-              changeId: m.changeId
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: [m.position.longitude, m.position.latitude]
-            }
-          }))
-        };
-      }
-
-      function shapeToLineFeature (shape, maneuver) {
-        return {
-          type: 'Feature',
-          properties: {
-            type: maneuver._type,
-            instruction: maneuver.instruction.replace(/(<([^>]+)>)/g, '')
-          },
-          geometry: {
-            type: 'LineString',
-            coordinates: shape.map(coordString => flip(coordString.split(',').map(Number)))
-          }
-        };
-      }
-
-      function routeGeometryFromRoute (route) {
-        const fc = {
-          type: 'FeatureCollection',
-          features: []
-        };
-        for (const leg of route.leg) {
-          const lineFeatures = leg.maneuver
-            .filter(m => m.shape.length > 1)
-            .map(m => shapeToLineFeature(m.shape, m));
-          fc.features.push(...lineFeatures);
-        }
-        return fc;
-      }
-
-      function addCumulativeTimes (leg) {
-        let total = 0;
-        for (const maneuver of leg.maneuver) {
-          maneuver.cumulative = `${pad2(Math.floor(total / 3600))}:${pad2(Math.floor(total / 60) % 60)}`;
-          total += (maneuver.travelTime || 0);
-        }
-      }
-
-      let result;
-      try {
-        result = await makeRequest();
-      } catch (e) {
-        console.log(e);
-        console.log(e.response, e.response.status, e.response.responseText, e.response.data.subtype);
-        if (e.response && e.response.status === 400 && e.response.data.subtype === 'NoRouteFound') {
-          this.errorMessage = 'No route was found.';
-        } else if (e.response && e.response.data && e.response.data.details === 'Time Table Transit Routing is only supported for two StopOver waypoints') {
-          this.errorMessage = 'Sorry, you can specify a time, or multiple waypoints, but not both.';
-        } else {
-          this.errorMessage = 'Sorry, directions are currently unavailable.'
-        }
-        if (e.response && e.response.data && e.response.data.details) {
-          console.log(e.response.data.details, e.response.data.additionalData);
-        }
-        return;
-      }
-      const route = result.data.response.route[0];
-      route.leg.forEach(addCumulativeTimes);
-      this.route = route;
-      console.log(route);
-      this.boundingBox = [route.boundingBox.topLeft.longitude, route.boundingBox.bottomRight.latitude, route.boundingBox.bottomRight.longitude, route.boundingBox.topLeft.latitude];
-      this.routeGeometry = routeGeometryFromRoute(route);
-      this.stopsGeometry = stopsGeometryFromRoute(route);
     },
     clickSaveGpx () {
       if (!this.routeGeometry) {
@@ -355,17 +223,6 @@ export default {
     }
   }
 }
-const pad2 = (x) => ('0' + x).slice(-2);
-const flip = ([a, b]) => [b, a];
-
-function polylineToGeoJSON (polyline) {
-  const points = flexpolyline.decode(polyline).polyline
-  return {
-    type: 'LineString',
-    coordinates: points.map(([a, b]) => [b, a])
-  }
-}
-
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
