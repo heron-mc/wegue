@@ -176,7 +176,6 @@ export function routingLayers (routingOptions, map) {
       endSource.addFeatures(geojson.readFeatures(endGeometry));
     }
     if (stopsGeometry) {
-      console.log(stopsGeometry);
       stopsSource.addFeatures(geojson.readFeatures(stopsGeometry));
     }
     if (boundingBox) {

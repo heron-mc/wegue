@@ -19,7 +19,6 @@
 </template>
 
 <script>
-// import { WguEventBus } from '../../WguEventBus.js';
 import routingConfig from './routingConfig';
 import { transform } from 'ol/proj';
 import axios from 'axios';
@@ -38,7 +37,6 @@ export default {
   }),
   watch: {
     target () {
-      console.log({ target: this.target });
       this.$emit('change', this.target);
     },
     async searchQuery () {
@@ -56,11 +54,9 @@ export default {
       });
       const results = result.items.map(item => ({
         text: item.title,
-        value: feature({}, point([item.position.lng, item.position.lat]))
+        value: feature({ source: 'geocode' }, point([item.position.lng, item.position.lat]))
       }));
       this.geocodeSuggestions = results;
-      console.log(results);
-      // console.log(this.searchQuery);
     }
   },
   computed: {
@@ -73,14 +69,12 @@ export default {
       return transform(coord, this.$map.getView().getProjection(), 'EPSG:4326');
     },
     changeRouteTarget () {
-      console.log(this.target);
       if (this.target && this.target.properties._customPoint) {
         this.$map.getViewport().style.cursor = 'crosshair';
         this.$map.once('click', e => {
           // just checking we're still in the same state
           if (this.target.properties._customPoint) {
             const coords = this.toEpsg4326(e.coordinate);
-            console.log(coords);
             this.$map.getViewport().style.cursor = '';
             this.target.geometry.coordinates = coords;
           }

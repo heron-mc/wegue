@@ -92,7 +92,6 @@ export async function getRouteV7 ({
     result = await makeRequest();
     const route = result.data.response.route[0];
     route.leg.forEach(addCumulativeTimes);
-    console.log(route);
     ret.route = route;
     ret.boundingBox = [route.boundingBox.topLeft.longitude, route.boundingBox.bottomRight.latitude, route.boundingBox.bottomRight.longitude, route.boundingBox.topLeft.latitude];
     ret.routeGeometry = routeGeometryFromRoute(route);
@@ -153,7 +152,6 @@ export async function getRouteV8 ({
           return vals.map(val => `${key}=${val}`).join('&')
         }).join('&')
   });
-  console.log(result.data);
   const route = result.data.routes[0]
   return {
     route,

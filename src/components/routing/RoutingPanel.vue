@@ -67,7 +67,7 @@ export default {
       from: undefined,
       to: undefined,
       waypoints: [],
-      localSuggestions: undefined,
+      localSuggestions: [],
       transportMode: 'fastest;publicTransport',
       transportModes: [{
         text: 'Car (fastest)',
@@ -160,12 +160,13 @@ export default {
     loadLocalSuggestions () {
       WguEventBus.$on('ol-map-rendered', async () => {
         // Find layers that have been marked 'routable' in app config, and use them as routing targets
-        const layerUrls = this.$map.getLayers().getArray().filter(l => l.getProperties().routable).map(l => l.getSource().getUrl());
+        const layerUrls = this.$map.getLayers().getArray()
+          .filter(l => l.getProperties().routable)
+          .map(l => l.getSource().getUrl());
         const featureCollections = await Promise.all(layerUrls.map(axios.get));
-        console.log(featureCollections[0].data.features[0]);
         const localSuggestions = []
         for (const { data } of featureCollections) {
-          localSuggestions.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi })));
+          localSuggestions.push(...data.features.map(poi => ({ text: poi.properties.name, value: poi, source: 'local' })));
         }
         localSuggestions.sort((a, b) => (a.text < b.text ? -1 : 1));
         this.localSuggestions = localSuggestions;
