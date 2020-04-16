@@ -100,10 +100,6 @@
       "target": "toolbar",
       "darkLayout": true
     },
-    "wgu-helpwin": {
-      "target": "menu",
-      "darkLayout": true
-    },
     "wgu-share": {
       "target": "toolbar",
       "darkLayout": true
