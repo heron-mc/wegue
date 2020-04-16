@@ -87,7 +87,7 @@
       "sketchVertexFillColor": "rgba(198,40,40,0.2)"
     },
     "wgu-infoclick": {
-      "target": "toolbar",
+      "target": "menu",
       "win": true,
       "draggable": false,
       "darkLayout": true,
