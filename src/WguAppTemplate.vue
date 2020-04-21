@@ -19,6 +19,7 @@
     <slot name="wgu-before-content" />
 
     <v-content>
+      <wgu-routing-panel />
       <v-container id="ol-map-container" fluid fill-height style="padding: 0">
          <wgu-map :color="baseColor" />
          <!-- layer loading indicator -->
@@ -67,6 +68,7 @@
   import InfoClickWin from './components/infoclick/InfoClickWin'
   import MapLoadingStatus from './components/progress/MapLoadingStatus'
   import FeatureInfoWindow from './components/FeatureInfoWindow'
+  import RoutingPanel from './components/routing/RoutingPanel'
 
   export default {
     name: 'wgu-app-tpl',
@@ -79,7 +81,8 @@
       'wgu-layerlist-win': LayerListWin,
       'wgu-infoclick-win': InfoClickWin,
       'wgu-maploading-status': MapLoadingStatus,
-      'wgu-feature-info-window-win': FeatureInfoWindow
+      'wgu-feature-info-window-win': FeatureInfoWindow,
+      'wgu-routing-panel': RoutingPanel
     },
     data () {
       return {

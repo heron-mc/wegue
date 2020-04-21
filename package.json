@@ -19,8 +19,12 @@
     "init:app": "node util/init-app.js"
   },
   "dependencies": {
+    "axios": "^0.19.2",
+    "file-saver": "^2.0.2",
+    "humanize-duration": "^3.22.0",
     "ol": "6.2.1",
     "proj4": "2.5.0",
+    "togpx": "^0.5.4",
     "vue": "2.6.11",
     "vuetify": "1.5.23"
   },

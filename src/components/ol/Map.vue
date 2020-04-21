@@ -1,6 +1,7 @@
 <template></template>
 
 <script>
+/* eslint-disable */
 
 import Vue from 'vue';
 import Map from 'ol/Map'
@@ -19,7 +20,13 @@ import { WguEventBus } from '../../WguEventBus.js';
 import { LayerFactory } from '../../factory/Layer.js';
 import ColorUtil from '../../util/Color';
 import PermalinkController from './PermalinkController';
-
+import VectorLayer from 'ol/layer/Vector'
+import VectorSource from 'ol/source/Vector'
+import GeoJSON from 'ol/format/GeoJSON';
+import Feature from 'ol/Feature';
+import LineString from 'ol/geom/LineString';
+import { Style, Stroke, RegularShape, Fill, Text } from 'ol/style';
+import { routingLayers } from '../routing/routingLayers';
 export default {
   name: 'wgu-map',
   props: {
@@ -113,6 +120,8 @@ export default {
       this.permalinkController.apply();
       this.permalinkController.setup();
     }
+    window.map = this.map; //TODO remove
+    this.map.once('rendercomplete', () => WguEventBus.$emit('ol-map-rendered'));
   },
 
   methods: {
@@ -158,9 +167,8 @@ export default {
         layersToAdd.forEach(layer => addInteraction(layer));
         layers.push(...layersToAdd);
       }));
-      return layers;
+      return [...layers, ...routingLayers(this.$appConfig.modules['wgu-routing'], this.map)];
     },
-
     /**
      * Creates a PermalinkController, override in subclass for specializations.
      *

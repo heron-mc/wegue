@@ -119,6 +119,13 @@
           "imageWidth": 360
         }
       ]
+    },
+    "wgu-routing": {
+      "transportModes": ["car", "publicTransport"],
+      "panel": true,
+      "target": "toolbar",
+      "icon": "info",
+      "darkLayout": true
     }
   }
 

@@ -12,4 +12,6 @@ test/unit/coverage
 *.ntvs*
 *.njsproj
 *.sln
+
+# Contains API keys
 /src/components/routing/routingConfig.js
