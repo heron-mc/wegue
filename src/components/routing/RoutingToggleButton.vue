@@ -1,6 +1,6 @@
 <template>
 
-  <v-btn icon @click="toggleUi">
+  <v-btn icon :dark="dark" @click="toggleUi">
     <v-icon medium>explore</v-icon>
   </v-btn>
 
@@ -11,6 +11,9 @@ import { WguEventBus } from '../../WguEventBus'
 
 export default {
   name: 'wgu-routing-btn',
+  props: {
+    dark: {type: Boolean, required: false, default: false}
+  },
   data: function () {
     return {
       state: false

@@ -128,7 +128,8 @@
       "transportModes": ["car", "publicTransport"],
       "panel": true,
       "target": "toolbar",
-      "icon": "info"
+      "icon": "info",
+      "darkLayout": true
     }
   }
 
