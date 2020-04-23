@@ -98,7 +98,7 @@
 
           // synchronize visibility with UI when changed programatically
           layer.on('change:visible', (evt) => {
-            this.onOlLayerVizChange()
+            this.onOlLayerVizChange(evt)
           });
         });
 
