@@ -6,6 +6,27 @@
       <v-list-tile-content class="black--text">
           <v-list-tile-title>{{ layerItem.title }}</v-list-tile-title>
       </v-list-tile-content>
+      <v-list-tile-avatar>
+        <img v-if="layerItem.category === 'poi'" v-bind:src="layerItem.icon" alt="POI Icon">
+        <v-card v-if="layerItem.category === 'route'"
+                          :style="{
+                            background: layerItem.lineColor,
+                          }"
+                          width="30"
+                          height="4"
+                          class="mr-2"
+                        />
+        <v-card v-if="layerItem.category === 'area'"
+                          :style="{
+                            background: layerItem.fillColor,
+                            border: '3px solid',
+                            borderColor: layerItem.lineColor
+                          }"
+                          width="30"
+                          height="30"
+                          class="mr-2"
+                        />
+      </v-list-tile-avatar>
     </v-list-tile>
   </v-list>
 
@@ -28,45 +49,60 @@
     },
     methods: {
       /**
-       * This function is executed, after the map is bound (see mixins/Mapable)
+       * Executed after the map is bound (see mixins/Mapable)
        */
       onMapBound () {
-        var me = this;
-        me.createLayerItems();
+        this.createLayerItems();
 
         // react on added / removed layers
-        me.map.getLayers().on('change:length', function (evt) {
-          me.createLayerItems();
+        this.map.getLayers().on('change:length', (evt) => {
+          this.createLayerItems();
         });
       },
       /**
        * Creates the layer items from the OpenLayers map.
        */
       createLayerItems () {
-        const me = this;
-        // go over all layers from the map and list them up
-        var layers = this.map.getLayers();
-        // clone to only reverse the order for the list
-        var layerArrClone = layers.getArray().slice(0);
-        layers = layerArrClone.reverse();
+        // go over all (reversed) layers from the map and list them up
+        const layers = this.map.getLayers().getArray().slice(0).reverse();
 
-        var layerItems = [];
-        layers.forEach(function (layer) {
+        let layerItems = [];
+        layers.forEach((layer) => {
           // skip if layer should not be listed
           if (layer.get('displayInLayerList') === false) {
             return;
           }
+          const layerId = layer.get('lid');
+          const layerCategory = layerId.split('_')[0];
+          const layerStyle = layer.getStyle();
+          let icon, lineColor, fillColor;
+          if (layerCategory === 'route') {
+            lineColor = layerStyle.getStroke().getColor();
+          } else if (layerCategory === 'area') {
+            lineColor = layerStyle.getStroke().getColor();
+            fillColor = layerStyle.getFill().getColor();
+          } else if (layerCategory === 'poi') {
+            // Temporary icon until SVGs avail
+            icon = 'static/icon/windmill2.png';
+          }
+
           layerItems.push({
             title: layer.get('name'),
-            lid: layer.get('lid'),
+            lid: layerId,
+            category: layerCategory,
+            icon: icon,
+            lineColor: lineColor,
+            fillColor: fillColor,
             visible: layer.getVisible()
           });
 
           // synchronize visibility with UI when changed programatically
-          layer.on('change:visible', me.onOlLayerVizChange);
+          layer.on('change:visible', (evt) => {
+            this.onOlLayerVizChange()
+          });
         });
 
-        me.layerItems = layerItems;
+        this.layerItems = layerItems;
       },
 
       /**
@@ -77,12 +113,11 @@
        * @param  {ol/Object.ObjectEvent} evt The OL event of 'change:visible'
        */
       onOlLayerVizChange (evt) {
-        const me = this;
-        if (!me.changeVisByClickUpdate) {
-          me.layerItems.forEach(function (layerItem, idx) {
+        if (!this.changeVisByClickUpdate) {
+          this.layerItems.forEach((layerItem, idx) => {
             if (layerItem.lid === evt.target.get('lid')) {
               // execute click handler to change visibility
-              me.onItemClick(null, layerItem);
+              this.onItemClick(null, layerItem);
             }
           });
         }
@@ -92,16 +127,15 @@
        * Handler for click on item in layer list:
        * Toggles the corresponding visibility and calls this.layerVizChanged.
        *
-       * @param  {Object} ect       Original vue click event
+       * @param  {Object} evt       Original vue click event
        * @param  {Object} layerItem Layer item data object
        */
       onItemClick (evt, layerItem) {
-        const me = this;
         layerItem.visible = !layerItem.visible;
 
-        me.changeVisByClickUpdate = true;
+        this.changeVisByClickUpdate = true;
         this.layerVizChanged();
-        me.changeVisByClickUpdate = false;
+        this.changeVisByClickUpdate = false;
       },
 
       /**
@@ -109,10 +143,8 @@
        * apply the current visibility state in 'data' to the OL layers.
        */
       layerVizChanged () {
-        var me = this;
-
-        me.layerItems.forEach(function (layerItem, idx) {
-          const layer = LayerUtil.getLayerByLid(layerItem.lid, me.map);
+        this.layerItems.forEach((layerItem, idx) => {
+          const layer = LayerUtil.getLayerByLid(layerItem.lid, this.map);
           if (layer) {
             layer.setVisible(layerItem.visible);
           }

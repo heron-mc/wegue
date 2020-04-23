@@ -64,7 +64,7 @@
   import AppFooter from './components/AppFooter'
   import AppLogo from '../src/components/AppLogo'
   import MeasureWin from '../src/components/measuretool/MeasureWin'
-  import LayerListWin from '../src/components/layerlist/LayerListWin'
+  import LayerListWin from './components/layerlist/LayerListWin'
   import InfoClickWin from '../src/components/infoclick/InfoClickWin'
   import MapLoadingStatus from '../src/components/progress/MapLoadingStatus'
   import FeatureInfoWindow from '../src/components/FeatureInfoWindow'
