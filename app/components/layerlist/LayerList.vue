@@ -83,7 +83,7 @@
             fillColor = layerStyle.getFill().getColor();
           } else if (layerCategory === 'poi') {
             // Temporary icon until SVGs avail
-            icon = 'static/icon/windmill2.png';
+            icon = layerStyle.getImage().getSrc();
           }
 
           layerItems.push({

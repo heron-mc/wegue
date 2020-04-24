@@ -41,6 +41,8 @@ export const OlStyleFactory = {
         image: new IconStyle(({
           src: styleConf.iconUrl,
           anchor: styleConf.iconAnchor,
+          // JvdB Hardcoded!!!
+          scale: 2,
           anchorXUnits: styleConf.iconAnchorXUnits,
           anchorYUnits: styleConf.iconAnchorYUnits
         }))
