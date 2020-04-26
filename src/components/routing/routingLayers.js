@@ -10,6 +10,8 @@ export function routingLayers (routingOptions, map) {
   if (!routingOptions) {
     return;
   }
+  const startLabel = routingOptions.startLabel || 'Start';
+  const endLabel = routingOptions.endLabel || 'Finish';
   const stopsSource = new VectorSource({ });
   const labelStyle = new Style({
     text: new Text({
@@ -68,7 +70,7 @@ export function routingLayers (routingOptions, map) {
           angle: 3.14159 / 4
         })
       }),
-      (endpointLabelStyle.getText().setText('Start'), endpointLabelStyle)
+      (endpointLabelStyle.getText().setText(startLabel), endpointLabelStyle)
     ],
     source: startSource
   });
@@ -87,7 +89,7 @@ export function routingLayers (routingOptions, map) {
           angle: 3.14159 / 4
         })
       }),
-      (endpointLabelStyle.getText().setText('Finish'), endpointLabelStyle)
+      (endpointLabelStyle.getText().setText(endLabel), endpointLabelStyle)
     ]
   });
   const waypointsSource = new VectorSource({ });

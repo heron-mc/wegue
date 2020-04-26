@@ -5,8 +5,10 @@ import Vuetify from 'vuetify';
 import WguApp from '../app/WguApp';
 import UrlUtil from './util/Url';
 import 'vuetify/dist/vuetify.min.css';
+import VueI18n from 'vue-i18n';
 
 Vue.use(Vuetify);
+Vue.use(VueI18n);
 
 require('../node_modules/ol/ol.css');
 
@@ -44,6 +46,7 @@ fetch('static/app-conf' + appCtxFile + '.json')
     new Vue({
       el: '#app',
       template: '<wgu-app/>',
-      components: { WguApp }
+      components: { WguApp },
+      i18n: new VueI18n({ locale: 'de' })
     });
   });

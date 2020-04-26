@@ -1,4 +1,16 @@
-<<template>
+<i18n>
+de:
+  Public transport directions: Anweisungen für öffentliche Verkehrsmittel
+  Driving directions: Fahrtrichtung
+  Bicycle directions: Fahrradanweisungen
+  Walking directions: Wegbeschreibungen
+  Time: Dauer
+  Start: Anfangszeit
+  Distance: Entfernung
+  Routes: Routen
+  Instructions: Anleitung
+</i18n>
+<template>
 <div id="route"v-if="route">
   <!-- v8 response -->
   <div v-for="(section, sectionNo) of (route.sections || [])">
@@ -14,27 +26,27 @@
   </div>
   <!-- v7 response -->
   <div v-if="routeLegs">
-    <h2>{{ transportModeTitle }} directions</h2>
+    <h2>{{ $t(transportModeTitle + ' directions') }}</h2>
     <table class="route-summary">
       <tr>
-        <th>Time:</th>
+        <th>{{ $t('Time') }}:</th>
         <td>{{ routeDuration }}</td>
       </tr>
       <tr v-if="routeStartTime">
-        <th>Start:</th>
+        <th>{{ $t('Start') }}:</th>
         <td>{{ routeStartDate && routeStartDate + ' at '}} {{ routeStartTime }}</td>
       </tr>
       <tr>
-        <th>Distance:</th>
+        <th>{{ $t('Distance') }}:</th>
         <td>{{ routeDistance }}</td>
       </tr>
       <tr v-if="route.publicTransportLine">
-        <th>Routes:</th>
+        <th>{{ $t('Routes') }}:</th>
         <td>{{ route.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
       </tr>
     </table>
 
-    <h3>Instructions</h3>
+    <h3>{{ $t('Instructions') }}</h3>
     <div v-for="leg of routeLegs">
       <table class="maneuvers">
         <tr v-for="maneuver of leg.maneuver">
