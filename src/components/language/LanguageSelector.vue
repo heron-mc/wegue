@@ -7,7 +7,7 @@ de:
   <div>
   <!-- <v-icon medium>flag</v-icon> -->
   <v-select class="selector" prepend-icon="flag" :items="items" v-model="language" :dark="dark" min-width="1" flat>
-    <template v-slot:selection="{ item, index }">
+    <template v-slot:selection="{ item }">
       {{ item.value.toUpperCase() }}
     </template>
   </v-select>
@@ -44,7 +44,7 @@ export default {
   },
   watch: {
     language () {
-      this.$i18n.locale = this.language;
+      this.$root.$i18n.locale = this.language;
       WguEventBus.$emit('locale-changed', this.language);
     }
   },
