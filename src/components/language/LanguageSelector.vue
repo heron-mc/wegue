@@ -6,7 +6,7 @@ de:
 <template>
   <div>
   <!-- <v-icon medium>flag</v-icon> -->
-  <v-select class="selector" prepend-icon="flag" :items="items" v-model="language" :dark="dark" min-width="1" flat>
+  <v-select class="selector" prepend-icon="flag" :items="items" v-model="language" :dark="dark" :menu-props="{minWidth:'1'}" flat>
     <template v-slot:selection="{ item }">
       {{ item.value.toUpperCase() }}
     </template>

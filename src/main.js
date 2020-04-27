@@ -45,7 +45,10 @@ const createApp = function (appConfig) {
     el: '#app',
     template: '<wgu-app/>',
     components: { WguApp },
-    i18n: new VueI18n({ locale })
+    i18n: new VueI18n({
+      locale,
+      silentTranslationWarn: true
+    })
   });
 };
 
