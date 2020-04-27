@@ -22,5 +22,3 @@ module.exports = {
     image: 'xlink:href'
   },
 }
-
-console.log(module.exports.loaders);
