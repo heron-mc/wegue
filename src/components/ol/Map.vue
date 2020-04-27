@@ -177,7 +177,8 @@ export default {
       const options = {
         ...routingOptions,
         startLabel: this.$t(routingOptions.startLabel || 'Start'),
-        endLabel: this.$t(routingOptions.endLabel || 'Finish')
+        endLabel: this.$t(routingOptions.endLabel || 'Finish'),
+        $t: this.$t.bind(this)
       }
       return [...layers, ...routingLayers(options, this.map)];
     },

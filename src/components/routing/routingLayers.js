@@ -3,15 +3,16 @@ import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import GeoJSON from 'ol/format/GeoJSON';
 import LineString from 'ol/geom/LineString';
-// import Feature from 'ol/Feature';
-// import LineString from 'ol/geom/LineString';
 import { Style, Stroke, RegularShape, Fill, Text } from 'ol/style';
 export function routingLayers (routingOptions, map) {
   if (!routingOptions) {
     return;
   }
-  const startLabel = routingOptions.startLabel || 'Start';
-  const endLabel = routingOptions.endLabel || 'Finish';
+  const {
+    startLabel = 'Start',
+    endLabel = 'Finish',
+    $t = x => x // i18n translation function
+  } = routingOptions;
   const stopsSource = new VectorSource({ });
   const labelStyle = new Style({
     text: new Text({
@@ -70,7 +71,7 @@ export function routingLayers (routingOptions, map) {
           angle: 3.14159 / 4
         })
       }),
-      (endpointLabelStyle.getText().setText(startLabel), endpointLabelStyle)
+      (endpointLabelStyle.getText().setText($t(startLabel)), endpointLabelStyle)
     ],
     source: startSource
   });
@@ -89,7 +90,7 @@ export function routingLayers (routingOptions, map) {
           angle: 3.14159 / 4
         })
       }),
-      (endpointLabelStyle.getText().setText(endLabel), endpointLabelStyle)
+      (endpointLabelStyle.getText().setText($t(endLabel)), endpointLabelStyle)
     ]
   });
   const waypointsSource = new VectorSource({ });
@@ -188,6 +189,10 @@ export function routingLayers (routingOptions, map) {
         maxZoom: 14
       });
     }
+  });
+  WguEventBus.$on('locale-changed', () => {
+    startSource.changed();
+    endSource.changed();
   });
   return [routeLayer, stopsLayer, startLayer, waypointsLayer, endLayer];
 }

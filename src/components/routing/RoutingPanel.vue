@@ -90,28 +90,6 @@ export default {
       waypoints: [],
       localSuggestions: [],
       transportMode: 'fastest;publicTransport',
-      transportModes: [{
-        text: this.$t('Car (fastest)'),
-        value: 'car-fast'
-      }, {
-        text: this.$t('Car (shortest distance)'),
-        value: 'car-short'
-      }, {
-        text: this.$t('Public transport'),
-        value: 'fastest;publicTransport'
-      }, {
-        text: this.$t('Bicycle (fastest)'),
-        value: 'fastest;bicycle'
-      }, {
-        text: this.$t('Bicycle (shortest distance)'),
-        value: 'shortest;bicycle'
-      }, {
-        text: this.$t('Pedestrian (fastest)'),
-        value: 'fastest;pedestrian'
-      }, {
-        text: this.$t('Pedestrian (shortest distance)'),
-        value: 'shotest;pedestrian'
-      }],
       errorMessage: undefined,
       dev: location.hash.match(/dev/),
       routeGeometry: undefined,
@@ -129,6 +107,32 @@ export default {
     });
   },
   computed: {
+    transportModes () {
+      return [
+        {
+          text: this.$t('Car (fastest)'),
+          value: 'car-fast'
+        }, {
+          text: this.$t('Car (shortest distance)'),
+          value: 'car-short'
+        }, {
+          text: this.$t('Public transport'),
+          value: 'fastest;publicTransport'
+        }, {
+          text: this.$t('Bicycle (fastest)'),
+          value: 'fastest;bicycle'
+        }, {
+          text: this.$t('Bicycle (shortest distance)'),
+          value: 'shortest;bicycle'
+        }, {
+          text: this.$t('Pedestrian (fastest)'),
+          value: 'fastest;pedestrian'
+        }, {
+          text: this.$t('Pedestrian (shortest distance)'),
+          value: 'shotest;pedestrian'
+        }
+      ]
+    },
     // when anything changes that was used to calculate the route, we clear the route
     routeParameters () {
       return [this.from, this.to, this.waypoints.map(w => w && w.geometry.coordinates), this.transportMode, this.timeDate.timeMode, this.timeDate.time, Date.now()];
@@ -207,7 +211,8 @@ export default {
         from: this.from,
         waypoints: this.waypoints,
         to: this.to,
-        transportMode: this.transportMode
+        transportMode: this.transportMode,
+        locale: this.$i18n.locale
       });
 
       this.route = response.route;

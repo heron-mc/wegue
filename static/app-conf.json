@@ -124,7 +124,11 @@
       "transportModes": ["car", "publicTransport"],
       "panel": true,
       "target": "toolbar",
-      "icon": "info",
+      "darkLayout": true
+    },
+    "wgu-language": {
+      "languages": ["en", "de"],
+      "target": "toolbar",
       "darkLayout": true
     }
   }

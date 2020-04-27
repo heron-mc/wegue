@@ -34,6 +34,8 @@ if (appCtx) {
   // simple aproach to avoid path traversal
   appCtxFile = '-' + appCtx.replace(/(\.\.[/])+/g, '');
 }
+const lang = (navigator.languages || [])[0] || navigator.userLanguage || navigator.language || navigator.browserLanguage || 'en';
+const locale = lang.match(/^de/i) ? 'de' : 'en';
 
 fetch('static/app-conf' + appCtxFile + '.json')
   .then(function (response) {
@@ -47,6 +49,6 @@ fetch('static/app-conf' + appCtxFile + '.json')
       el: '#app',
       template: '<wgu-app/>',
       components: { WguApp },
-      i18n: new VueI18n({ locale: 'de' })
+      i18n: new VueI18n({ locale })
     });
   });

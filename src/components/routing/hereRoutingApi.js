@@ -124,7 +124,8 @@ export async function getRouteV8 ({
   from,
   to,
   waypoints,
-  transportMode
+  transportMode,
+  locale
 }) {
   // https://developer.here.com/documentation/routing-api/api-reference-swagger.html
   // https://developer.here.com/documentation/routing/dev_guide/topics/resource-calculate-route.html
@@ -144,7 +145,8 @@ export async function getRouteV8 ({
       destination: flip(to.geometry.coordinates).join(','),
       ...(via ? { via } : {}),
       return: 'summary,polyline,instructions,actions',
-      apiKey: routingConfig.hereApiKey
+      apiKey: routingConfig.hereApiKey,
+      lang: locale
     },
     // the API wants &via=x,y&via=x,y whereas Axios by default provides &via[]=x,y&via[]=x,y
     paramsSerializer: params =>

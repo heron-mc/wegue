@@ -9,16 +9,18 @@ de:
   Distance: Entfernung
   Routes: Routen
   Instructions: Anleitung
+  km: km
+  Section: Sektion
 </i18n>
 <template>
 <div id="route"v-if="route">
   <!-- v8 response -->
-  <div v-for="(section, sectionNo) of (route.sections || [])">
-    <h2 v-if="sectionNo === 0">Driving directions</h2>
-    <h3>Section {{ sectionNo + 1 }} ({{ Math.round(section.summary.length/100)/10}} km)</h3>
+  <div v-for="(section, sectionNo) of (route.sections || [])" :key="sectionNo">
+    <h2 v-if="sectionNo === 0">{{ $t('Driving directions') }}</h2>
+    <h3>{{ `${$t('Section')} ${sectionNo + 1}` }} ({{ Math.round(section.summary.length/100)/10}} {{ $t('km') }})</h3>
     <div class="actions">
       <table>
-        <tr v-for="action of section.actions">
+        <tr v-for="(action, i) of section.actions" :key="i">
           <td> {{ action.instruction }}</td>
         </tr>
       </table>
@@ -73,10 +75,10 @@ export default {
   name: 'RoutingInstructions',
   computed: {
     routeDuration () {
-      return this.route && humanizeDuration(this.route.summary.baseTime * 1000, { round: true, units: ['h', 'm'] });
+      return this.route && humanizeDuration(this.route.summary.baseTime * 1000, { round: true, units: ['h', 'm'], language: this.$i18n.locale });
     },
     routeDistance () {
-      return this.route && `${Math.round(this.route.summary.distance * 10 / 1000) / 10} km`;
+      return this.route && `${Math.round(this.route.summary.distance * 10 / 1000) / 10} ${this.$t('km')}`;
     },
     routeStartDate () {
       if (!this.dateSpecified) {
