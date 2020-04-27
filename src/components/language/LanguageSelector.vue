@@ -1,3 +1,8 @@
+<i18n>
+de:
+  German: Deutsch
+  English: Englisch
+</i18n>
 <template>
   <div>
   <!-- <v-icon medium>flag</v-icon> -->
@@ -34,7 +39,7 @@ export default {
   },
   computed: {
     items () {
-      return [{ text: 'English', value: 'en' }, { text: 'German', value: 'de' }];
+      return [{ text: this.$t('English'), value: 'en' }, { text: this.$t('German'), value: 'de' }];
     }
   },
   watch: {
