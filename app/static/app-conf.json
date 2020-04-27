@@ -1,0 +1,136 @@
+{
+
+  "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'>Naturpark Lüneburger Heide</a>",
+
+  "baseColor": "rgba(226, 0, 122, 1)",
+
+  "logoText": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo'</a>",
+
+  "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
+  "footerTextRight": "Geolicious",
+  "showCopyrightYear": true,
+
+  "mapCenter": [1113871, 7012966],
+  "mapZoom": 9,
+
+  "permalink": {
+    "location": "search",
+    "layers": true,
+    "extent": true,
+    "projection": "EPSG:4326",
+    "paramPrefix": "",
+    "history": false
+  },
+
+  "mapLayers": [
+    {
+      "type": "VECTOR",
+      "lid": "np_lh_border",
+      "name": "Naturpark Grenze",
+      "url": "./static/data/np_lh_border_4326.geojson",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": false,
+      "style": {
+        "strokeColor": "rgba(226, 0, 122, 1)",
+        "strokeWidth": 4
+      }
+    },
+    {
+      "type": "VECTOR",
+      "lid": "heide",
+      "name": "Heide",
+      "url": "./static/data/overpass_natural-heath.geojson",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": false,
+      "style": {
+        "strokeColor": "rgb(162, 114, 240)",
+        "strokeWidth": 4,
+        "fillColor": "rgba(162, 114, 240, 0.5)"
+      }
+    },
+    {
+      "type": "LAYERCOLLECTION",
+      "url": "http://staging.nplh.geolicious.de/api/layer_list_wegue_format"
+    },
+    {
+      "type": "OSM",
+      "lid": "osm-bg",
+      "name": "OSM",
+      "isBaseLayer": true,
+      "visible": true,
+      "displayInLayerList": false
+    }
+  ],
+
+  "modules": {
+    "wgu-layerlist": {
+      "target": "toolbar",
+      "darkLayout": true,
+      "win": true,
+      "draggable": false
+    },
+    "wgu-measuretool": {
+      "target": "menu",
+      "win": true,
+      "draggable": false,
+      "strokeColor": "#c62828",
+      "fillColor": "rgba(198,40,40,0.2)",
+      "sketchStrokeColor": "rgba(198,40,40,0.8)",
+      "sketchFillColor": "rgba(198,40,40,0.1)",
+      "sketchVertexStrokeColor": "#c62828",
+      "sketchVertexFillColor": "rgba(198,40,40,0.2)"
+    },
+    "wgu-infoclick": {
+      "target": "menu",
+      "win": true,
+      "draggable": false,
+      "darkLayout": true,
+      "initPos": {
+        "left": 8,
+        "top": 74
+      }
+    },
+    "wgu-zoomtomaxextent": {
+      "target": "toolbar",
+      "darkLayout": true
+    },
+    "wgu-share": {
+      "target": "toolbar",
+      "darkLayout": true
+    },
+    "wgu-feature-info-window": {
+      "win": true,
+      "draggable": true,
+      "width": 360,
+      "icon": "info",
+      "layers": [
+        {
+          "layerId": "layer",
+          "title": "Info",
+          "titleProp": "name",
+          "imageProp": "image_url",
+          "descProp": "description",
+          "imageWidth": 360
+        }
+      ]
+    },
+    "wgu-routing": {
+      "transportModes": ["car", "publicTransport"],
+      "panel": true,
+      "target": "toolbar",
+      "darkLayout": true
+    },
+    "wgu-language": {
+      "languages": ["en", "de"],
+      "target": "toolbar",
+      "darkLayout": true
+    }
+  }
+
+}

@@ -1,77 +1,114 @@
 {
 
-  "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'>Naturpark Lüneburger Heide</a>",
+  "title": "Vue.js / OpenLayers WebGIS",
 
-  "baseColor": "rgba(226, 0, 122, 1)",
+  "baseColor": "red darken-3",
 
-  "logoText": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo'</a>",
+  "logo": "https://dummyimage.com/100x100/aaa/fff&text=Wegue",
+  "logoSize": "100",
 
-  "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
-  "footerTextRight": "Geolicious",
+  "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a>",
+  "footerTextRight": "meggsimum",
   "showCopyrightYear": true,
 
-  "mapCenter": [1113871, 7012966],
-  "mapZoom": 9,
-
-  "permalink": {
-    "location": "search",
-    "layers": true,
-    "extent": true,
-    "projection": "EPSG:4326",
-    "paramPrefix": "",
-    "history": false
-  },
+  "mapZoom": 2,
+  "mapCenter": [0, 0],
 
   "mapLayers": [
+
     {
       "type": "VECTOR",
-      "lid": "np_lh_border",
-      "name": "Naturpark Grenze",
-      "url": "./static/data/np_lh_border_4326.geojson",
+      "lid": "Shops",
+      "name": "Shops DaSchau",
+      "url": "./static/data/shops-dannstadt.geojson",
       "formatConfig": {
       },
       "format": "GeoJSON",
       "visible": true,
-      "selectable": false,
+      "selectable": true,
       "style": {
-        "strokeColor": "rgba(226, 0, 122, 1)",
-        "strokeWidth": 4
+        "radius": 4,
+        "strokeColor": "purple",
+        "strokeWidth": 2,
+        "fillColor": "rgba(155,153,51,0.5)"
       }
     },
+
     {
       "type": "VECTOR",
-      "lid": "heide",
-      "name": "Heide",
-      "url": "./static/data/overpass_natural-heath.geojson",
+      "lid": "earthquakes",
+      "name": "Earthquakes 2012 (Mag 5)",
+      "url": "./static/data/2012_Earthquakes_Mag5.kml",
       "formatConfig": {
+        "extractStyles": false
       },
-      "format": "GeoJSON",
+      "format": "KML",
       "visible": true,
-      "selectable": false,
+      "attributions": "U.S. Geological Survey",
+      "selectable": true,
+      "hoverable": true,
+      "hoverAttribute": "name",
       "style": {
-        "strokeColor": "rgb(162, 114, 240)",
-        "strokeWidth": 4,
-        "fillColor": "rgba(162, 114, 240, 0.5)"
+        "radius": 4,
+        "strokeColor": "rgb(207, 16, 32)",
+        "strokeWidth": 1,
+        "fillColor": "rgba(207, 16, 32, 0.6)"
       }
     },
+
     {
-      "type": "LAYERCOLLECTION",
-      "url": "http://staging.nplh.geolicious.de/api/layer_list_wegue_format"
+      "type": "WMS",
+      "lid": "ahocevar-wms",
+      "name": "WMS (ahocevar)",
+      "format": "image/png",
+      "layers": "topp:states",
+      "url": "https://ahocevar.com/geoserver/wms",
+      "transparent": true,
+      "singleTile": false,
+      "projection": "EPSG:3857",
+      "attribution": "",
+      "isBaseLayer": false,
+      "visible": false,
+      "displayInLayerList": true
     },
+
+    {
+      "type": "VECTORTILE",
+      "name": "Vector Tile Layer",
+      "url": "https://ahocevar.com/geoserver/gwc/service/tms/1.0.0/ne:ne_10m_admin_0_countries@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+      "format": "MVT",
+      "visible": false,
+      "style": {
+        "strokeColor": "gray",
+        "strokeWidth": 1,
+        "fillColor": "rgba(20,20,20,0.1)"
+      }
+    },
+
+    {
+      "type": "XYZ",
+      "name": "OpenTopoMap",
+      "url": "https://tile.opentopomap.org/{z}/{x}/{y}.png",
+      "attributions": "Map data: <a href=\"https://openstreetmap.org/copyright\">©OpenStreetMap</a>-contributors, SRTM | Map representation (Kartendarstellung): © <a href=\"http://opentopomap.org/\">OpenTopoMap</a> (<a href=\"https://creativecommons.org/licenses/by-sa/3.0/\">CC-BY-SA</a>)",
+      "lid": "opentopomap",
+      "displayInLayerList": true,
+      "visible": false
+    },
+
     {
       "type": "OSM",
       "lid": "osm-bg",
       "name": "OSM",
-      "isBaseLayer": true,
+      "isBaseLayer": false,
       "visible": true,
-      "displayInLayerList": false
+      "displayInLayerList": true
     }
+
   ],
 
   "modules": {
     "wgu-layerlist": {
-      "target": "toolbar",
-      "darkLayout": true,
+      "target": "menu",
       "win": true,
       "draggable": false
     },
@@ -90,47 +127,33 @@
       "target": "menu",
       "win": true,
       "draggable": false,
-      "darkLayout": true,
       "initPos": {
         "left": 8,
         "top": 74
+      }
+    },
+    "wgu-geocoder": {
+      "target": "toolbar",
+      "darkLayout": true,
+      "minChars": 2,
+      "queryDelay": 200,
+      "selectZoom": 16,
+      "debug": false,
+      "placeHolder": "Search address",
+      "provider": "osm",
+      "providerOptions": {
+        "lang": "en-US",
+        "countrycodes": "",
+        "limit": 6
       }
     },
     "wgu-zoomtomaxextent": {
       "target": "toolbar",
       "darkLayout": true
     },
-    "wgu-share": {
-      "target": "toolbar",
-      "darkLayout": true
-    },
-    "wgu-feature-info-window": {
-      "win": true,
-      "draggable": true,
-      "width": 360,
-      "icon": "info",
-      "layers": [
-        {
-          "layerId": "layer",
-          "title": "Info",
-          "titleProp": "name",
-          "imageProp": "image_url",
-          "descProp": "description",
-          "imageWidth": 360
-        }
-      ]
-    },
-    "wgu-routing": {
-      "transportModes": ["car", "publicTransport"],
-      "panel": true,
-      "target": "toolbar",
-      "darkLayout": true
-    },
-    "wgu-language": {
-      "languages": ["en", "de"],
+    "wgu-helpwin": {
       "target": "toolbar",
       "darkLayout": true
     }
   }
-
 }
