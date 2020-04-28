@@ -1,7 +1,7 @@
 <i18n>
 de:
-    Download all layers as GPX: Laden Sie alle Ebenen als GPX herunter
-    Wegue layers: Wegue Schichten
+    Download all active layers as GPX: Laden Sie alle aktiven Ebenen als GPX herunter
+    Wegue layers: Wegue Ebenen
 </i18n>
 <template>
   <v-tooltip bottom>
@@ -29,7 +29,7 @@ export default {
   props: {
     dark: {type: Boolean, required: false, default: false},
     icon: {type: String, required: false, default: 'cloud_download'},
-    hoverText: {type: String, required: false, default: 'Download all layers as GPX'}
+    hoverText: {type: String, required: false, default: 'Download all active layers as GPX'}
   },
   data: function () {
     return {
