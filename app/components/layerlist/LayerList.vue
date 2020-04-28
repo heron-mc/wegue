@@ -6,11 +6,11 @@
             :load-children="fetchItems"
             :open.sync="open"
           >
-            <template v-if="item.lid" v-slot:prepend="{ item }">
-              <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="layerVizChanged">
-              <v-list-tile-content class="black--text">
-                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              </v-list-tile-content>
+            <template v-slot:prepend="{ item }">
+              <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="layerVizChanged($event, item)">
+<!--              <v-list-tile-content class="black&#45;&#45;text">-->
+<!--                  <v-list-tile-title>{{ item.name }}</v-list-tile-title>-->
+<!--              </v-list-tile-content>-->
               <v-list-tile-avatar>
                 <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
                 <v-card v-if="item.category === 'route'"
@@ -112,7 +112,7 @@
           }
           const layerId = layer.get('lid');
           const layerCategory = layerId.split('_')[0];
-          const layerStyle = layer.getStyle();
+          let layerStyle = layer.getStyle();
           let icon, lineColor, fillColor;
           if (layerCategory === 'route') {
             lineColor = layerStyle.getStroke().getColor();
@@ -122,7 +122,9 @@
             fillColor = layerStyle.getFill().getColor();
             categoryItems = items[2]['children'];
           } else if (layerCategory === 'poi') {
-            // Temporary icon until SVGs avail
+            if (Array.isArray(layerStyle)) {
+              layerStyle = layerStyle[1];
+            }
             icon = layerStyle.getImage().getSrc();
             categoryItems = items[0]['children'];
           }
@@ -130,7 +132,6 @@
           const layerItem = {
             id: categoryItems.length + 100,
             name: layer.get('name'),
-            title: layer.get('name'),
             lid: layerId,
             category: layerCategory,
             icon: icon,
@@ -192,7 +193,7 @@
        * Handles the 'change' event of the visibility checkboxes in order to
        * apply the current visibility state in 'data' to the OL layers.
        */
-      layerVizChanged () {
+      layerVizChanged (evt, item) {
         this.layerItems.forEach((layerItem, idx) => {
           const layer = LayerUtil.getLayerByLid(layerItem.lid, this.map);
           if (layer) {
