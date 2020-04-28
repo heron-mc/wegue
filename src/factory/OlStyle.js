@@ -1,4 +1,5 @@
 import { Circle as CircleStyle, Icon as IconStyle, Fill, Stroke, Style } from 'ol/style';
+import { pinSvg } from './markerPin';
 
 /**
  * Factory, which creates OpenLayers style instances according to a given config
@@ -37,7 +38,20 @@ export const OlStyleFactory = {
   createPointStyle (styleConf) {
     let pointStyle;
     if (styleConf.iconUrl) {
-      pointStyle = new Style({
+      // create a customised marker pin with the icon in it.
+      const [anchorX, anchorY] = styleConf.iconAnchor || [0.5, 0.5];
+      const svgImage = new Image();
+      svgImage.src = pinSvg({ strokeColor: styleConf.color || 'blue' });
+      const outer = new Style({
+        image: new IconStyle(({
+          img: svgImage,
+          imgSize: [32, 32],
+          anchor: [anchorX, anchorY - 0.2],
+          anchorXUnits: styleConf.iconAnchorXUnits,
+          anchorYUnits: styleConf.iconAnchorYUnits
+        }))
+      });
+      const inner = new Style({
         image: new IconStyle(({
           src: styleConf.iconUrl,
           scale: styleConf.scale || 1,
@@ -45,7 +59,8 @@ export const OlStyleFactory = {
           anchorXUnits: styleConf.iconAnchorXUnits,
           anchorYUnits: styleConf.iconAnchorYUnits
         }))
-      })
+      });
+      pointStyle = [outer, inner];
     } else {
       pointStyle = new Style({
         image: new CircleStyle({
