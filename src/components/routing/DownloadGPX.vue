@@ -1,7 +1,11 @@
+<i18n>
+de:
+  Save as GPX file: Als GPX-Datei speichern
+</i18n>
 <template>
 <v-btn v-if="routeGeometry" flat color="primary" @click="clickSaveGpx">
     <v-icon>cloud_download</v-icon>
-    &nbsp;&nbsp;Save as GPX file.
+    &nbsp;&nbsp;{{ $t('Save as GPX file') }}.
 </v-btn>
 </template>
 

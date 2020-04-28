@@ -1,11 +1,16 @@
+<i18n>
+de:
+  Distance: Entfernung
+  Area: Fläche
+</i18n>
 <template>
 
   <v-btn-toggle v-model="measureTypeData" mandatory>
      <v-btn large value="distance">
-       Distance
+       {{ $t('Distance') }}
      </v-btn>
      <v-btn large value="area">
-       Area
+       {{ $t('Area') }}
      </v-btn>
    </v-btn-toggle>
 

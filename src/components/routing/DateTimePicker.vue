@@ -1,10 +1,21 @@
+<i18n>
+de:
+  Arrival or departure time: Ankunfts- oder Abfahrtszeit
+  Arrive by: Ankunft vor
+  Depart at: Abfahrt um
+  Hour: Stunde
+  Minute: Minute
+  Today: Heute
+  Another day: Ein anderer Tag
+  Date: Datum
+</i18n>
 <template>
 <div>
   <v-select
     :items="timeModes"
     v-model="timeMode"
     clearable
-    label="Arrival or departure time"
+    :label="$t('Arrival or departure time')"
   ></v-select>
   <v-layout row v-if="timeMode">
     <v-flex col xs3>
@@ -12,7 +23,7 @@
         id="hour"
         style="text-align: right"
         v-model="hour"
-        label="Hour"
+        :label="$t('Hour')"
         :items="hourItems"
       ></v-select>
     </v-flex>
@@ -22,7 +33,7 @@
     <v-flex col xs3>
       <v-select
         v-model="minute"
-        label="Minute"
+        :label="$t('Minute')"
         :items="minuteItems"
       ></v-select>
     </v-flex>
@@ -30,13 +41,13 @@
   <v-select
     v-if="timeMode && time"
     v-model="travelDay"
-    :items="['Today', 'Another day']"
+    :items="[{ text: $t('Today'), value: 'Today'}, { text: $t('Another day'), value: 'Another day'}]"
   /></v-select>
 
   <v-date-picker
     v-if="timeMode && travelDay !== 'Today'"
     v-model="rawDate"
-    label="Date"
+    :label="$t('Date')"
 
   ></v-date-picker>
 </div>
@@ -48,7 +59,6 @@ import { pad2 } from './routingUtils';
 export default {
   data: () => ({
     timeMode: undefined,
-    timeModes: [{ text: 'Arrive by', value: 'arrival' }, { text: 'Depart at', value: 'departure' }],
     hourItems: [],
     minuteItems: [],
     hour: undefined,
@@ -65,6 +75,9 @@ export default {
     }
   },
   computed: {
+    timeModes () {
+      return [{ text: this.$t('Arrive by'), value: 'arrival' }, { text: this.$t('Depart at'), value: 'departure' }]
+    },
     time () {
       if (!this.timeMode || this.hour === undefined || this.minute === undefined) {
         return undefined;

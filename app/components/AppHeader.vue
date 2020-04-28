@@ -61,6 +61,7 @@ import InfoClickButton from '../../src/components/infoclick/ToggleButton'
 import ShareButton from '../../src/components/sharebutton/ShareButton'
 import ZoomToMaxExtentButton from '../../src/components/maxextentbutton/ZoomToMaxExtentButton'
 import RoutingToggleButton from '../../src/components/routing/RoutingToggleButton'
+import LanguageSelector from '../../src/components/language/LanguageSelector'
 import Geocoder from '../../src/components/geocoder/Geocoder'
 
 export default {
@@ -73,6 +74,7 @@ export default {
     'wgu-helpwin-btn': HelpWinToggleButton,
     'wgu-measuretool-btn': MeasureToolToggleButton,
     'wgu-infoclick-btn': InfoClickButton,
+    'wgu-language-btn': LanguageSelector,
     'wgu-routing-btn': RoutingToggleButton
   },
   props: {

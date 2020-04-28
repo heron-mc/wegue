@@ -1,12 +1,26 @@
-<<template>
+<i18n>
+de:
+  Public transport directions: Anweisungen für öffentliche Verkehrsmittel
+  Driving directions: Fahrtrichtung
+  Bicycle directions: Fahrradanweisungen
+  Walking directions: Wegbeschreibungen
+  Time: Dauer
+  Start: Anfangszeit
+  Distance: Entfernung
+  Routes: Routen
+  Instructions: Anleitung
+  km: km
+  Section: Sektion
+</i18n>
+<template>
 <div id="route"v-if="route">
   <!-- v8 response -->
-  <div v-for="(section, sectionNo) of (route.sections || [])">
-    <h2 v-if="sectionNo === 0">Driving directions</h2>
-    <h3>Section {{ sectionNo + 1 }} ({{ Math.round(section.summary.length/100)/10}} km)</h3>
+  <div v-for="(section, sectionNo) of (route.sections || [])" :key="sectionNo">
+    <h2 v-if="sectionNo === 0">{{ $t('Driving directions') }}</h2>
+    <h3>{{ `${$t('Section')} ${sectionNo + 1}` }} ({{ Math.round(section.summary.length/100)/10}} {{ $t('km') }})</h3>
     <div class="actions">
       <table>
-        <tr v-for="action of section.actions">
+        <tr v-for="(action, i) of section.actions" :key="i">
           <td> {{ action.instruction }}</td>
         </tr>
       </table>
@@ -14,27 +28,27 @@
   </div>
   <!-- v7 response -->
   <div v-if="routeLegs">
-    <h2>{{ transportModeTitle }} directions</h2>
+    <h2>{{ $t(transportModeTitle + ' directions') }}</h2>
     <table class="route-summary">
       <tr>
-        <th>Time:</th>
+        <th>{{ $t('Time') }}:</th>
         <td>{{ routeDuration }}</td>
       </tr>
       <tr v-if="routeStartTime">
-        <th>Start:</th>
+        <th>{{ $t('Start') }}:</th>
         <td>{{ routeStartDate && routeStartDate + ' at '}} {{ routeStartTime }}</td>
       </tr>
       <tr>
-        <th>Distance:</th>
+        <th>{{ $t('Distance') }}:</th>
         <td>{{ routeDistance }}</td>
       </tr>
       <tr v-if="route.publicTransportLine">
-        <th>Routes:</th>
+        <th>{{ $t('Routes') }}:</th>
         <td>{{ route.publicTransportLine.map(l => l.lineName).join(',  ') }}</td>
       </tr>
     </table>
 
-    <h3>Instructions</h3>
+    <h3>{{ $t('Instructions') }}</h3>
     <div v-for="leg of routeLegs">
       <table class="maneuvers">
         <tr v-for="maneuver of leg.maneuver">
@@ -61,10 +75,10 @@ export default {
   name: 'RoutingInstructions',
   computed: {
     routeDuration () {
-      return this.route && humanizeDuration(this.route.summary.baseTime * 1000, { round: true, units: ['h', 'm'] });
+      return this.route && humanizeDuration(this.route.summary.baseTime * 1000, { round: true, units: ['h', 'm'], language: this.$i18n.locale });
     },
     routeDistance () {
-      return this.route && `${Math.round(this.route.summary.distance * 10 / 1000) / 10} km`;
+      return this.route && `${Math.round(this.route.summary.distance * 10 / 1000) / 10} ${this.$t('km')}`;
     },
     routeStartDate () {
       if (!this.dateSpecified) {
