@@ -1,33 +1,41 @@
 <template>
 
   <v-list>
-    <v-list-tile class="wgu-layerlist-item" v-for="layerItem in layerItems" v-bind:key="layerItem.lid" @click="onItemClick($event, layerItem)">
-      <input type="checkbox" :key="layerItem.lid" class="wgu-layer-viz-cb" v-model="layerItem.visible" @change="layerVizChanged">
-      <v-list-tile-content class="black--text">
-          <v-list-tile-title>{{ layerItem.title }}</v-list-tile-title>
-      </v-list-tile-content>
-      <v-list-tile-avatar>
-        <img v-if="layerItem.category === 'poi'" v-bind:src="layerItem.icon" alt="POI Icon">
-        <v-card v-if="layerItem.category === 'route'"
-                          :style="{
-                            background: layerItem.lineColor,
-                          }"
-                          width="30"
-                          height="4"
-                          class="mr-2"
-                        />
-        <v-card v-if="layerItem.category === 'area'"
-                          :style="{
-                            background: layerItem.fillColor,
-                            border: '3px solid',
-                            borderColor: layerItem.lineColor
-                          }"
-                          width="30"
-                          height="30"
-                          class="mr-2"
-                        />
-      </v-list-tile-avatar>
-    </v-list-tile>
+    <v-treeview
+            :items="items"
+            :load-children="fetchItems"
+            :open.sync="open"
+          >
+            <template v-if="item.lid" v-slot:prepend="{ item }">
+              <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="layerVizChanged">
+              <v-list-tile-content class="black--text">
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              </v-list-tile-content>
+              <v-list-tile-avatar>
+                <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
+                <v-card v-if="item.category === 'route'"
+                                  :style="{
+                                    background: item.lineColor,
+                                  }"
+                                  width="30"
+                                  height="4"
+                                  class="mr-2"
+                                />
+                <v-card v-if="item.category === 'area'"
+                                  :style="{
+                                    background: item.fillColor,
+                                    border: '3px solid',
+                                    borderColor: item.lineColor
+                                  }"
+                                  width="30"
+                                  height="30"
+                                  class="mr-2"
+                                />
+              </v-list-tile-avatar>
+            </template>
+          </v-treeview>
+<!--       <v-list-tile class="wgu-layerlist-item" v-for="layerItem in layerItems" v-bind:key="item.lid" @click="onItemClick($event, layerItem)">-->
+<!--    </v-list-tile>-->
   </v-list>
 
 </template>
@@ -44,7 +52,14 @@
     data () {
       return {
         layerItems: [],
+        categoryItems: [],
+        open: [1],
         changeVisByClickUpdate: false
+      }
+    },
+    computed: {
+      items () {
+        return this.categoryItems
       }
     },
     methods: {
@@ -66,7 +81,30 @@
         // go over all (reversed) layers from the map and list them up
         const layers = this.map.getLayers().getArray().slice(0).reverse();
 
-        let layerItems = [];
+        let items = [
+          {
+            id: 1,
+            name: 'POIs',
+            lid: undefined,
+            children: [
+            ]
+          },
+          {
+            id: 15,
+            name: 'Routes',
+            lid: undefined,
+            children: [
+            ]
+          },
+          {
+            id: 19,
+            name: 'Areas',
+            lid: undefined,
+            children: [
+            ]
+          }];
+
+        let categoryItems = items[0]['children'];
         layers.forEach((layer) => {
           // skip if layer should not be listed
           if (layer.get('displayInLayerList') === false) {
@@ -78,15 +116,20 @@
           let icon, lineColor, fillColor;
           if (layerCategory === 'route') {
             lineColor = layerStyle.getStroke().getColor();
+            categoryItems = items[1]['children'];
           } else if (layerCategory === 'area') {
             lineColor = layerStyle.getStroke().getColor();
             fillColor = layerStyle.getFill().getColor();
+            categoryItems = items[2]['children'];
           } else if (layerCategory === 'poi') {
             // Temporary icon until SVGs avail
             icon = layerStyle.getImage().getSrc();
+            categoryItems = items[0]['children'];
           }
 
-          layerItems.push({
+          const layerItem = {
+            id: categoryItems.length + 100,
+            name: layer.get('name'),
             title: layer.get('name'),
             lid: layerId,
             category: layerCategory,
@@ -94,7 +137,10 @@
             lineColor: lineColor,
             fillColor: fillColor,
             visible: layer.getVisible()
-          });
+          };
+
+          categoryItems.push(layerItem);
+          this.layerItems.push(layerItem);
 
           // synchronize visibility with UI when changed programatically
           layer.on('change:visible', (evt) => {
@@ -102,7 +148,11 @@
           });
         });
 
-        this.layerItems = layerItems;
+        this.categoryItems = items;
+      },
+
+      fetchItems () {
+        return this.categoryItems;
       },
 
       /**
