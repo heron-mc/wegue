@@ -10,7 +10,7 @@
     <!-- slot to inject components at the beginning (before title) -->
     <slot name="wgu-tb-start"></slot>
 
-    <v-toolbar-title>{{title}}</v-toolbar-title>
+    <v-toolbar-title><span v-html="title"/></v-toolbar-title>
 
     <!-- slot to inject components after the title text -->
     <slot name="wgu-tb-after-title"></slot>
@@ -55,21 +55,27 @@
 
 import Vue from 'vue'
 import LayerListToggleButton from './layerlist/ToggleButton'
-import HelpWinToggleButton from './helpwin/ToggleButton'
-import MeasureToolToggleButton from './measuretool/ToggleButton'
-import InfoClickButton from './infoclick/ToggleButton'
-import ZoomToMaxExtentButton from './maxextentbutton/ZoomToMaxExtentButton'
-import Geocoder from './geocoder/Geocoder'
+import HelpWinToggleButton from '../../src/components/helpwin/ToggleButton'
+import MeasureToolToggleButton from '../../src/components/measuretool/ToggleButton'
+import InfoClickButton from '../../src/components/infoclick/ToggleButton'
+import ShareButton from '../../src/components/sharebutton/ShareButton'
+import ZoomToMaxExtentButton from '../../src/components/maxextentbutton/ZoomToMaxExtentButton'
+import RoutingToggleButton from '../../src/components/routing/RoutingToggleButton'
+import LanguageSelector from '../../src/components/language/LanguageSelector'
+import Geocoder from '../../src/components/geocoder/Geocoder'
 
 export default {
   name: 'wgu-app-header',
   components: {
+    'wgu-share-btn': ShareButton,
     'wgu-geocoder-btn': Geocoder,
     'wgu-zoomtomaxextent-btn': ZoomToMaxExtentButton,
     'wgu-layerlist-btn': LayerListToggleButton,
     'wgu-helpwin-btn': HelpWinToggleButton,
     'wgu-measuretool-btn': MeasureToolToggleButton,
-    'wgu-infoclick-btn': InfoClickButton
+    'wgu-infoclick-btn': InfoClickButton,
+    'wgu-language-btn': LanguageSelector,
+    'wgu-routing-btn': RoutingToggleButton
   },
   props: {
     color: {type: String, required: false, default: 'red darken-3'}
@@ -119,6 +125,7 @@ export default {
       const appConfig = Vue.prototype.$appConfig || {};
       const modulesConfs = appConfig.modules || {};
       let moduleWins = [];
+
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
         if (moduleOpts.target === 'toolbar') {

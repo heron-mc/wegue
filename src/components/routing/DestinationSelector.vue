@@ -1,3 +1,8 @@
+<i18n>
+de:
+  Click on the map to choose a location.: Klicken Sie auf die Karte, um einen Ort auszuwählen.
+  Point on map: Punkt auf Karte
+</i18n>
 <template>
 <div class="routing-target">
   <v-autocomplete
@@ -17,7 +22,7 @@
   </v-autocomplete>
   <v-alert color="info" outline :value="choosingPoint">
     <v-icon>location_searching</v-icon>
-    Click on the map to choose a location.
+    {{ $t('Click on the map to choose a location.') }}
   </v-alert>
 </div>
 </template>
@@ -33,11 +38,7 @@ export default {
   data: () => ({
     target: undefined,
     geocodeSuggestions: [],
-    searchQuery: undefined,
-    customPoint: {
-      text: 'Point on map',
-      value: feature({ name: 'Point on map', source: 'custom' }, point(null))
-    }
+    searchQuery: undefined
   }),
   watch: {
     target () {
@@ -67,6 +68,12 @@ export default {
   computed: {
     choosingPoint () {
       return this.target && this.target.properties.source === 'custom' && this.target.geometry.coordinates === null;
+    },
+    customPoint () {
+      return {
+        text: this.$t('Point on map'),
+        value: feature({ name: 'Point on map', source: 'custom' }, point(null))
+      }
     }
   },
   methods: {

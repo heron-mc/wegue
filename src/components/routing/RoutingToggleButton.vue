@@ -1,8 +1,16 @@
+<i18n>
+de:
+  Get directions: Anweisungen bekommen
+</i18n>
 <template>
-
-  <v-btn icon :dark="dark" @click="toggleUi">
-    <v-icon medium>explore</v-icon>
-  </v-btn>
+  <v-tooltip bottom>
+    <template #activator="{ on: tooltip }">
+      <v-btn icon :dark="dark"  v-on="{ ...tooltip }" @click="toggleUi">
+        <v-icon medium>{{ icon }}</v-icon>
+      </v-btn>
+    </template>
+    <span>{{ $t(hoverText) }}</span>
+  </v-tooltip>
 
 </template>
 
@@ -12,7 +20,9 @@ import { WguEventBus } from '../../WguEventBus'
 export default {
   name: 'wgu-routing-btn',
   props: {
-    dark: {type: Boolean, required: false, default: false}
+    dark: {type: Boolean, required: false, default: false},
+    icon: {type: String, required: false, default: 'explore'},
+    hoverText: {type: String, required: false, default: 'Get directions'}
   },
   data: function () {
     return {
