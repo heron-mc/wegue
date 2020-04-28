@@ -1,3 +1,6 @@
+<i18n>
+de:
+</i18n>
 <template>
 
   <v-footer :color="color" class="white--text" app>

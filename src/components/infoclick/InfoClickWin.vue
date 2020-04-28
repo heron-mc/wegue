@@ -1,16 +1,21 @@
+<i18n>
+de:
+  Map Click Info: Kartenklickinfo
+  Click on the map to get information for the clicked map position.: Klicken Sie auf die Karte, um Informationen zur angeklickten Kartenposition zu erhalten.
+</i18n>
 <template>
 
   <v-card class="wgu-infoclick-win" v-draggable-win="draggable"  v-if=show v-bind:style="{ left: left, top: top }">
     <v-toolbar :color="color" class="" dark>
       <v-toolbar-side-icon><v-icon>{{icon}}</v-icon></v-toolbar-side-icon>
-      <v-toolbar-title class="wgu-win-title">{{title}}</v-toolbar-title>
+      <v-toolbar-title class="wgu-win-title">{{ $t(title) }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-side-icon @click="show = false"><v-icon>close</v-icon></v-toolbar-side-icon>
     </v-toolbar>
     <v-card-title primary-title class="wgu-infoclick-win-title">
 
       <div v-if="!this.attributeData && !this.coordsData" class="no-data">
-        Click on the map to get information for the clicked map position.
+        {{ $t('Click on the map to get information for the clicked map position.') }}
       </div>
 
       <!-- feature property grid -->

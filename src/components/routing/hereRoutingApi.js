@@ -9,7 +9,8 @@ export async function getRouteV7 ({
   waypoints,
   to,
   transportMode,
-  timeDate
+  timeDate,
+  locale
 }) {
   const makeRequest = () => {
     let timeParam = {};
@@ -30,6 +31,7 @@ export async function getRouteV7 ({
     waypointParams[`waypoint${waypoints.length + 1}`] = toGeo(to);
 
     const mode = (transportMode === 'fastest;publicTransport' && timeDate.time ? 'fastest;publicTransportTimeTable' : transportMode);
+    const language = locale.match(/de/) ? 'de-de' : locale;
     return axios.get(`https://route.ls.hereapi.com/routing/7.2/calculateroute.json`, {
       params: {
         apiKey: routingConfig.hereApiKey,
@@ -40,8 +42,8 @@ export async function getRouteV7 ({
         routeattributes: 'all',
         combineChange: true, // avoid separate "enter" and "leave" steps for interchanges
         ...timeParam,
-        ...walkRadiusParam
-        // language: 'de-de'
+        ...walkRadiusParam,
+        language
       }
     });
   }
@@ -122,7 +124,8 @@ export async function getRouteV8 ({
   from,
   to,
   waypoints,
-  transportMode
+  transportMode,
+  locale
 }) {
   // https://developer.here.com/documentation/routing-api/api-reference-swagger.html
   // https://developer.here.com/documentation/routing/dev_guide/topics/resource-calculate-route.html
@@ -142,7 +145,8 @@ export async function getRouteV8 ({
       destination: flip(to.geometry.coordinates).join(','),
       ...(via ? { via } : {}),
       return: 'summary,polyline,instructions,actions',
-      apiKey: routingConfig.hereApiKey
+      apiKey: routingConfig.hereApiKey,
+      lang: locale
     },
     // the API wants &via=x,y&via=x,y whereas Axios by default provides &via[]=x,y&via[]=x,y
     paramsSerializer: params =>
