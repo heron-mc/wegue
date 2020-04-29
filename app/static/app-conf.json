@@ -132,6 +132,10 @@
       "languages": ["en", "de"],
       "target": "toolbar",
       "darkLayout": true
+    },
+    "wgu-savepdf": {
+      "target": "toolbar",
+      "darkLayout": true
     }
   }
 
