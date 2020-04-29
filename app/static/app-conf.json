@@ -65,8 +65,23 @@
       "lid": "osm-bg",
       "name": "OSM",
       "isBaseLayer": true,
+      "visible": false,
+      "displayInLayerList": true
+    },
+    {
+      "type": "XYZ",
+      "lid": "mapbox-streets",
+      "name": "Straßen",
+      "format": "image/png",
+      "layers": "default",
+      "url": "https://api.mapbox.com/styles/v1/leak-my-brain/ck5lomntv2i2e1iqikjqwxp1d/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibGVhay1teS1icmFpbiIsImEiOiJsYzNWV1E0In0.R0Y5eCKCP6j7VNaqsYaO8w",
+      "transparent": false,
+      "singleTile": false,
+      "projection": "EPSG:3857",
+      "attributions": "<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">© Mapbox</a> <a href=\"http://www.openstreetmap.org/copyright\" target=\"_blank\">© OpenStreetMap</a> <a href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a>",
+      "isBaseLayer": true,
       "visible": true,
-      "displayInLayerList": false
+      "displayInLayerList": true
     }
   ],
 
@@ -141,6 +156,21 @@
     "wgu-downloadlayers": {
       "target": "toolbar",
       "darkLayout": true
+    },
+    "wgu-geocoder": {
+      "target": "toolbar",
+      "darkLayout": true,
+      "minChars": 3,
+      "queryDelay": 200,
+      "selectZoom": 16,
+      "debug": false,
+      "placeHolder": "Suchen",
+      "provider": "osm",
+      "providerOptions": {
+        "lang": "de-DE",
+        "countrycodes": "DE",
+        "limit": 6
+      }
     }
   }
 
