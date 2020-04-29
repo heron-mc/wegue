@@ -135,6 +135,10 @@
     "wgu-savepdf": {
       "target": "toolbar",
       "darkLayout": true
+    },
+    "wgu-downloadlayers": {
+      "target": "toolbar",
+      "darkLayout": true
     }
   }
 
