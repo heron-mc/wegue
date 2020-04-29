@@ -40,10 +40,10 @@ export default {
     click () {
         console.log(this.map);
         const geojson = new GeoJSON();
-        const layers = this.map.getLayers().getArray().filter(l => l.getVisible() && l.get('displayInLayerList') !== false);
+        const layers = this.map.getLayers().getArray().filter(l => l.getVisible() && l.get('displayInLayerList') !== false && l.getSource().getFeatures);
         const features = [];
         for (const layer of layers) {
-            features.push(...layer.getSource().getFeatures());
+          features.push(...layer.getSource().getFeatures());
         }
         const featureCollection = geojson.writeFeaturesObject(features, { dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
         featureCollection.features = featureCollection.features.filter(f => f.geometry.type !== 'Polygon' && f.geometry.type !== 'MultiPolygon');

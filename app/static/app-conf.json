@@ -58,7 +58,7 @@
     },
     {
       "type": "LAYERCOLLECTION",
-      "url": "http://staging.nplh.geolicious.de/api/layer_list_wegue_format"
+      "url": "http://staging.nplh.geolicious.de/api/layer_list_wegue_format/{locale}/"
     },
     {
       "type": "OSM",
