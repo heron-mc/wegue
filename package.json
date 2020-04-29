@@ -23,6 +23,8 @@
     "axios": "^0.19.2",
     "file-saver": "^2.0.2",
     "humanize-duration": "^3.22.0",
+    "jspdf": "^1.5.3",
+    "marked": "^1.0.0",
     "ol": "6.2.1",
     "proj4": "2.5.0",
     "togpx": "^0.5.4",

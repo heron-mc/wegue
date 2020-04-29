@@ -61,7 +61,9 @@ import InfoClickButton from '../../src/components/infoclick/ToggleButton'
 import ShareButton from '../../src/components/sharebutton/ShareButton'
 import ZoomToMaxExtentButton from '../../src/components/maxextentbutton/ZoomToMaxExtentButton'
 import RoutingToggleButton from '../../src/components/routing/RoutingToggleButton'
+import DownloadLayersButton from '../../src/components/downloadlayers/DownloadLayersButton'
 import LanguageSelector from '../../src/components/language/LanguageSelector'
+import SavePdfButton from '../../src/components/savepdf/SavePdfButton'
 import Geocoder from '../../src/components/geocoder/Geocoder'
 
 export default {
@@ -75,7 +77,9 @@ export default {
     'wgu-measuretool-btn': MeasureToolToggleButton,
     'wgu-infoclick-btn': InfoClickButton,
     'wgu-language-btn': LanguageSelector,
-    'wgu-routing-btn': RoutingToggleButton
+    'wgu-routing-btn': RoutingToggleButton,
+    'wgu-savepdf-btn': SavePdfButton,
+    'wgu-downloadlayers-btn': DownloadLayersButton
   },
   props: {
     color: {type: String, required: false, default: 'red darken-3'}
