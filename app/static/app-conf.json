@@ -76,7 +76,7 @@
       "transparent": false,
       "singleTile": false,
       "projection": "EPSG:3857",
-      "attribution": "<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">© Mapbox</a> <a href=\"http://www.openstreetmap.org/copyright\" target=\"_blank\">© OpenStreetMap</a> <a href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a>",
+      "attributions": "<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">© Mapbox</a> <a href=\"http://www.openstreetmap.org/copyright\" target=\"_blank\">© OpenStreetMap</a> <a href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a>",
       "isBaseLayer": true,
       "visible": true,
       "displayInLayerList": true
