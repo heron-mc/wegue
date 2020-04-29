@@ -1,3 +1,7 @@
+<i18n>
+de:
+  Layers: Kartenebenen
+</i18n>
 <template>
 
   <v-card
@@ -6,7 +10,7 @@
   >
     <v-toolbar :color="color" class="" dark>
       <v-toolbar-side-icon><v-icon>{{icon}}</v-icon></v-toolbar-side-icon>
-      <v-toolbar-title class="wgu-win-title">{{title}}</v-toolbar-title>
+      <v-toolbar-title class="wgu-win-title">{{ $t(title) }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-side-icon @click="show=false"><v-icon>close</v-icon></v-toolbar-side-icon>
     </v-toolbar>
