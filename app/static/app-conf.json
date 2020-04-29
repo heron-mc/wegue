@@ -1,8 +1,8 @@
 {
 
-  "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'>Naturpark Lüneburger Heide</a>",
+  "title": "<img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo' style='margin-top:5px;height:60px;'><img src='./static/media/EU-ELER_CMYK.png' alt='EU-ELER Logo' style='margin-top:5px;margin-left:50px;height:60px;'><img src='./static/media/Leader_07_13_jpg.jpg' alt='LEADER Logo' style='margin-top:5px;margin-left:50px;height:60px;'><img src='./static/media/LogoHeideshuttle.png' alt='Heideshuttle Logo' style='margin-top:5px;margin-left:50px;height:60px;'>",
 
-  "baseColor": "rgba(226, 0, 122, 1)",
+  "baseColor": "rgba(255, 255, 255, 1)",
 
   "logoText": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo'</a>",
 
@@ -71,7 +71,7 @@
   "modules": {
     "wgu-layerlist": {
       "target": "toolbar",
-      "darkLayout": true,
+      "darkLayout": false,
       "win": true,
       "draggable": false
     },
@@ -90,19 +90,19 @@
       "target": "menu",
       "win": true,
       "draggable": false,
-      "darkLayout": true,
+      "darkLayout": false,
       "initPos": {
         "left": 8,
         "top": 74
       }
     },
     "wgu-zoomtomaxextent": {
-      "target": "toolbar",
-      "darkLayout": true
+      "target": "menu",
+      "darkLayout": false
     },
     "wgu-share": {
       "target": "toolbar",
-      "darkLayout": true
+      "darkLayout": false
     },
     "wgu-feature-info-window": {
       "win": true,
@@ -124,16 +124,16 @@
       "transportModes": ["car", "publicTransport"],
       "panel": true,
       "target": "toolbar",
-      "darkLayout": true
+      "darkLayout": false
     },
     "wgu-language": {
       "languages": ["en", "de"],
       "target": "toolbar",
-      "darkLayout": true
+      "darkLayout": false
     },
     "wgu-savepdf": {
-      "target": "toolbar",
-      "darkLayout": true
+      "target": "menu",
+      "darkLayout": false
     }
   }
 
