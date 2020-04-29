@@ -33,7 +33,7 @@
     <slot name="wgu-tb-after-auto-buttons"></slot>
 
     <v-menu v-if="menuButtons.length" offset-y>
-      <v-btn icon dark slot="activator">
+      <v-btn icon bright slot="activator">
         <v-icon medium>menu</v-icon>
       </v-btn>
       <v-list>
