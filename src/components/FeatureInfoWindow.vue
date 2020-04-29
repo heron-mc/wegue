@@ -17,7 +17,7 @@
         <v-card-title v-if="attributes[titleProp]" primary-title>
             <h3 class="headline mb-0">{{attributes[titleProp]}}</h3>
         </v-card-title>
-        <v-card-text v-if="attributes[descProp]">{{attributes[descProp]}}</v-card-text>
+        <v-card-text v-if="attributes[descProp]" v-html="description"></v-card-text>
         <v-card-actions>
           <v-btn v-if="attributes[infoUrlProp]" flat color="blue" :href="attributes[infoUrlProp]" target="_blank">{{infoUrlText}}</v-btn>
         </v-card-actions>
@@ -29,6 +29,7 @@
 
 import { WguEventBus } from '../WguEventBus.js';
 import { DraggableWin } from '../directives/DraggableWin.js';
+import marked from 'marked';
 
 export default {
   name: 'wgu-feature-info-window-win',
@@ -92,6 +93,11 @@ export default {
 
       this.setFeature(selected[0]);
     });
+  },
+  computed: {
+    description () {
+      return marked(this.attributes[this.descProp] || '');
+    }
   },
   methods: {
     /**
