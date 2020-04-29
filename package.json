@@ -19,14 +19,19 @@
     "init:app": "node util/init-app.js"
   },
   "dependencies": {
+    "@kazupon/vue-i18n-loader": "^0.5.0",
     "axios": "^0.19.2",
     "file-saver": "^2.0.2",
     "humanize-duration": "^3.22.0",
+    "jspdf": "^1.5.3",
+    "marked": "^1.0.0",
     "ol": "6.2.1",
     "proj4": "2.5.0",
     "togpx": "^0.5.4",
     "vue": "2.6.11",
-    "vuetify": "1.5.23"
+    "vue-i18n": "^8.17.3",
+    "vuetify": "1.5.23",
+    "yaml-loader": "^0.6.0"
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.32",

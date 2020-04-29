@@ -1,3 +1,12 @@
+<i18n>
+de:
+  Share permalink: Teilen Sie Permalink
+  Copy Hyperlink: Hyperlink kopieren
+  Copy HTML Embed Code: Kopieren Sie den HTML-Einbettungscode
+  Email Hyperlink: E-Mail-Hyperlink
+  An error occurred: Ein Fehler ist aufgetreten
+  Copied: Kopiert
+</i18n>
 <template>
   <div class="text-xs-center">
       <v-menu>
@@ -6,11 +15,11 @@
             <template #activator="{ on: tooltip }">
               <v-btn icon :dark="dark"  v-on="{ ...tooltip, ...menu }">
                 <v-icon medium>{{icon}}</v-icon>
-                {{text}}
+                {{$t(text)}}
               </v-btn>
               <textarea id="textstore" ref="textstore" style="display: none; position: relative"></textarea>
             </template>
-            <span>{{hoverText}}</span>
+            <span>{{ $t(hoverText) }}</span>
           </v-tooltip>
         </template>
         <v-list>
@@ -19,7 +28,7 @@
               <v-icon medium>link</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{copyUrlText}}</v-list-tile-title>
+              <v-list-tile-title>{{ $t(copyUrlText) }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="onCopyEmbedHTML()">
@@ -27,7 +36,7 @@
                <v-icon medium>code</v-icon>
              </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{copyEmbedHtmlText}}</v-list-tile-title>
+              <v-list-tile-title>{{ $t(copyEmbedHtmlText) }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile>
@@ -35,7 +44,7 @@
                <v-icon medium>email</v-icon>
              </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title v-html="mailToUrl"/>
+              <v-list-tile-title><a :href="mailToUrl">{{ $t(emailUrlText) }}</a></v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -47,7 +56,7 @@
           type="info"
           transition="fade-transition"
         >
-        {{alertText}}
+        {{ $t(alertText)}}
       </v-alert>
     </div>
 </template>
@@ -143,7 +152,7 @@ export default {
       try {
         const permalinkController = this.map.get('permalinkcontroller');
         const url = encodeURIComponent(permalinkController.getShareUrl());
-        this.mailToUrl = `<a href="mailto:?subject=${this.emailSubjectText}&body=${url}">${this.emailUrlText}</a>`
+        this.mailToUrl = `mailto:?subject=${this.emailSubjectText}&body=${url}`;
       } catch (error) {
         this.showAlert(this.alertErrorText);
       }
@@ -160,7 +169,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
   .v-alert.wgu-alert {
     position: fixed;
     top: 5em;

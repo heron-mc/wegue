@@ -1,3 +1,8 @@
+<i18n>
+de:
+  Start: Anfang
+  Finish: Ziel
+</i18n>
 <template></template>
 
 <script>
@@ -167,7 +172,15 @@ export default {
         layersToAdd.forEach(layer => addInteraction(layer));
         layers.push(...layersToAdd);
       }));
-      return [...layers, ...routingLayers(this.$appConfig.modules['wgu-routing'], this.map)];
+
+      const routingOptions = this.$appConfig.modules['wgu-routing'];
+      const options = {
+        ...routingOptions,
+        startLabel: this.$t(routingOptions.startLabel || 'Start'),
+        endLabel: this.$t(routingOptions.endLabel || 'Finish'),
+        $t: this.$t.bind(this)
+      }
+      return [...layers, ...routingLayers(options, this.map)];
     },
     /**
      * Creates a PermalinkController, override in subclass for specializations.
@@ -248,10 +261,17 @@ export default {
      * @param  {Object} event The OL event for pointermove
      */
     onPointerMove (event) {
+      function setCursor() {
+        const hit = map.hasFeatureAtPixel(event.pixel, { layerFilter: l => l.get('selectable') });
+        map.getViewport().style.cursor = hit ? 'pointer': '';
+      }
       const me = this;
       const map = me.map;
       const overlayEl = me.overlayEl;
       let hoverAttr;
+      setCursor();
+
+
       const features = map.getFeaturesAtPixel(event.pixel, {layerFilter: (layer) => {
         if (layer.get('hoverable')) {
           hoverAttr = layer.get('hoverAttribute');

@@ -1,11 +1,16 @@
+<i18n>
+de:
+  LENGTH: LÄNGE
+  AREA: FLÄCHE
+</i18n>
 <template>
 
   <div class="">
     <div class="measure-result">
-      LENGTH: {{distance}}
+      {{ $t('LENGTH') }}: {{distance}}
     </div>
     <div class="measure-result">
-      AREA: {{area}}
+      {{ $t('AREA') }}: {{area}}
     </div>
   </div>
 

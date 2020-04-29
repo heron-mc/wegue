@@ -123,6 +123,7 @@
       "win": true,
       "draggable": true,
       "width": 360,
+      "textHeight": 400,
       "icon": "info",
       "layers": [
         {
@@ -139,7 +140,19 @@
       "transportModes": ["car", "publicTransport"],
       "panel": true,
       "target": "toolbar",
-      "icon": "info",
+      "darkLayout": true
+    },
+    "wgu-language": {
+      "languages": ["en", "de"],
+      "target": "toolbar",
+      "darkLayout": true
+    },
+    "wgu-savepdf": {
+      "target": "toolbar",
+      "darkLayout": true
+    },
+    "wgu-downloadlayers": {
+      "target": "toolbar",
       "darkLayout": true
     }
   }

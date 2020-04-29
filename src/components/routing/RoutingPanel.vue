@@ -1,4 +1,25 @@
 /* eslint-disable */
+<i18n>
+de:
+  Get directions: Anweisungen bekommen
+  Public transport: Öffentlicher Verkehr
+  Bicycle (fastest): Fahrrad (am schnellsten)
+  Bicycle (shortest distance): Fahrrad (kürzeste Strecke)
+  Pedestrian (shortest distance): Fußgänger (kürzeste Entfernung)
+  Pedestrian (fastest): Fußgänger (am schnellsten)
+  Car (shortest distance): Auto (kürzeste Entfernung)
+  Car (fastest): Auto (am schnellsten)
+  Mode: Transportmodus
+  From: Von
+  to: nach
+  via: über
+  Remove stop: Anschlag entfernen
+  Add stop: Stop hinzufügen
+  Sorry, you can specify a time, or multiple waypoints, but not both.: Leider können Sie eine Zeit oder mehrere Wegpunkte angeben, aber nicht beide.
+  Sorry, directions are currently unavailable.: Eine Wegbeschreibung ist derzeit leider nicht verfügbar.
+  No route was found.: Es wurde keine Route gefunden.
+</i18n>
+
 <template>
   <v-navigation-drawer
       v-model="drawerOpen"
@@ -10,27 +31,27 @@
         <v-select
           :items="transportModes"
           v-model="transportMode"
-          label="Mode"
+          :label="$t('Mode')"
           outline
         ></v-select>
-        <DestinationSelector label="From" @change="from = $event" :localSuggestions="localSuggestions"/>
+        <DestinationSelector :label="$t('From')" @change="from = $event" :localSuggestions="localSuggestions"/>
         <DestinationSelector v-for="(waypoint, i) in waypoints" label="via" @change="$set(waypoints, i, $event)" :localSuggestions="localSuggestions" :key="i" />
         <v-btn color="primary" flat small
           v-if="from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
-          Add stop
+          {{ $t('Add stop') }}
         </v-btn>
-        <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">Remove stop</v-btn>
-        <DestinationSelector label="to" @change="to = $event"  :localSuggestions="localSuggestions"/>
+        <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">{{ $t('Remove stop') }}</v-btn>
+        <DestinationSelector :label="$t('to')" @change="to = $event"  :localSuggestions="localSuggestions"/>
         <div v-if="transportMode === 'fastest;publicTransport' && from && to">
           <DateTimePicker @change="timeDate=$event"/>
         </div>
         <v-container justify-center="true">
           <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(timeDate.time && timeDate.timeIsInvalid)">
-            Get directions
+            {{ $t('Get directions') }}
           </v-btn>
         </v-container>
         <v-alert :value="errorMessage" outline type="error" class="ma-3">
-          {{ errorMessage }}
+          {{ $t(errorMessage) }}
         </v-alert>
         <RoutingInstructions v-if="route" :route="route" :dateSpecified="timeDate.isDateSpecified" :transportModeTitle="responseTransportMode"/>
         <DownloadGPX :routeGeometry="routeGeometry" :transportMode="transportMode" />
@@ -69,28 +90,6 @@ export default {
       waypoints: [],
       localSuggestions: [],
       transportMode: 'fastest;publicTransport',
-      transportModes: [{
-        text: 'Car (fastest)',
-        value: 'car-fast'
-      }, {
-        text: 'Car (shortest distance)',
-        value: 'car-short'
-      }, {
-        text: 'Public transport',
-        value: 'fastest;publicTransport'
-      }, {
-        text: 'Bicycle (fastest)',
-        value: 'fastest;bicycle'
-      }, {
-        text: 'Bicycle (shortest distance)',
-        value: 'shortest;bicycle'
-      }, {
-        text: 'Pedestrian (fastest)',
-        value: 'fastest;pedestrian'
-      }, {
-        text: 'Pedestrian (shortest distance)',
-        value: 'shotest;pedestrian'
-      }],
       errorMessage: undefined,
       dev: location.hash.match(/dev/),
       routeGeometry: undefined,
@@ -108,6 +107,32 @@ export default {
     });
   },
   computed: {
+    transportModes () {
+      return [
+        {
+          text: this.$t('Car (fastest)'),
+          value: 'car-fast'
+        }, {
+          text: this.$t('Car (shortest distance)'),
+          value: 'car-short'
+        }, {
+          text: this.$t('Public transport'),
+          value: 'fastest;publicTransport'
+        }, {
+          text: this.$t('Bicycle (fastest)'),
+          value: 'fastest;bicycle'
+        }, {
+          text: this.$t('Bicycle (shortest distance)'),
+          value: 'shortest;bicycle'
+        }, {
+          text: this.$t('Pedestrian (fastest)'),
+          value: 'fastest;pedestrian'
+        }, {
+          text: this.$t('Pedestrian (shortest distance)'),
+          value: 'shotest;pedestrian'
+        }
+      ]
+    },
     // when anything changes that was used to calculate the route, we clear the route
     routeParameters () {
       return [this.from, this.to, this.waypoints.map(w => w && w.geometry.coordinates), this.transportMode, this.timeDate.timeMode, this.timeDate.time, Date.now()];
@@ -186,7 +211,8 @@ export default {
         from: this.from,
         waypoints: this.waypoints,
         to: this.to,
-        transportMode: this.transportMode
+        transportMode: this.transportMode,
+        locale: this.$i18n.locale
       });
 
       this.route = response.route;
@@ -198,7 +224,8 @@ export default {
         waypoints: this.waypoints,
         to: this.to,
         transportMode: this.transportMode,
-        timeDate: this.timeDate
+        timeDate: this.timeDate,
+        locale: this.$i18n.locale
       });
       if (response.errorMessage) {
         this.errorMessage = response.errorMessage;
