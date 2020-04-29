@@ -139,6 +139,21 @@
     "wgu-downloadlayers": {
       "target": "toolbar",
       "darkLayout": true
+    },
+    "wgu-geocoder": {
+      "target": "toolbar",
+      "darkLayout": true,
+      "minChars": 3,
+      "queryDelay": 200,
+      "selectZoom": 16,
+      "debug": false,
+      "placeHolder": "Suchen",
+      "provider": "osm",
+      "providerOptions": {
+        "lang": "de-DE",
+        "countrycodes": "DE",
+        "limit": 6
+      }
     }
   }
 
