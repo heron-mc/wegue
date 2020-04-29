@@ -261,10 +261,17 @@ export default {
      * @param  {Object} event The OL event for pointermove
      */
     onPointerMove (event) {
+      function setCursor() {
+        const hit = map.hasFeatureAtPixel(event.pixel, { layerFilter: l => l.get('selectable') });
+        map.getViewport().style.cursor = hit ? 'pointer': '';
+      }
       const me = this;
       const map = me.map;
       const overlayEl = me.overlayEl;
       let hoverAttr;
+      setCursor();
+
+
       const features = map.getFeaturesAtPixel(event.pixel, {layerFilter: (layer) => {
         if (layer.get('hoverable')) {
           hoverAttr = layer.get('hoverAttribute');
