@@ -29,7 +29,7 @@
 
 import { WguEventBus } from '../WguEventBus.js';
 import { DraggableWin } from '../directives/DraggableWin.js';
-import marked from 'marked';
+import marked from 'marked/marked.min.js'; // importing the min is not best practice, but avoids a problem with ES6 code and uglify.
 
 export default {
   name: 'wgu-feature-info-window-win',
