@@ -13,11 +13,11 @@
           <v-toolbar-side-icon @click="onWinXClose"><v-icon>close</v-icon></v-toolbar-side-icon>
         </v-toolbar>
 
-        <v-img v-if="attributes[imageProp]" :src="attributes[imageProp]" :width="imageWidth" :height="imageHeight" />
+        <v-img v-if="attributes[imageProp]" :src="attributes[imageProp]" :width="imageWidth" :height="imageHeight" style="margin: 10px auto 0 auto"/>
         <v-card-title v-if="attributes[titleProp]" primary-title>
             <h3 class="headline mb-0">{{attributes[titleProp]}}</h3>
         </v-card-title>
-        <v-card-text v-if="attributes[descProp]" v-html="description"></v-card-text>
+        <v-card-text v-if="attributes[descProp]" v-html="description" :style="{maxHeight:textHeight, overflowY:'scroll'}"></v-card-text>
         <v-card-actions>
           <v-btn v-if="attributes[infoUrlProp]" flat color="blue" :href="attributes[infoUrlProp]" target="_blank">{{infoUrlText}}</v-btn>
         </v-card-actions>
@@ -57,7 +57,8 @@ export default {
       infoUrlProp: null,
       infoUrlText: null,
       imageHeight: null,
-      imageWidth: null
+      imageWidth: null,
+      textHeight: null
     }
   },
   mounted () {
@@ -80,16 +81,12 @@ export default {
       if (!layer) {
         return;
       }
-      // {...layer}; TODO How to use Object Spread
-      this.layerId = layer.layerId;
-      this.title = layer.title || layer.titleProp || 'Feature Info';
-      this.titleProp = layer.titleProp;
-      this.descProp = layer.descProp;
-      this.imageProp = layer.imageProp;
-      this.imageHeight = layer.imageHeight;
-      this.imageWidth = layer.imageWidth;
-      this.infoUrlProp = layer.infoUrlProp;
-      this.infoUrlText = layer.infoUrlText || 'More info...';
+      Object.assign(this, {
+        ...layer,
+        infoUrlText: layer.infoUrlText || 'More info...',
+        title: layer.title || layer.titleProp || 'Feature Info',
+        textHeight: `${layer.textHeight || 200}px`
+      });
 
       this.setFeature(selected[0]);
     });
