@@ -169,7 +169,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
   .v-alert.wgu-alert {
     position: fixed;
     top: 5em;

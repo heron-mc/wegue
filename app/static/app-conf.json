@@ -108,6 +108,7 @@
       "win": true,
       "draggable": true,
       "width": 360,
+      "textHeight": 400,
       "icon": "info",
       "layers": [
         {
