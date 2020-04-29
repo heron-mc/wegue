@@ -161,7 +161,7 @@ export default {
       let layers = [];
       const mapLayersConfig = this.$appConfig.mapLayers;
       await Promise.all(mapLayersConfig.reverse().map(async lConf => {
-        let layersToAdd = await LayerFactory.getInstance(lConf);
+        let layersToAdd = await LayerFactory.getInstance(lConf, { locale: this.$i18n.locale });
         // One layer definition can lead to several layer instances being created
         if (Array.isArray(layersToAdd)) {
           // Reverse like main config to have Layers added in right stacking order.
