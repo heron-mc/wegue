@@ -17,7 +17,7 @@ de:
       </v-tab>
       <v-tab-item>
         <v-list>
-          <v-treeview :items="categoriesTree" :load-children="fetchCategoryItems" :open.sync="open">
+          <v-treeview :items="categoriesTree" :open.sync="open" keyField="id">
             <template v-slot:prepend="{ item }">
               <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="layerVizChanged(item)">
               <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
@@ -99,12 +99,14 @@ de:
         layerItems: [],
         categoryItems: [],
         tagItems: [],
-        open: [1],
-        changeVisByClickUpdate: false
+        open: [100],
+        changeVisByClickUpdate: false,
+        nodeId: 0
       }
     },
     computed: {
       categoriesTree () {
+        this.createLayerItems();
         return this.categoryItems
       },
       tagsTree () {
@@ -165,21 +167,21 @@ de:
         // Predefined Categories
         let categoryItems = [
           {
-            id: 1,
+            id: 100,
             name: 'POIs',
             lid: undefined,
             children: [
             ]
           },
           {
-            id: 20,
+            id: 200,
             name: 'Routes',
             lid: undefined,
             children: [
             ]
           },
           {
-            id: 30,
+            id: 300,
             name: 'Areas',
             lid: undefined,
             children: [
@@ -188,24 +190,35 @@ de:
 
         // Tag defs come from the tags added to Layers
         let tagItems = [];
-        let nextId = 4;
+        let nodeId = 0;
+        let tagNodeId = 0;
+        function nextId (parent) {
+          nodeId += 1;
+          return parent['id'] + nodeId;
+        }
+        function nextTagNodeId () {
+          tagNodeId += 1;
+          return tagNodeId;
+        }
         layers.forEach((layer, idx) => {
           // skip if layer should not be listed
           if (layer.get('displayInLayerList') === false) {
             return;
           }
           let layerItem = this.createLayerItem(layer);
-          layerItem.id = nextId;
-          nextId += 1;
+
           // First add to Categories tree
           const layerCategory = layerItem.category;
-          let categoryNode = categoryItems[0]['children'];
+          let categoryNode = categoryItems[0]
           if (layerCategory === 'route') {
-            categoryNode = categoryItems[1]['children'];
+            categoryNode = categoryItems[1];
           } else if (layerCategory === 'area') {
-            categoryNode = categoryItems[2]['children'];
+            categoryNode = categoryItems[2];
           }
-          categoryNode.push(layerItem);
+          layerItem['id'] = nextId(categoryNode);
+          categoryNode['children'].push(layerItem);
+
+          this.layerItems.push(layerItem);
 
           // Skip if no tags
           if (!layerItem.tags) {
@@ -214,8 +227,8 @@ de:
 
           // One or more Tags avail: add to the Tags tree
           layerItem = this.createLayerItem(layer);
-          layerItem.id = nextId;
-          nextId += 1;
+          layerItem.id = nextTagNodeId();
+          this.layerItems.push(layerItem);
           const tags = layerItem.tags;
           tags.forEach((tag, idx) => {
             let tagNode;
@@ -227,20 +240,16 @@ de:
 
             if (!tagNode) {
               tagNode = {
-                id: nextId,
+                id: nextTagNodeId(),
                 name: tag,
                 lid: undefined,
                 children: [
                 ]
               };
               tagItems.push(tagNode)
-              nextId += 1;
             }
             tagNode = tagNode.children.push(layerItem)
           });
-
-          this.layerItems.push(layerItem);
-
           // synchronize visibility with UI when changed programatically
           // layer.on('change:visible', (evt) => {
           //   this.onOlLayerVizChange(evt)
