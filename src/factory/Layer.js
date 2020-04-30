@@ -35,7 +35,7 @@ export const LayerFactory = {
    * @param  {Object} lConf  Layer config object
    * @return {ol.layer.Base} OL layer instance
    */
-  async getInstance (lConf) {
+  async getInstance (lConf, options = {}) {
     // apply LID (Layer ID) if not existent
     if (!lConf.lid) {
       // Make a unique layerId from Layer name and URL so contexts
@@ -55,7 +55,7 @@ export const LayerFactory = {
     } else if (lConf.type === 'VECTORTILE') {
       return this.createVectorTileLayer(lConf);
     } else if (lConf.type === 'LAYERCOLLECTION') {
-      return this.createLayersFromCollection(lConf);
+      return this.createLayersFromCollection(lConf, options);
     } else {
       return null;
     }
@@ -83,7 +83,8 @@ export const LayerFactory = {
           'TILED': lConf.tiled
         },
         serverType: lConf.serverType,
-        attributions: lConf.attributions
+        attributions: lConf.attributions,
+        crossOrigin: 'Anonymous'
       })
     });
 
@@ -105,7 +106,9 @@ export const LayerFactory = {
       visible: lConf.visible,
       opacity: lConf.opacity,
       source: new XyzSource({
-        url: lConf.url
+        url: lConf.url,
+        crossOrigin: 'Anonymous',
+        attributions: lConf.attributions
       })
     });
 
@@ -126,7 +129,7 @@ export const LayerFactory = {
       selectable: lConf.selectable || false,
       visible: lConf.visible,
       opacity: lConf.opacity,
-      source: new OsmSource()
+      source: new OsmSource({ crossOrigin: 'Anonymous' })
     });
 
     return layer;
@@ -195,8 +198,9 @@ export const LayerFactory = {
    * @param  {Object} lConf Wegue Layer list config object
    * @return {Array} array of layer instances
    */
-  async createLayersFromCollection (lConf) {
-    const response = await (await fetch(lConf.url)).json();
+  async createLayersFromCollection (lConf, { locale = '' }) {
+    const url = lConf.url.replace(/\{locale\}/, locale);
+    const response = await (await fetch(url)).json();
     return Promise.all(response.map(async layerDef => {
       return this.getInstance(layerDef);
     }));
