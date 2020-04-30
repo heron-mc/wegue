@@ -33,9 +33,10 @@
       "format": "GeoJSON",
       "visible": true,
       "selectable": false,
+      "displayInLayerList": false,
       "style": {
         "strokeColor": "rgba(226, 0, 122, 1)",
-        "strokeWidth": 4
+        "strokeWidth": 3
       }
     },
     {
