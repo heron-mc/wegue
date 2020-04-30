@@ -149,15 +149,15 @@
     },
     "wgu-savepdf": {
       "target": "toolbar",
-      "darkLayout": true
+      "darkLayout": false
     },
     "wgu-downloadlayers": {
       "target": "toolbar",
-      "darkLayout": true
+      "darkLayout": false
     },
     "wgu-geocoder": {
       "target": "toolbar",
-      "darkLayout": true,
+      "darkLayout": false,
       "minChars": 3,
       "queryDelay": 200,
       "selectZoom": 16,
