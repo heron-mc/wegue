@@ -84,6 +84,21 @@
   ],
 
   "modules": {
+    "wgu-geocoder": {
+      "target": "toolbar",
+      "darkLayout": false,
+      "minChars": 3,
+      "queryDelay": 200,
+      "selectZoom": 16,
+      "debug": false,
+      "placeHolder": "Suchen",
+      "provider": "osm",
+      "providerOptions": {
+        "lang": "de-DE",
+        "countrycodes": "DE",
+        "limit": 6
+      }
+    },
     "wgu-layerlist": {
       "target": "toolbar",
       "darkLayout": false,
@@ -148,27 +163,12 @@
       "darkLayout": false
     },
     "wgu-savepdf": {
-      "target": "toolbar",
+      "target": "menu",
       "darkLayout": false
     },
     "wgu-downloadlayers": {
-      "target": "toolbar",
+      "target": "menu",
       "darkLayout": false
-    },
-    "wgu-geocoder": {
-      "target": "toolbar",
-      "darkLayout": false,
-      "minChars": 3,
-      "queryDelay": 200,
-      "selectZoom": 16,
-      "debug": false,
-      "placeHolder": "Suchen",
-      "provider": "osm",
-      "providerOptions": {
-        "lang": "de-DE",
-        "countrycodes": "DE",
-        "limit": 6
-      }
     }
   }
 
