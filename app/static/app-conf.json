@@ -1,6 +1,6 @@
 {
 
-  "title": "<img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo' style='margin-top:5px;height:60px;'><img src='./static/media/EU-ELER_CMYK.png' alt='EU-ELER Logo' style='margin-top:5px;margin-left:50px;height:60px;'><img src='./static/media/Leader_07_13_jpg.jpg' alt='LEADER Logo' style='margin-top:5px;margin-left:50px;height:60px;'><img src='./static/media/LogoHeideshuttle.png' alt='Heideshuttle Logo' style='margin-top:5px;margin-left:50px;height:60px;'>",
+  "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo' style='margin-top:5px;height:60px;'></a><img src='./static/media/EU-ELER_CMYK.png' alt='EU-ELER Logo' style='margin-top:5px;margin-left:50px;height:60px;'><img src='./static/media/Leader_07_13_jpg.jpg' alt='LEADER Logo' style='margin-top:5px;margin-left:50px;height:60px;'><a href='https://naturpark-lueneburger-heide.de/aktiv-und-mobil-in-der-heide/heide-shuttle-co' target='_blank'><img src='./static/media/LogoHeideshuttle.png' alt='Heideshuttle Logo' style='margin-top:5px;margin-left:50px;height:60px;'></a>",
 
   "baseColor": "rgba(255, 255, 255, 1)",
 
