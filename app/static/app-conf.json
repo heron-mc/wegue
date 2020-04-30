@@ -59,14 +59,6 @@
       "url": "http://staging.nplh.geolicious.de/api/layer_list_wegue_format/{locale}/"
     },
     {
-      "type": "OSM",
-      "lid": "osm-bg",
-      "name": "OSM",
-      "isBaseLayer": true,
-      "visible": false,
-      "displayInLayerList": true
-    },
-    {
       "type": "XYZ",
       "lid": "mapbox-streets",
       "name": "Straßen",
