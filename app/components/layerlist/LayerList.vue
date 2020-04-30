@@ -17,7 +17,7 @@ de:
       </v-tab>
       <v-tab-item>
         <v-list>
-          <v-treeview :items="categoriesTree" :open.sync="open" keyField="id">
+          <v-treeview :items="categoriesTree" :load-children="fetchCategoryItems" :open.sync="open" keyField="id">
             <template v-slot:prepend="{ item }">
               <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="layerVizChanged(item)">
               <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
@@ -106,7 +106,6 @@ de:
     },
     computed: {
       categoriesTree () {
-        this.createLayerItems();
         return this.categoryItems
       },
       tagsTree () {
@@ -162,7 +161,8 @@ de:
        */
       createLayerItems () {
         // go over all (reversed) layers from the map and list them up
-        const layers = this.map.getLayers().getArray().slice(0).reverse();
+        const layers = this.map.getLayers().getArray().slice(0).reverse().filter(
+          l => l.get('displayInLayerList') !== false && l.getSource().getFeatures);
 
         // Predefined Categories
         let categoryItems = [
@@ -200,11 +200,8 @@ de:
           tagNodeId += 1;
           return tagNodeId;
         }
+
         layers.forEach((layer, idx) => {
-          // skip if layer should not be listed
-          if (layer.get('displayInLayerList') === false) {
-            return;
-          }
           let layerItem = this.createLayerItem(layer);
 
           // First add to Categories tree
