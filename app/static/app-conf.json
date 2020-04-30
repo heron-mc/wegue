@@ -116,16 +116,6 @@
       "sketchVertexStrokeColor": "#c62828",
       "sketchVertexFillColor": "rgba(198,40,40,0.2)"
     },
-    "wgu-infoclick": {
-      "target": "menu",
-      "win": true,
-      "draggable": false,
-      "darkLayout": false,
-      "initPos": {
-        "left": 8,
-        "top": 74
-      }
-    },
     "wgu-zoomtomaxextent": {
       "target": "menu",
       "darkLayout": false
