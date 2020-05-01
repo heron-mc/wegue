@@ -17,9 +17,9 @@ de:
       </v-tab>
       <v-tab-item>
         <v-list>
-          <v-treeview :items="categoriesTree" :load-children="fetchCategoryItems" :open.sync="open" keyField="id">
+          <v-treeview :items="categoriesTree" :load-children="fetchCategoryItems" :open.sync="unfoldCategories">
             <template v-slot:prepend="{ item }">
-              <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="layerVizChanged(item)">
+              <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
               <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
               <v-card v-if="item.category === 'route'"
                                 :style="{
@@ -51,10 +51,9 @@ de:
            <v-treeview
                    :items="tagsTree"
                    :load-children="fetchTagItems"
-                   :open.sync="open"
                  >
                    <template v-slot:prepend="{ item }">
-                     <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="layerVizChanged(item)">
+                     <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
                      <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
                      <v-card v-if="item.category === 'route'"
                                        :style="{
@@ -96,12 +95,9 @@ de:
     },
     data () {
       return {
-        layerItems: [],
         categoryItems: [],
         tagItems: [],
-        open: [100],
-        changeVisByClickUpdate: false,
-        nodeId: 0
+        unfoldCategories: [1]
       }
     },
     computed: {
@@ -125,9 +121,9 @@ de:
         });
       },
       /**
-       * Creates single layer item from an OpenLayers Layer.
+       * Creates single layer (tree) item from an OpenLayers Layer.
        */
-      createLayerItem (layer) {
+      createLayerItem (layer, childId) {
         const layerId = layer.get('lid');
         const layerCategory = layerId.split('_')[0];
         let layerStyle = layer.getStyle();
@@ -145,7 +141,7 @@ de:
         }
 
         return {
-          id: -1,
+          id: childId,
           name: layer.get('name'),
           lid: layerId,
           category: layerCategory,
@@ -160,97 +156,84 @@ de:
        * Creates the layer items from the OpenLayers map.
        */
       createLayerItems () {
-        // go over all (reversed) layers from the map and list them up
+        // Get applicable layers: displayInLayerList enabled and Vector Layers
         const layers = this.map.getLayers().getArray().slice(0).reverse().filter(
           l => l.get('displayInLayerList') !== false && l.getSource().getFeatures);
 
-        // Predefined Categories
+        let nodeId = 1;
+        function nextId () {
+          nodeId += 1;
+          return nodeId;
+        }
+
+        // Predefined Categories TODO make smarter
         let categoryItems = [
           {
-            id: 100,
+            id: 1,
             name: 'POIs',
             lid: undefined,
+            visible: false,
             children: [
             ]
           },
           {
-            id: 200,
+            id: nextId(),
             name: 'Routes',
             lid: undefined,
+            visible: false,
             children: [
             ]
           },
           {
-            id: 300,
+            id: nextId(),
             name: 'Areas',
             lid: undefined,
+            visible: false,
             children: [
             ]
           }];
 
         // Tag defs come from the tags added to Layers
         let tagItems = [];
-        let nodeId = 0;
-        let tagNodeId = 0;
-        function nextId (parent) {
-          nodeId += 1;
-          return parent['id'] + nodeId;
-        }
-        function nextTagNodeId () {
-          tagNodeId += 1;
-          return tagNodeId;
-        }
 
         layers.forEach((layer, idx) => {
-          let layerItem = this.createLayerItem(layer);
+          let layerItem = this.createLayerItem(layer, nextId());
 
           // First add to Categories tree
           const layerCategory = layerItem.category;
-          let categoryNode = categoryItems[0]
+          let categoryNode = categoryItems[0];
           if (layerCategory === 'route') {
             categoryNode = categoryItems[1];
           } else if (layerCategory === 'area') {
             categoryNode = categoryItems[2];
           }
-          layerItem['id'] = nextId(categoryNode);
-          categoryNode['children'].push(layerItem);
+          categoryNode.children.push(layerItem);
 
-          this.layerItems.push(layerItem);
-
-          // Skip if no tags
+          // Skip if no tags present for layer
           if (!layerItem.tags) {
             return;
           }
 
           // One or more Tags avail: add to the Tags tree
-          layerItem = this.createLayerItem(layer);
-          layerItem.id = nextTagNodeId();
-          this.layerItems.push(layerItem);
+          // Must be existing layer item: reuse for common visibility state
           const tags = layerItem.tags;
           tags.forEach((tag, idx) => {
-            let tagNode;
-            tagItems.forEach((tagItem, idx) => {
-              if (tagItem.name === 'tag') {
-                tagNode = tagItem;
-              }
-            });
-
+            const tagNodes = tagItems.filter(tagItem => tagItem.name === 'tag');
+            let tagNode = tagNodes.length > 0 ? tagNodes[0] : undefined;
             if (!tagNode) {
+              // Create new tag parent node
               tagNode = {
-                id: nextTagNodeId(),
+                id: nextId(),
                 name: tag,
                 lid: undefined,
+                visible: false,
                 children: [
                 ]
               };
               tagItems.push(tagNode)
             }
-            tagNode = tagNode.children.push(layerItem)
+            tagNode.children.push(layerItem)
           });
-          // synchronize visibility with UI when changed programatically
-          // layer.on('change:visible', (evt) => {
-          //   this.onOlLayerVizChange(evt)
-          // });
         });
 
         this.categoryItems = categoryItems;
@@ -266,54 +249,22 @@ de:
       },
 
       /**
-       * Handles the 'change:visible' event of the layer in order to
-       * apply the current visibility state to the corresponding checkbox in
-       * case the 'change:visible' wasn't triggered by click.
-       *
-       * @param  {ol/Object.ObjectEvent} evt The OL event of 'change:visible'
-       */
-      onOlLayerVizChange (evt) {
-        if (!this.changeVisByClickUpdate) {
-          this.layerItems.forEach((layerItem, idx) => {
-            if (layerItem.lid === evt.target.get('lid')) {
-              // execute click handler to change visibility
-              this.onItemClick(null, layerItem);
-            }
-          });
-        }
-      },
-
-      /**
-       * Handler for click on item in layer list:
-       * Toggles the corresponding visibility and calls this.layerVizChanged.
-       *
-       * @param  {Object} evt       Original vue click event
-       * @param  {Object} layerItem Layer item data object
-       */
-      onItemClick (evt, layerItem) {
-        layerItem.visible = !layerItem.visible;
-
-        this.changeVisByClickUpdate = true;
-        this.layerVizChanged();
-        this.changeVisByClickUpdate = false;
-      },
-
-      /**
        * Handles the 'change' event of the visibility checkboxes in order to
-       * apply the current visibility state in 'data' to the OL layers.
+       * apply the current visibility state in 'data' to the OL layers, recursive.
        */
-      layerVizChanged (item) {
-        if (item && item.children) {
-          item.children.forEach((item, idx) => {
-            this.onItemClick(null, item)
-          });
-          return;
-        }
-        this.layerItems.forEach((item, idx) => {
+      onItemChanged (item) {
+        if (!item.children) {
+          // Child node clicked or changed via parent
           const layer = LayerUtil.getLayerByLid(item.lid, this.map);
           if (layer) {
             layer.setVisible(item.visible);
           }
+          return
+        }
+        // Parent node clicked
+        item.children.forEach((child, idx) => {
+          child.visible = item.visible;
+          this.onItemChanged(child)
         });
       }
     }
