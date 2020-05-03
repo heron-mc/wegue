@@ -4,7 +4,7 @@ de:
   Routes: Strecke
   Areas: Gebiete
   Categories: Kategorien
-  Tags: Tags
+  Tags: Schlagworte
 </i18n>
 <template>
   <div>
