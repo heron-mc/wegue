@@ -32,6 +32,7 @@ import Feature from 'ol/Feature';
 import LineString from 'ol/geom/LineString';
 import { Style, Stroke, RegularShape, Fill, Text } from 'ol/style';
 import { routingLayers } from '../routing/routingLayers';
+import { geolocationLayers } from '../geolocation/geolocationLayers';
 export default {
   name: 'wgu-map',
   props: {
@@ -180,7 +181,7 @@ export default {
         endLabel: this.$t(routingOptions.endLabel || 'Finish'),
         $t: this.$t.bind(this)
       }
-      return [...layers, ...routingLayers(options, this.map)];
+      return [...layers, ...routingLayers(options, this.map), ...geolocationLayers(this.$appConfig.geolocation, this.map)];
     },
     /**
      * Creates a PermalinkController, override in subclass for specializations.

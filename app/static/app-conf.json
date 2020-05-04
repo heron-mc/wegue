@@ -170,6 +170,8 @@
         "limit": 6
       }
     }
+  },
+  "geolocation": {
+    "enabled": true
   }
-
 }
