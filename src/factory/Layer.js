@@ -145,6 +145,7 @@ export const LayerFactory = {
     const vectorLayer = new VectorLayer({
       name: lConf.name,
       lid: lConf.lid,
+      tags: lConf.tags,
       displayInLayerList: lConf.displayInLayerList,
       selectable: lConf.selectable || false,
       routable: lConf.routable || false,

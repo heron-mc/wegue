@@ -32,6 +32,7 @@
       },
       "format": "GeoJSON",
       "visible": true,
+      "displayInLayerList": false,
       "selectable": false,
       "displayInLayerList": false,
       "style": {
@@ -48,6 +49,7 @@
       },
       "format": "GeoJSON",
       "visible": true,
+      "displayInLayerList": false,
       "selectable": false,
       "style": {
         "strokeColor": "rgb(162, 114, 240)",
@@ -152,6 +154,8 @@
       "target": "menu",
       "darkLayout": false
     }
+  },
+  "geolocation": {
+    "enabled": true
   }
-
 }
