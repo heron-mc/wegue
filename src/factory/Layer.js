@@ -83,7 +83,8 @@ export const LayerFactory = {
           'TILED': lConf.tiled
         },
         serverType: lConf.serverType,
-        attributions: lConf.attributions
+        attributions: lConf.attributions,
+        crossOrigin: 'Anonymous'
       })
     });
 
@@ -106,6 +107,7 @@ export const LayerFactory = {
       opacity: lConf.opacity,
       source: new XyzSource({
         url: lConf.url,
+        crossOrigin: 'Anonymous',
         attributions: lConf.attributions
       })
     });
@@ -127,7 +129,7 @@ export const LayerFactory = {
       selectable: lConf.selectable || false,
       visible: lConf.visible,
       opacity: lConf.opacity,
-      source: new OsmSource()
+      source: new OsmSource({ crossOrigin: 'Anonymous' })
     });
 
     return layer;

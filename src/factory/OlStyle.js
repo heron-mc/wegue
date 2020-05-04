@@ -48,7 +48,8 @@ export const OlStyleFactory = {
           imgSize: [32, 32],
           anchor: [anchorX, anchorY - 0.2],
           anchorXUnits: styleConf.iconAnchorXUnits,
-          anchorYUnits: styleConf.iconAnchorYUnits
+          anchorYUnits: styleConf.iconAnchorYUnits,
+          crossOrigin: 'Anonymous'
         }))
       });
       const inner = new Style({
@@ -57,7 +58,8 @@ export const OlStyleFactory = {
           scale: styleConf.scale || 1,
           anchor: styleConf.iconAnchor,
           anchorXUnits: styleConf.iconAnchorXUnits,
-          anchorYUnits: styleConf.iconAnchorYUnits
+          anchorYUnits: styleConf.iconAnchorYUnits,
+          crossOrigin: 'Anonymous'
         }))
       });
       pointStyle = [outer, inner];
