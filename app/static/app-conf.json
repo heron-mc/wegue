@@ -32,6 +32,7 @@
       },
       "format": "GeoJSON",
       "visible": true,
+      "displayInLayerList": false,
       "selectable": false,
       "style": {
         "strokeColor": "rgba(226, 0, 122, 1)",
@@ -47,6 +48,7 @@
       },
       "format": "GeoJSON",
       "visible": true,
+      "displayInLayerList": false,
       "selectable": false,
       "style": {
         "strokeColor": "rgb(162, 114, 240)",

@@ -55,6 +55,7 @@ export const OlStyleFactory = {
       const inner = new Style({
         image: new IconStyle(({
           src: styleConf.iconUrl,
+          scale: styleConf.scale || 1,
           anchor: styleConf.iconAnchor,
           anchorXUnits: styleConf.iconAnchorXUnits,
           anchorYUnits: styleConf.iconAnchorYUnits,
