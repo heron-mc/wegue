@@ -9,8 +9,10 @@ de:
 <template>
   <div>
     <v-tabs
-      dark
-      slider-color="grey"
+      :dark="dark"
+      :sliderColor="sliderColor"
+      grow
+      class="wgu-layer-list-tabs"
     >
       <v-tab>
         {{ $t(categoriesTitle) }}
@@ -85,11 +87,16 @@ de:
 <script>
   import { Mapable } from '../../../src/mixins/Mapable';
   import LayerUtil from '../../../src/util/Layer';
+  import {WguEventBus} from '../../../src/WguEventBus';
 
   export default {
     name: 'wgu-layerlist',
     mixins: [Mapable],
     props: {
+      minWidth: {type: Number, required: false, default: 360},
+      maxWidth: {type: Number, required: false, default: 420},
+      dark: {type: Boolean, required: false, default: false},
+      sliderColor: {type: String, required: false, default: 'grey'},
       categoriesTitle: {type: String, required: false, default: 'Categories'},
       tagsTitle: {type: String, required: false, default: 'Tags'}
     },
@@ -117,6 +124,10 @@ de:
 
         // react on added / removed layers
         this.map.getLayers().on('change:length', (evt) => {
+          this.createLayerItems();
+        });
+        WguEventBus.$on('locale-changed', language => {
+          this.$i18n.locale = language;
           this.createLayerItems();
         });
       },
@@ -170,7 +181,7 @@ de:
         let categoryItems = [
           {
             id: 1,
-            name: 'POIs',
+            name: this.$i18n.t('POIs'),
             lid: undefined,
             visible: false,
             children: [
@@ -178,7 +189,7 @@ de:
           },
           {
             id: nextId(),
-            name: 'Routes',
+            name: this.$i18n.t('Routes'),
             lid: undefined,
             visible: false,
             children: [
@@ -186,7 +197,7 @@ de:
           },
           {
             id: nextId(),
-            name: 'Areas',
+            name: this.$i18n.t('Areas'),
             lid: undefined,
             visible: false,
             children: [
@@ -273,6 +284,10 @@ de:
 
 <style>
 
+  .wgu-layer-list-tabs {
+    min-width: 360px;
+    max-width: 420px;
+  }
   .wgu-layer-viz-cb {
     width: 24px;
   }
