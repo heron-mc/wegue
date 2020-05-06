@@ -53,8 +53,8 @@ de:
         <v-alert :value="errorMessage" outline type="error" class="ma-3">
           {{ $t(errorMessage) }}
         </v-alert>
-        <RoutingInstructions v-if="route" :route="route" :dateSpecified="timeDate.isDateSpecified" :transportModeTitle="responseTransportMode"/>
         <DownloadGPX :routeGeometry="routeGeometry" :transportMode="transportMode" />
+        <RoutingInstructions v-if="route" :route="route" :dateSpecified="timeDate.isDateSpecified" :transportModeTitle="responseTransportMode"/>
       </v-form>
     </v-card>
   </v-navigation-drawer>
