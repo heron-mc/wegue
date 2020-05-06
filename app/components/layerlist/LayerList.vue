@@ -93,8 +93,6 @@ de:
     name: 'wgu-layerlist',
     mixins: [Mapable],
     props: {
-      minWidth: {type: Number, required: false, default: 360},
-      maxWidth: {type: Number, required: false, default: 420},
       dark: {type: Boolean, required: false, default: false},
       sliderColor: {type: String, required: false, default: 'grey'},
       categoriesTitle: {type: String, required: false, default: 'Categories'},
