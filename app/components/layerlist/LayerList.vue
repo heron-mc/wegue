@@ -7,7 +7,7 @@ de:
   Tags: Schlagworte
 </i18n>
 <template>
-  <div>
+  <v-card class="wgu-layer-list-card">
     <v-tabs
       :dark="dark"
       :sliderColor="sliderColor"
@@ -80,7 +80,7 @@ de:
          </v-list>
       </v-tab-item>
     </v-tabs>
-  </div>
+  </v-card>
 
 </template>
 
@@ -93,8 +93,6 @@ de:
     name: 'wgu-layerlist',
     mixins: [Mapable],
     props: {
-      minWidth: {type: Number, required: false, default: 360},
-      maxWidth: {type: Number, required: false, default: 420},
       dark: {type: Boolean, required: false, default: false},
       sliderColor: {type: String, required: false, default: 'grey'},
       categoriesTitle: {type: String, required: false, default: 'Categories'},
@@ -284,6 +282,9 @@ de:
 
 <style>
 
+  .wgu-layer-list-card {
+    overflow: scroll !important;
+  }
   .wgu-layer-list-tabs {
     min-width: 360px;
     max-width: 420px;

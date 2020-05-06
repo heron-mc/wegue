@@ -97,7 +97,8 @@
       "target": "toolbar",
       "darkLayout": false,
       "win": true,
-      "draggable": false
+      "initShow": true,
+      "draggable": true
     },
     "wgu-measuretool": {
       "target": "menu",
