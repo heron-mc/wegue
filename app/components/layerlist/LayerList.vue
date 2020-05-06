@@ -7,7 +7,7 @@ de:
   Tags: Schlagworte
 </i18n>
 <template>
-  <div>
+  <v-card class="wgu-layer-list-card">
     <v-tabs
       :dark="dark"
       :sliderColor="sliderColor"
@@ -80,7 +80,7 @@ de:
          </v-list>
       </v-tab-item>
     </v-tabs>
-  </div>
+  </v-card>
 
 </template>
 
@@ -282,6 +282,9 @@ de:
 
 <style>
 
+  .wgu-layer-list-card {
+    overflow: scroll !important;
+  }
   .wgu-layer-list-tabs {
     min-width: 360px;
     max-width: 420px;
