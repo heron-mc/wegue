@@ -38,12 +38,13 @@ de:
       icon: {type: String, required: false, default: 'layers'},
       title: {type: String, required: false, default: 'Layers'},
       draggable: {type: Boolean, required: false, default: true},
+      initShow: {type: Boolean, required: false, default: false},
       initPos: {type: Object, required: false}
     },
     data () {
       return {
         moduleName: 'wgu-layerlist',
-        show: false,
+        show: this.initShow,
         left: this.initPos ? this.initPos.left + 'px' : '10px',
         top: this.initPos ? this.initPos.top + 'px' : '70px'
       }
