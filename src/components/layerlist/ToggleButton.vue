@@ -1,10 +1,17 @@
+<i18n>
+de:
+  Additional map layers: Zusätzliche Kartenebenen
+</i18n>
 <template>
-
-  <v-btn icon :dark="dark" @click="toggleUi">
-    <v-icon medium>{{icon}}</v-icon>
-    {{text}}
-  </v-btn>
-
+  <v-tooltip bottom>
+    <template v-slot:activator="{ on: tooltip }">
+      <v-btn icon :dark="dark" @click="toggleUi" v-on="tooltip">
+        <v-icon medium>{{icon}}</v-icon>
+        {{text}}
+      </v-btn>
+    </template>
+    <span>{{ $t('Additional map layers') }}</span>
+  </v-tooltip>
 </template>
 
 <script>
