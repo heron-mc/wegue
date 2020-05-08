@@ -287,7 +287,7 @@ de:
 <style>
 
   .wgu-layer-list-card {
-    overflow: scroll;
+    overflow: auto;
     max-height: calc(100vh - 200px);
   }
   .wgu-layer-list-tabs {
