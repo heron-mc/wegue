@@ -41,23 +41,6 @@
       }
     },
     {
-      "type": "VECTOR",
-      "lid": "heide",
-      "name": "Heide",
-      "url": "./static/data/overpass_natural-heath.geojson",
-      "formatConfig": {
-      },
-      "format": "GeoJSON",
-      "visible": true,
-      "displayInLayerList": false,
-      "selectable": false,
-      "style": {
-        "strokeColor": "rgb(162, 114, 240)",
-        "strokeWidth": 4,
-        "fillColor": "rgba(162, 114, 240, 0.5)"
-      }
-    },
-    {
       "type": "LAYERCOLLECTION",
       "url": "http://staging.nplh.geolicious.de/api/layer_list_wegue_format/{locale}/"
     },
