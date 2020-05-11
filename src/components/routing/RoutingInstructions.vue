@@ -1,16 +1,16 @@
 <i18n>
 de:
-  Public transport directions: Anweisungen für öffentliche Verkehrsmittel
-  Driving directions: Fahrtrichtung
-  Bicycle directions: Fahrradanweisungen
-  Walking directions: Wegbeschreibungen
+  Public transport directions: Wegbeschreibung für öffentliche Verkehrsmittel
+  Driving directions: Wegbeschreibung
+  Bicycle directions: Wegbeschreibung
+  Walking directions: Wegbeschreibung
   Time: Dauer
-  Start: Anfangszeit
+  Start: Abfahrtszeit
   Distance: Entfernung
   Routes: Routen
-  Instructions: Anleitung
+  Instructions: Beschreibungen
   km: km
-  Section: Sektion
+  Section: Abschnitt
 </i18n>
 <template>
 <div id="route"v-if="route">

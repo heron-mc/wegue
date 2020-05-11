@@ -3,7 +3,7 @@ de:
 </i18n>
 <template>
 
-  <v-footer :color="color" class="white--text" app>
+  <v-footer :color="color" class="grey--text" app>
     <span class="wgu-footer-left" v-html="footerTextLeft"></span>
     <v-spacer></v-spacer>
     <div class="wgu-footer-right">

@@ -1,7 +1,7 @@
 <i18n>
 de:
   Click on the map to choose a location.: Klicken Sie auf die Karte, um einen Ort auszuwählen.
-  Point on map: Punkt auf Karte
+  Point on map: Punkt auf der Karte
 </i18n>
 <template>
 <div class="routing-target">

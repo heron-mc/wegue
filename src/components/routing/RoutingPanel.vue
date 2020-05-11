@@ -1,20 +1,20 @@
 /* eslint-disable */
 <i18n>
 de:
-  Get directions: Anweisungen bekommen
-  Public transport: Öffentlicher Verkehr
-  Bicycle (fastest): Fahrrad (am schnellsten)
-  Bicycle (shortest distance): Fahrrad (kürzeste Strecke)
+  Get directions: Route berechnen
+  Public transport: Öffentliche Verkehrsmittel
+  Bicycle (fastest): Fahrrad (schnellste Route)
+  Bicycle (shortest distance): Fahrrad (kürzeste Route)
   Pedestrian: Fußgänger
-  Car (shortest distance): Auto (kürzeste Entfernung)
-  Car (fastest): Auto (am schnellsten)
-  Mode: Transportmodus
+  Car (shortest distance): Auto (kürzeste Route)
+  Car (fastest): Auto (schnellste Route)
+  Mode: Verkehrsmittel
   From: Von
   to: nach
   via: über
-  Remove stop: Anschlag entfernen
-  Add stop: Stop hinzufügen
-  Sorry, you can specify a time, or multiple waypoints, but not both.: Leider können Sie eine Zeit oder mehrere Wegpunkte angeben, aber nicht beide.
+  Remove stop: Zwischenstop entfernen
+  Add stop: Zwischenstop hinzufügen
+  Sorry, you can specify a time, or multiple waypoints, but not both.: Leider können Sie eine Zeit oder mehrere Wegpunkte angeben, aber nicht beides.
   Sorry, directions are currently unavailable.: Eine Wegbeschreibung ist derzeit leider nicht verfügbar.
   No route was found.: Es wurde keine Route gefunden.
 </i18n>
@@ -52,8 +52,8 @@ de:
         <v-alert :value="errorMessage" outline type="error" class="ma-3">
           {{ $t(errorMessage) }}
         </v-alert>
-        <RoutingInstructions v-if="route" :route="route" :dateSpecified="timeDate.isDateSpecified" :transportModeTitle="responseTransportMode"/>
         <DownloadGPX :routeGeometry="routeGeometry" :transportMode="transportMode" />
+        <RoutingInstructions v-if="route" :route="route" :dateSpecified="timeDate.isDateSpecified" :transportModeTitle="responseTransportMode"/>
       </v-form>
     </v-card>
   </v-navigation-drawer>
