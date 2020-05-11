@@ -93,7 +93,7 @@ export default {
   },
   computed: {
     description () {
-      return marked(this.attributes[this.descProp] || '');
+      return marked(this.attributes[this.descProp] || '').replace(/<a /g, '<a target="_blank" ');
     }
   },
   methods: {

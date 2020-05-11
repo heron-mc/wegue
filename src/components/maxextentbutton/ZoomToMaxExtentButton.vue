@@ -1,10 +1,17 @@
+<i18n>
+de:
+  Reset map: Karte zurücksetzen
+</i18n>
 <template>
-
-  <v-btn icon :dark="dark" @click="onClick">
-    <v-icon medium>{{icon}}</v-icon>
-    {{text}}
-  </v-btn>
-
+  <v-tooltip bottom>
+    <template v-slot:activator="{ on: tooltip }">
+      <v-btn icon :dark="dark" @click="onClick" v-on="tooltip">
+        <v-icon medium>{{icon}}</v-icon>
+        {{ text }}
+      </v-btn>
+    </template>
+    <span>{{ $t('Reset map') }}</span>
+  </v-tooltip>
 </template>
 
 <script>

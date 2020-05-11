@@ -5,8 +5,7 @@ de:
   Public transport: Öffentliche Verkehrsmittel
   Bicycle (fastest): Fahrrad (schnellste Route)
   Bicycle (shortest distance): Fahrrad (kürzeste Route)
-  Pedestrian (shortest distance): Fußgänger (kürzeste Route)
-  Pedestrian (fastest): Fußgänger (schnellste Route)
+  Pedestrian: Fußgänger
   Car (shortest distance): Auto (kürzeste Route)
   Car (fastest): Auto (schnellste Route)
   Mode: Verkehrsmittel
@@ -125,11 +124,8 @@ export default {
           text: this.$t('Bicycle (shortest distance)'),
           value: 'shortest;bicycle'
         }, {
-          text: this.$t('Pedestrian (fastest)'),
-          value: 'fastest;pedestrian'
-        }, {
-          text: this.$t('Pedestrian (shortest distance)'),
-          value: 'shotest;pedestrian'
+          text: this.$t('Pedestrian'),
+          value: 'shortest;pedestrian'
         }
       ]
     },

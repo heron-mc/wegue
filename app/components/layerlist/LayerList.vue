@@ -53,6 +53,7 @@ de:
            <v-treeview
                    :items="tagsTree"
                    :load-children="fetchTagItems"
+                   :open.sync="unfoldTags"
                  >
                    <template v-slot:prepend="{ item }">
                      <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
@@ -102,7 +103,8 @@ de:
       return {
         categoryItems: [],
         tagItems: [],
-        unfoldCategories: [1]
+        unfoldCategories: [],
+        unfoldTags: []
       }
     },
     computed: {
@@ -169,16 +171,15 @@ de:
         const layers = this.map.getLayers().getArray().slice(0).reverse().filter(
           l => l.get('displayInLayerList') !== false && l.getSource().getFeatures);
 
-        let nodeId = 1;
+        let nodeId = 0;
         function nextId () {
-          nodeId += 1;
-          return nodeId;
+          return ++nodeId;
         }
 
         // Predefined Categories TODO make smarter
         let categoryItems = [
           {
-            id: 1,
+            id: nextId(),
             name: this.$i18n.t('POIs'),
             lid: undefined,
             visible: false,
@@ -247,6 +248,9 @@ de:
 
         this.categoryItems = categoryItems;
         this.tagItems = tagItems;
+        // Unfold the first item folders
+        this.unfoldTags = this.tagItems.length > 0 ? [this.tagItems[0]['id']] : [];
+        this.unfoldCategories = [this.categoryItems[0]['id']];
       },
 
       fetchCategoryItems () {
@@ -283,7 +287,8 @@ de:
 <style>
 
   .wgu-layer-list-card {
-    overflow: scroll !important;
+    overflow: auto;
+    max-height: calc(100vh - 200px);
   }
   .wgu-layer-list-tabs {
     min-width: 360px;

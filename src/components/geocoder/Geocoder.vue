@@ -1,3 +1,7 @@
+<i18n>
+de:
+  Search for a place: Suche nach einem Ort
+</i18n>
 <template>
 
   <v-toolbar-items>
@@ -17,11 +21,17 @@
       :rounded="rounded"
       :search-input.sync="search"
     ></v-combobox>
-
-    <v-btn @click='toggle()' icon :dark="dark" slot="activator">
-      <v-icon medium>{{buttonIcon}}</v-icon>
-    </v-btn>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on: tooltip }">
+        <v-btn @click='toggle()' icon :dark="dark" slot="activator" v-on="tooltip">
+          <v-icon medium>{{buttonIcon}}</v-icon>
+        </v-btn>
+      </template>
+      <span>{{ $t('Search for a place') }}</span>
+    </v-tooltip>
   </v-toolbar-items>
+</template>
+
 
 </template>
 

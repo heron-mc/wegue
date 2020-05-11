@@ -1,10 +1,17 @@
+<i18n>
+de:
+  Layers: Kartenebenen
+</i18n>
 <template>
-
-  <v-btn icon :dark="dark" @click="toggleUi">
-    <v-icon medium>{{icon}}</v-icon>
-    {{text}}
-  </v-btn>
-
+  <v-tooltip bottom>
+    <template v-slot:activator="{ on: tooltip }">
+      <v-btn icon :dark="dark" @click="toggleUi" v-on="tooltip">
+        <v-icon medium>{{icon}}</v-icon>
+        {{text}}
+      </v-btn>
+    </template>
+    <span>{{ $t('Layers') }}</span>
+  </v-tooltip>
 </template>
 
 <script>
@@ -21,7 +28,8 @@ export default {
   props: {
     icon: {type: String, required: false, default: 'layers'},
     text: {type: String, required: false, default: ''},
-    dark: {type: Boolean, required: false, default: false}
+    dark: {type: Boolean, required: false, default: false},
+    hoverText: {type: String, required: false, default: 'Layers'}
   },
   data: function () {
     return {
