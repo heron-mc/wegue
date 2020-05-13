@@ -130,7 +130,8 @@ export const OlStyleFactory = {
             src: styleConf.iconUrl || 'static/icon/arrow-up-thin-64.png',
             scale: styleConf.scale || 0.15,
             // for some reason opacity has no effect?
-            rotation: styleConf.iconRotate === false ? 0 : rotation
+            rotation: styleConf.iconRotate === false ? 0 : rotation,
+            crossOrigin: 'Anonymous'
           })
         }))
       ];
