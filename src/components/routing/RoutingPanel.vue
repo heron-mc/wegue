@@ -23,6 +23,8 @@ de:
   <v-navigation-drawer
       v-model="drawerOpen"
       hide-overlay
+      disable-resize-watcher
+      disable-route-watcher
       absolute
   >
     <v-card class="pa-2">
@@ -83,7 +85,7 @@ export default {
   },
   data () {
     return {
-      drawerOpen: undefined,
+      drawerOpen: false,
       from: undefined,
       to: undefined,
       waypoints: [],
