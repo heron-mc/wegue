@@ -26,6 +26,7 @@ de:
       disable-resize-watcher
       disable-route-watcher
       absolute
+      stateless
   >
     <v-card class="pa-2">
       <v-form>
