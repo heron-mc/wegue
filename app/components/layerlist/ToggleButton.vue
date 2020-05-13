@@ -1,6 +1,6 @@
 <i18n>
 de:
-  Additional map layers: Zusätzliche Kartenebenen
+  Layers: Kartenebenen
 </i18n>
 <template>
   <v-tooltip bottom>
@@ -10,7 +10,7 @@ de:
         {{text}}
       </v-btn>
     </template>
-    <span>{{ $t('Additional map layers') }}</span>
+    <span>{{ $t('Layers') }}</span>
   </v-tooltip>
 </template>
 
@@ -28,7 +28,8 @@ export default {
   props: {
     icon: {type: String, required: false, default: 'layers'},
     text: {type: String, required: false, default: ''},
-    dark: {type: Boolean, required: false, default: false}
+    dark: {type: Boolean, required: false, default: false},
+    hoverText: {type: String, required: false, default: 'Layers'}
   },
   data: function () {
     return {
