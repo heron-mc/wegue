@@ -21,7 +21,7 @@ export default {
   name: 'wgu-routing-btn',
   props: {
     dark: {type: Boolean, required: false, default: false},
-    icon: {type: String, required: false, default: 'navigation'},
+    icon: {type: String, required: false, default: 'search'},
     hoverText: {type: String, required: false, default: 'Get directions'}
   },
   data: function () {
