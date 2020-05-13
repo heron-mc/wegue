@@ -22,6 +22,7 @@
       <wgu-routing-panel />
       <v-container id="ol-map-container" fluid fill-height style="padding: 0">
          <wgu-map :color="baseColor" />
+         <wgu-mapbox-attribution />
          <!-- layer loading indicator -->
          <wgu-maploading-status :color="baseColor" />
          <slot name="wgu-after-map" />
@@ -70,7 +71,7 @@
   import MapLoadingStatus from '../src/components/progress/MapLoadingStatus'
   import FeatureInfoWindow from '../src/components/FeatureInfoWindow'
   import RoutingPanel from '../src/components/routing/RoutingPanel'
-
+  import MapboxAttribution from './components/MapboxAttribution';
   export default {
     name: 'wgu-app-tpl',
     components: {
@@ -83,7 +84,8 @@
       'wgu-infoclick-win': InfoClickWin,
       'wgu-maploading-status': MapLoadingStatus,
       'wgu-feature-info-window-win': FeatureInfoWindow,
-      'wgu-routing-panel': RoutingPanel
+      'wgu-routing-panel': RoutingPanel,
+      'wgu-mapbox-attribution': MapboxAttribution
     },
     data () {
       return {
