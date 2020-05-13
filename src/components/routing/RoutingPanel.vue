@@ -171,6 +171,20 @@ export default {
           'pedestrian': 'Walking'
         }[this.route.mode.transportModes[0]]
       }
+    },
+    boundingBoxForStops () {
+      let bbox;
+      const stops = [this.from && this.from.geometry.coordinates, ...this.waypoints.map(w => w && w.geometry.coordinates), this.to && this.to.geometry.coordinates];
+      for (let stop of stops) {
+        if (stop) {
+          bbox = bbox || [...stop, ...stop];
+          bbox[0] = Math.min(bbox[0], stop[0]);
+          bbox[1] = Math.min(bbox[1], stop[1]);
+          bbox[2] = Math.max(bbox[2], stop[0]);
+          bbox[3] = Math.max(bbox[3], stop[1]);
+        }
+      }
+      return bbox;
     }
   },
   watch: {
@@ -187,7 +201,7 @@ export default {
         waypointsGeometry: featureCollection(this.waypointsGeometry),
         endGeometry: this.to && this.to.geometry.coordinates ? point(this.to.geometry.coordinates) : undefined,
         stopsGeometry: this.stopsGeometry,
-        boundingBox: this.boundingBox
+        boundingBox: this.boundingBox || this.boundingBoxForStops
       });
     },
     route () {
