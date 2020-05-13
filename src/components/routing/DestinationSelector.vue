@@ -95,7 +95,7 @@ export default {
       }
     },
     clearCustomTarget () {
-      if (this.target.source === 'custom') {
+      if (this.target.properties.source === 'custom') {
         this.target.geometry.coordinates = null;
       }
     }
