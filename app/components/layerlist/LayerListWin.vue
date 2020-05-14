@@ -15,7 +15,7 @@ de:
       <v-toolbar-side-icon @click="show=false"><v-icon>close</v-icon></v-toolbar-side-icon>
     </v-toolbar>
 
-    <wgu-layerlist />
+    <wgu-layerlist v-bind="options" />
 
   </v-card>
 
@@ -39,7 +39,8 @@ de:
       title: {type: String, required: false, default: 'Layers'},
       draggable: {type: Boolean, required: false, default: true},
       initShow: {type: Boolean, required: false, default: false},
-      initPos: {type: Object, required: false}
+      initPos: {type: Object, required: false},
+      options: { type: Object, required: false, default: {} }
     },
     data () {
       return {

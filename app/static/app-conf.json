@@ -31,7 +31,6 @@
       "visible": true,
       "displayInLayerList": false,
       "selectable": false,
-      "displayInLayerList": false,
       "style": {
         "strokeColor": "#51a026",
         "strokeWidth": 3
@@ -78,7 +77,11 @@
       "darkLayout": false,
       "win": true,
       "initShow": true,
-      "draggable": true
+      "draggable": true,
+      "options": {
+        "hideCategories": true,
+        "hideTags": false
+      }
     },
     "wgu-measuretool": {
       "target": "menu",
