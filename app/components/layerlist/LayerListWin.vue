@@ -8,7 +8,7 @@ de:
     v-draggable-win="draggable" class="wgu-layerlist"
     v-if=show v-bind:style="{ left: left, top: top}"
   >
-    <v-toolbar :color="color" class="" :dark="dark">
+    <v-toolbar :color="color" :dark="dark">
       <v-toolbar-side-icon><v-icon>{{icon}}</v-icon></v-toolbar-side-icon>
       <v-toolbar-title class="wgu-win-title">{{ $t(title) }}</v-toolbar-title>
       <v-spacer></v-spacer>

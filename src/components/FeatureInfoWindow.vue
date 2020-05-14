@@ -6,7 +6,7 @@
       v-if="this.feature !== null"
       v-bind:style="{ left: left, top: top, width: width }" >
 
-      <v-toolbar :color="color" class="" dark>
+      <v-toolbar :color="color" class="" :dark="dark">
           <v-toolbar-side-icon><v-icon>{{icon}}</v-icon></v-toolbar-side-icon>
           <v-toolbar-title>{{title}}</v-toolbar-title>
           <v-spacer></v-spacer>
@@ -37,6 +37,7 @@ export default {
     DraggableWin
   },
   props: {
+    dark: {type: Boolean, required: false, default: false},
     icon: {type: String, required: false, default: 'info'},
     color: {type: String, required: false, default: 'red darken-3'},
     draggable: {type: Boolean, required: false, default: true}

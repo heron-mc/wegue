@@ -87,6 +87,7 @@
       "target": "menu",
       "win": true,
       "draggable": false,
+      "darkLayout": false,
       "strokeColor": "#c62828",
       "fillColor": "rgba(198,40,40,0.2)",
       "sketchStrokeColor": "rgba(198,40,40,0.8)",
@@ -105,6 +106,7 @@
     "wgu-feature-info-window": {
       "win": true,
       "draggable": true,
+      "darkLayout": false,
       "width": 380,
       "textHeight": 400,
       "icon": "info",

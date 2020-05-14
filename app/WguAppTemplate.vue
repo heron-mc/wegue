@@ -33,6 +33,7 @@
       <component
         :is="moduleWin.type" :key="index" :ref="moduleWin.type"
         :color="baseColor"
+        :dark="moduleWin.dark"
         :draggable="moduleWin.draggable"
         :initPos="moduleWin.initPos"
         :initShow="moduleWin.initShow"
@@ -132,6 +133,7 @@
           if (moduleOpts.win === true) {
             moduleWins.push({
               type: key + '-win',
+              dark: moduleOpts.darkLayout,
               draggable: moduleOpts.draggable,
               initPos: moduleOpts.initPos,
               initShow: moduleOpts.initShow,
