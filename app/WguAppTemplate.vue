@@ -39,6 +39,7 @@
         :width="moduleWin.width"
         :title="moduleWin.title"
         :icon="moduleWin.icon"
+        :options="moduleWin.options"
       />
     </template>
 
@@ -136,7 +137,8 @@
               initShow: moduleOpts.initShow,
               title: moduleOpts.title,
               width: moduleOpts.width,
-              icon: moduleOpts.icon
+              icon: moduleOpts.icon,
+              options: moduleOpts.options
             });
           }
         }

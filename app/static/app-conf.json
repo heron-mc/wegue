@@ -78,7 +78,10 @@
       "darkLayout": false,
       "win": true,
       "initShow": true,
-      "draggable": true
+      "draggable": true,
+      "options": {
+        "hideCategories": true
+      }
     },
     "wgu-measuretool": {
       "target": "menu",
