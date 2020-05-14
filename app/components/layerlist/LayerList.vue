@@ -1,6 +1,4 @@
 <i18n>
-en:
-  Natur: Nature
 de:
   POIs: POIs
   Routes: Strecke
@@ -231,9 +229,7 @@ de:
           // One or more Tags avail: add to the Tags tree
           // Must be existing layer item: reuse for common visibility state
           const tags = layerItem.tags;
-          tags.forEach((tagRaw, idx) => {
-            const tag = this.$t(tagRaw);
-
+          tags.forEach((tag, idx) => {
             const tagNode = tagItems.find(tagItem => tagItem.name === tag);
             if (!tagNode) {
               // Create new tag parent node

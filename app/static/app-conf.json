@@ -79,8 +79,8 @@
       "initShow": true,
       "draggable": true,
       "options": {
-        "hideCategories": false,
-        "hideTags": true
+        "hideCategories": true,
+        "hideTags": false
       }
     },
     "wgu-measuretool": {
