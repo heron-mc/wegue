@@ -1,10 +1,6 @@
 <i18n>
-<<<<<<< HEAD
 en:
-  Natur: Nature
   _untagged: Other
-=======
->>>>>>> 92254ae1a46c2544ac7cb5962b8f02a88cc916b5
 de:
   POIs: POIs
   Routes: Strecke
@@ -231,10 +227,6 @@ de:
           const tags = layerItem.tags || [this.$t('_untagged')];
           // One or more Tags avail: add to the Tags tree
           // Must be existing layer item: reuse for common visibility state
-<<<<<<< HEAD
-=======
-          const tags = layerItem.tags;
->>>>>>> 92254ae1a46c2544ac7cb5962b8f02a88cc916b5
           tags.forEach((tag, idx) => {
             const tagNode = tagItems.find(tagItem => tagItem.name === tag);
             if (!tagNode) {
