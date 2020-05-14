@@ -1,7 +1,10 @@
 <i18n>
+<<<<<<< HEAD
 en:
   Natur: Nature
   _untagged: Other
+=======
+>>>>>>> 92254ae1a46c2544ac7cb5962b8f02a88cc916b5
 de:
   POIs: POIs
   Routes: Strecke
@@ -16,12 +19,12 @@ de:
       :dark="dark"
       :sliderColor="sliderColor"
       grow
-      class="wgu-layer-list-tabs"
+      :class="{'wgu-layer-list-tabs': true, 'wgu-layer-no-header': hideCategories || hideTags}"
     >
-      <v-tab>
+      <v-tab v-if="!hideCategories && !hideTags" >
         {{ $t(categoriesTitle) }}
       </v-tab>
-      <v-tab-item>
+      <v-tab-item v-if="!hideCategories">
         <v-list>
           <v-treeview :items="categoriesTree" :load-children="fetchCategoryItems" :open.sync="unfoldCategories">
             <template v-slot:prepend="{ item }">
@@ -49,10 +52,10 @@ de:
           </v-treeview>
         </v-list>
       </v-tab-item>
-      <v-tab>
+      <v-tab v-if="!hideCategories && !hideTags">
         {{ $t(tagsTitle) }}
       </v-tab>
-      <v-tab-item>
+      <v-tab-item v-if="!hideTags">
         <v-list>
            <v-treeview
                    :items="tagsTree"
@@ -101,7 +104,9 @@ de:
       dark: {type: Boolean, required: false, default: false},
       sliderColor: {type: String, required: false, default: 'grey'},
       categoriesTitle: {type: String, required: false, default: 'Categories'},
-      tagsTitle: {type: String, required: false, default: 'Tags'}
+      tagsTitle: {type: String, required: false, default: 'Tags'},
+      hideCategories: { type: Boolean, required: false, default: false },
+      hideTags: { type: Boolean, required: false, default: false }
     },
     data () {
       return {
@@ -226,6 +231,10 @@ de:
           const tags = layerItem.tags || [this.$t('_untagged')];
           // One or more Tags avail: add to the Tags tree
           // Must be existing layer item: reuse for common visibility state
+<<<<<<< HEAD
+=======
+          const tags = layerItem.tags;
+>>>>>>> 92254ae1a46c2544ac7cb5962b8f02a88cc916b5
           tags.forEach((tag, idx) => {
             const tagNode = tagItems.find(tagItem => tagItem.name === tag);
             if (!tagNode) {
@@ -294,5 +303,7 @@ de:
   .wgu-layer-viz-cb {
     width: 24px;
   }
-
+  .wgu-layer-no-header .v-tabs__bar {
+    display: none;
+  }
 </style>

@@ -4,7 +4,7 @@
 
   "baseColor": "rgba(255, 255, 255, 1)",
 
-  "logoText": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank' style='text-decoration: none; color: white'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo'</a>",
+  "logoText": "",
 
   "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
   "footerTextRight": "Geolicious",
@@ -31,7 +31,6 @@
       "visible": true,
       "displayInLayerList": false,
       "selectable": false,
-      "displayInLayerList": false,
       "style": {
         "strokeColor": "#51a026",
         "strokeWidth": 3
@@ -78,7 +77,11 @@
       "darkLayout": false,
       "win": true,
       "initShow": true,
-      "draggable": true
+      "draggable": true,
+      "options": {
+        "hideCategories": false,
+        "hideTags": false
+      }
     },
     "wgu-measuretool": {
       "target": "menu",
