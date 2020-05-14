@@ -1,4 +1,6 @@
 <i18n>
+en:
+  Natur: Nature
 de:
   POIs: POIs
   Routes: Strecke
@@ -227,22 +229,22 @@ de:
           // One or more Tags avail: add to the Tags tree
           // Must be existing layer item: reuse for common visibility state
           const tags = layerItem.tags;
-          tags.forEach((tag, idx) => {
-            const tagNodes = tagItems.filter(tagItem => tagItem.name === 'tag');
-            let tagNode = tagNodes.length > 0 ? tagNodes[0] : undefined;
+          tags.forEach((tagRaw, idx) => {
+            const tag = this.$t(tagRaw);
+
+            const tagNode = tagItems.find(tagItem => tagItem.name === tag);
             if (!tagNode) {
               // Create new tag parent node
-              tagNode = {
+              tagItems.push({
                 id: nextId(),
                 name: tag,
                 lid: undefined,
                 visible: false,
-                children: [
-                ]
-              };
-              tagItems.push(tagNode)
+                children: [layerItem]
+              });
+            } else {
+              tagNode.children.push(layerItem)
             }
-            tagNode.children.push(layerItem)
           });
         });
 
