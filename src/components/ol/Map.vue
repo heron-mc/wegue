@@ -31,6 +31,8 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Feature from 'ol/Feature';
 import LineString from 'ol/geom/LineString';
 import { Style, Stroke, RegularShape, Fill, Text } from 'ol/style';
+import { boundingExtent } from 'ol/extent';
+import { transformExtent } from 'ol/proj';
 import { routingLayers } from '../routing/routingLayers';
 import { geolocationLayers } from '../geolocation/geolocationLayers';
 export default {
@@ -44,6 +46,7 @@ export default {
     return {
       zoom: this.$appConfig.mapZoom,
       center: this.$appConfig.mapCenter,
+      initialExtent: this.$appConfig.mapInitialExtent,
       projection: this.$appConfig.mapProjection,
       projectionObj: null,
       projectionDefs: this.$appConfig.projectionDefs,
@@ -73,6 +76,11 @@ export default {
 
       // initialize map hover functionality
       this.setupMapHover();
+
+      if (this.initialExtent) {
+        const extent3857 = transformExtent(this.initialExtent, 'EPSG:4326', 'EPSG:3857');
+        this.map.getView().fit(boundingExtent([extent3857.slice(0,2), extent3857.slice(2,4)]));
+      }
     }, 100);
   },
   async created () {

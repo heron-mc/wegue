@@ -9,10 +9,7 @@
   "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
   "footerTextRight": "Geolicious",
   "showCopyrightYear": true,
-
-  "mapCenter": [1113871, 7012966],
-  "mapZoom": 9,
-
+  "mapInitialExtent": [ 9.449917016474577, 52.95211458709528, 10.590470092042459, 53.479931065193284 ],
   "permalink": {
     "location": "search",
     "layers": true,
