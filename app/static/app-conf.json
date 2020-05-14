@@ -79,7 +79,7 @@
       "initShow": true,
       "draggable": true,
       "options": {
-        "hideCategories": true,
+        "hideCategories": false,
         "hideTags": false
       }
     },
