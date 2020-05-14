@@ -8,7 +8,7 @@ de:
     v-draggable-win="draggable" class="wgu-layerlist"
     v-if=show v-bind:style="{ left: left, top: top}"
   >
-    <v-toolbar :color="color" class="" dark>
+    <v-toolbar :color="color" class="" :dark="dark">
       <v-toolbar-side-icon><v-icon>{{icon}}</v-icon></v-toolbar-side-icon>
       <v-toolbar-title class="wgu-win-title">{{ $t(title) }}</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -34,6 +34,7 @@ de:
       'wgu-layerlist': LayerList
     },
     props: {
+      dark: {type: Boolean, required: false, default: false},
       color: {type: String, required: false, default: 'red darken-3'},
       icon: {type: String, required: false, default: 'layers'},
       title: {type: String, required: false, default: 'Layers'},
