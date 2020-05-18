@@ -16,11 +16,10 @@ de:
 
 <script>
 
-import { Mapable } from '../../mixins/Mapable';
+import { WguEventBus } from '../../WguEventBus.js';
 
 export default {
   name: 'wgu-zoomtomaxextent-btn',
-  mixins: [Mapable],
   props: {
     icon: {type: String, required: false, default: 'zoom_out_map'},
     text: {type: String, required: false, default: ''},
@@ -28,11 +27,7 @@ export default {
   },
   methods: {
     onClick () {
-      // derive correct initial zoom and center
-      const initialCenter = this.$appConfig.mapCenter;
-      const initalZoom = this.$appConfig.mapZoom
-      this.map.getView().setCenter(initialCenter);
-      this.map.getView().setZoom(initalZoom);
+      WguEventBus.$emit('reset-bounds');
     }
   }
 }
