@@ -76,12 +76,9 @@ export default {
 
       // initialize map hover functionality
       this.setupMapHover();
-
-      if (this.initialExtent) {
-        const extent3857 = transformExtent(this.initialExtent, 'EPSG:4326', 'EPSG:3857');
-        this.map.getView().fit(boundingExtent([extent3857.slice(0,2), extent3857.slice(2,4)]));
-      }
+      this.resetBounds();
     }, 100);
+    WguEventBus.$on('reset-bounds', () => this.resetBounds());
   },
   async created () {
     // make map rotateable according to property
@@ -134,7 +131,7 @@ export default {
       this.permalinkController.apply();
       this.permalinkController.setup();
     }
-    window.map = this.map; //TODO remove
+    window.map = this.map;
     this.map.once('rendercomplete', () => WguEventBus.$emit('ol-map-rendered'));
   },
 
@@ -297,9 +294,17 @@ export default {
       var attr = feature.get(hoverAttr);
       overlayEl.innerHTML = attr;
       me.overlay.setPosition(event.coordinate);
+    },
+    resetBounds() {
+      if (this.initialExtent) {
+        const extent3857 = transformExtent(this.initialExtent, 'EPSG:4326', 'EPSG:3857');
+        this.map.getView().fit(boundingExtent([extent3857.slice(0,2), extent3857.slice(2,4)]));
+      } else {
+        this.map.getView().setCenter(this.center);
+        this.map.getView().setZoom(this.zoom);
+      }
     }
-  }
-
+  },
 }
 </script>
 

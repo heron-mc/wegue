@@ -147,7 +147,11 @@ export const OlStyleFactory = {
   createStroke (styleConf) {
     const lineStyle = new Stroke({
       color: styleConf.strokeColor,
-      width: styleConf.strokeWidth
+      width: styleConf.strokeWidth,
+      lineDash: styleConf.strokeLineDash,
+      lineDashOffset: styleConf.strokeLineDashOffset,
+      lineCap: styleConf.strokeLineCap,
+      lineJoin: styleConf.strokeLineJoin
     });
     return lineStyle;
   },
