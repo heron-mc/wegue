@@ -32,9 +32,6 @@ de:
   </v-toolbar-items>
 </template>
 
-
-</template>
-
 <script>
   import {Mapable} from '../../mixins/Mapable';
   import {GeocoderController} from './GeocoderController';
