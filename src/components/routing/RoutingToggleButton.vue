@@ -20,13 +20,14 @@ import { WguEventBus } from '../../WguEventBus'
 export default {
   name: 'wgu-routing-btn',
   props: {
+    active: {type: Boolean, required: false, default: false},
     dark: {type: Boolean, required: false, default: false},
     icon: {type: String, required: false, default: 'navigation'},
     hoverText: {type: String, required: false, default: 'Get directions'}
   },
   data: function () {
     return {
-      state: false
+      state: this.active
     }
   },
   created () {

@@ -22,6 +22,11 @@ de:
 <template>
   <v-navigation-drawer
       v-model="drawerOpen"
+      :value="drawerOpen"
+      :dark="dark"
+      :right="right"
+      :width="width"
+      :height="height"
       hide-overlay
       disable-resize-watcher
       disable-route-watcher
@@ -77,6 +82,13 @@ export default {
   directives: {
   },
   props: {
+    right: {type: Boolean, required: false, default: false},
+    width: {type: Number, required: false, default: 360},
+    height: {type: String, required: false, default: '100%'},
+    dark: {type: Boolean, required: false, default: false},
+    color: {type: String, required: false, default: 'red darken-3'},
+    active: {type: Boolean, required: false, default: false},
+    options: { type: Object, required: false, default: {} }
   },
   components: {
     DestinationSelector, // The autocomplete component with places to route to/from
@@ -86,7 +98,8 @@ export default {
   },
   data () {
     return {
-      drawerOpen: false,
+      moduleName: 'wgu-routing',
+      drawerOpen: this.active,
       from: undefined,
       to: undefined,
       waypoints: [],

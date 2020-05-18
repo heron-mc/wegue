@@ -22,10 +22,12 @@
 
     <template v-for="(tbButton, index) in tbButtons">
       <component
-        :is="tbButton.type" :key="index"
+        :is="tbButton.type"
+        :key="index"
         :icon="tbButton.icon" :text="tbButton.text"
         :color="color"
         :dark="tbButton.dark"
+        :active="tbButton.active"
       />
     </template>
 
@@ -39,7 +41,15 @@
       <v-list>
           <template v-for="(tbButton, index) in menuButtons">
               <v-list-tile>
-                <component :is="tbButton.type" :key="index" :icon="tbButton.icon" :text="tbButton.text" :color="color" />
+                <component
+                  :is="tbButton.type"
+                  :key="index"
+                  :icon="tbButton.icon"
+                  :color="color"
+                  :text="tbButton.text"
+                  :dark="tbButton.dark"
+                  :active="tbButton.active"
+                />
               </v-list-tile>
           </template>
       </v-list>
@@ -110,7 +120,9 @@ export default {
         if (moduleOpts.target === 'menu') {
           moduleWins.push({
             type: key + '-btn',
-            target: moduleOpts.target
+            target: moduleOpts.target,
+            dark: moduleOpts.darkLayout,
+            active: moduleOpts.active
           });
         }
       }
@@ -128,19 +140,20 @@ export default {
     getToolbarButtons () {
       const appConfig = Vue.prototype.$appConfig || {};
       const modulesConfs = appConfig.modules || {};
-      let moduleWins = [];
+      let moduleButtons = [];
 
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
         if (moduleOpts.target === 'toolbar') {
-          moduleWins.push({
+          moduleButtons.push({
             type: key + '-btn',
             target: moduleOpts.target,
-            dark: moduleOpts.darkLayout
+            dark: moduleOpts.darkLayout,
+            active: moduleOpts.active
           });
         }
       }
-      return moduleWins;
+      return moduleButtons;
     }
   }
 }

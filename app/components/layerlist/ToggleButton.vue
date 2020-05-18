@@ -17,36 +17,37 @@ de:
 <script>
 
 import Vue from 'vue';
-import LayerListWin from './LayerListWin'
+import LayerListPanel from './LayerListPanel'
 import { WguEventBus } from '../../../src/WguEventBus'
 
 export default {
   name: 'wgu-layerlist-btn',
   components: {
-    'wgu-layerlist-win': LayerListWin
+    'wgu-layerlist-panel': LayerListPanel
   },
   props: {
     icon: {type: String, required: false, default: 'layers'},
     text: {type: String, required: false, default: ''},
     dark: {type: Boolean, required: false, default: false},
+    active: {type: Boolean, required: false, default: false},
     hoverText: {type: String, required: false, default: 'Layers'}
   },
   data: function () {
     return {
-      moduleName: 'wgu-layerlist'
+      moduleName: 'wgu-layerlist',
+      state: this.active
     }
   },
   created () {
-    var me = this;
     // TODO move to a father class
     WguEventBus.$on('app-mounted', () => {
-      me.win = Vue.prototype.cmpLookup[me.moduleName + '-win'];
+      this.panel = Vue.prototype.cmpLookup[this.moduleName + '-panel'];
     });
   },
   methods: {
     toggleUi () {
-      // TODO move to a father class
-      this.win.show = !this.win.show;
+      this.state = !this.state;
+      WguEventBus.$emit('toggle-layerlist-panel', this.state);
     }
   }
 };
@@ -55,3 +56,4 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 </style>
+
