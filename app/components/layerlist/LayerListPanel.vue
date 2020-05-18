@@ -39,7 +39,8 @@ de:
       color: {type: String, required: false, default: 'red darken-3'},
       title: {type: String, required: false, default: 'Layers'},
       active: {type: Boolean, required: false, default: false},
-      options: { type: Object, required: false, default: {} }
+      options: { type: Object, required: false, default: {} },
+      toggleGroup: {type: String, required: false, default: undefined}
     },
     data () {
       return {
@@ -51,6 +52,13 @@ de:
       WguEventBus.$on('toggle-layerlist-panel', state => {
         this.drawerOpen = state === undefined ? !this.drawerOpen : state;
       });
+
+      // When member of toggle group: close if any other panel active
+      if (this.toggleGroup) {
+        WguEventBus.$on(this.toggleGroup, arg => {
+          this.drawerOpen = arg.moduleName === this.moduleName;
+        });
+      }
     }
   }
 </script>

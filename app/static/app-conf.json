@@ -115,9 +115,10 @@
       "darkLayout": false,
       "panel": true,
       "active": true,
-      "right": true,
+      "right": false,
       "width": 360,
-      "height": "50%",
+      "height": "75%",
+      "toggleGroup": "side-panel-active",
       "options": {
         "hideCategories": false,
         "hideTags": false
@@ -130,6 +131,8 @@
       "active": false,
       "right": false,
       "width": 300,
+      "height": "100%",
+      "toggleGroup": "side-panel-active",
       "options": {
         "transportModes": ["car", "publicTransport"]
       }

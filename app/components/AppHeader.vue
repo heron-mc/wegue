@@ -28,6 +28,7 @@
         :color="color"
         :dark="tbButton.dark"
         :active="tbButton.active"
+        :toggleGroup="tbButton.toggleGroup"
       />
     </template>
 
@@ -49,6 +50,7 @@
                   :text="tbButton.text"
                   :dark="tbButton.dark"
                   :active="tbButton.active"
+                  :toggleGroup="tbButton.toggleGroup"
                 />
               </v-list-tile>
           </template>
@@ -114,19 +116,20 @@ export default {
     getModuleButtonData () {
       const appConfig = Vue.prototype.$appConfig || {};
       const modulesConfs = appConfig.modules || {};
-      let moduleWins = [];
+      let moduleButtons = [];
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
         if (moduleOpts.target === 'menu') {
-          moduleWins.push({
+          moduleButtons.push({
             type: key + '-btn',
             target: moduleOpts.target,
             dark: moduleOpts.darkLayout,
-            active: moduleOpts.active
+            active: moduleOpts.active,
+            toggleGroup: moduleOpts.toggleGroup
           });
         }
       }
-      return moduleWins;
+      return moduleButtons;
     },
     /**
      * Determines the module toolbar button configuration objects from app-config:
@@ -149,7 +152,8 @@ export default {
             type: key + '-btn',
             target: moduleOpts.target,
             dark: moduleOpts.darkLayout,
-            active: moduleOpts.active
+            active: moduleOpts.active,
+            toggleGroup: moduleOpts.toggleGroup
           });
         }
       }

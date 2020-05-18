@@ -88,7 +88,8 @@ export default {
     dark: {type: Boolean, required: false, default: false},
     color: {type: String, required: false, default: 'red darken-3'},
     active: {type: Boolean, required: false, default: false},
-    options: { type: Object, required: false, default: {} }
+    options: { type: Object, required: false, default: {} },
+    toggleGroup: {type: String, required: false, default: undefined}
   },
   components: {
     DestinationSelector, // The autocomplete component with places to route to/from
@@ -120,6 +121,13 @@ export default {
     WguEventBus.$on('toggle-routing-panel', state => {
       this.drawerOpen = state === undefined ? !this.drawerOpen : state;
     });
+
+    // When member of toggle group: close if any other panel active
+    if (this.toggleGroup) {
+      WguEventBus.$on(this.toggleGroup, arg => {
+        this.drawerOpen = arg.moduleName === this.moduleName;
+      });
+    }
   },
   computed: {
     transportModes () {

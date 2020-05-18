@@ -30,6 +30,7 @@
           :height="modulePanel.height"
           :title="modulePanel.title"
           :icon="modulePanel.icon"
+          :toggleGroup="modulePanel.toggleGroup"
           :options="modulePanel.options"
         />
       </template>
@@ -152,8 +153,11 @@
               initPos: moduleOpts.initPos,
               active: moduleOpts.active,
               title: moduleOpts.title,
+              right: moduleOpts.right,
               width: moduleOpts.width,
+              height: moduleOpts.height,
               icon: moduleOpts.icon,
+              toggleGroup: moduleOpts.toggleGroup,
               options: moduleOpts.options
             });
           }

@@ -30,7 +30,8 @@ export default {
     text: {type: String, required: false, default: ''},
     dark: {type: Boolean, required: false, default: false},
     active: {type: Boolean, required: false, default: false},
-    hoverText: {type: String, required: false, default: 'Layers'}
+    hoverText: {type: String, required: false, default: 'Layers'},
+    toggleGroup: {type: String, required: false, default: undefined}
   },
   data: function () {
     return {
@@ -43,11 +44,22 @@ export default {
     WguEventBus.$on('app-mounted', () => {
       this.panel = Vue.prototype.cmpLookup[this.moduleName + '-panel'];
     });
+    // When member of toggle group: close if any other panel active
+    if (this.toggleGroup) {
+      WguEventBus.$on(this.toggleGroup, moduleName => {
+        this.state = moduleName === this.moduleName;
+      });
+    }
   },
   methods: {
     toggleUi () {
       this.state = !this.state;
       WguEventBus.$emit('toggle-layerlist-panel', this.state);
+
+      // If part of toggleGroup, let other know we become active/visible
+      if (this.toggleGroup) {
+        WguEventBus.$emit(this.toggleGroup, {'moduleName': this.moduleName, 'state': this.state});
+      }
     }
   }
 };
