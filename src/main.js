@@ -16,7 +16,7 @@ require('./assets/css/wegue.css');
 
 // try to load an optional app specific CSS file (set project-specific styles)
 try {
-  require('../app/css/app.css');
+  require('../app/static/css/app.css');
 } catch (e) {}
 
 Vue.config.productionTip = false;
