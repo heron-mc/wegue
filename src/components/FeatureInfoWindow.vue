@@ -8,7 +8,7 @@
 
       <v-toolbar :color="color" class="" :dark="dark">
           <v-toolbar-side-icon><v-icon>{{icon}}</v-icon></v-toolbar-side-icon>
-          <v-toolbar-title>{{title}}</v-toolbar-title>
+          <v-toolbar-title class="wgu-win-title">{{title}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-side-icon @click="onWinXClose"><v-icon>close</v-icon></v-toolbar-side-icon>
         </v-toolbar>
