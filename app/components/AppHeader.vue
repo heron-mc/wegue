@@ -123,7 +123,7 @@ export default {
       let moduleButtons = [];
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
-        if (moduleOpts.target === 'menu' || moduleOpts.mobileTarget === 'menu' && this.smallScreen() === true) {
+        if (moduleOpts.target === 'menu' || (moduleOpts.mobileTarget === 'menu' && this.smallScreen() === true)) {
           moduleButtons.push({
             type: key + '-btn',
             target: moduleOpts.target,
