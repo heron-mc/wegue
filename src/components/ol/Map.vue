@@ -317,6 +317,10 @@ export default {
     right: 0.5em;
   }
 
+  .ol-control button {
+      color: hsl(0,0%,30%);
+  }
+
   div.ol-attribution.ol-uncollapsible {
     bottom: 12px;
     font-size: 10px;
