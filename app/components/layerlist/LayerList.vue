@@ -90,7 +90,7 @@ de:
       },
       tabs() {
         return [
-          ...(this.hideTags ? [] : [{title: this.tagsTitle, items: this.tagsTree, loadFunc: this.fetchTagItems, openFunc: this.unfoldTags}]),
+          ...(this.hideTags ? [] : [{title: this.tagsTitle, items: this.tagsTree, loadFunc: this.fetchTagItems, unfolded: this.unfoldTags}]),
           ...(this.hideCategories ? [] : [{title: this.categoriesTitle, items: this.categoriesTree, loadFunc: this.fetchCategoryItems, unfolded: this.unfoldCategories}])
         ];
       }
