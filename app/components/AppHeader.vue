@@ -22,10 +22,13 @@
 
     <template v-for="(tbButton, index) in tbButtons">
       <component
-        :is="tbButton.type" :key="index"
+        :is="tbButton.type"
+        :key="index"
         :icon="tbButton.icon" :text="tbButton.text"
         :color="color"
         :dark="tbButton.dark"
+        :active="tbButton.active"
+        :toggleGroup="tbButton.toggleGroup"
       />
     </template>
 
@@ -39,7 +42,16 @@
       <v-list>
           <template v-for="(tbButton, index) in menuButtons">
               <v-list-tile>
-                <component :is="tbButton.type" :key="index" :icon="tbButton.icon" :text="tbButton.text" :color="color" />
+                <component
+                  :is="tbButton.type"
+                  :key="index"
+                  :icon="tbButton.icon"
+                  :color="color"
+                  :text="tbButton.text"
+                  :dark="tbButton.dark"
+                  :active="tbButton.active"
+                  :toggleGroup="tbButton.toggleGroup"
+                />
               </v-list-tile>
           </template>
       </v-list>
@@ -108,17 +120,20 @@ export default {
     getModuleButtonData () {
       const appConfig = Vue.prototype.$appConfig || {};
       const modulesConfs = appConfig.modules || {};
-      let moduleWins = [];
+      let moduleButtons = [];
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
         if (moduleOpts.target === 'menu' || moduleOpts.mobileTarget === 'menu' && this.smallScreen() === true) {
-          moduleWins.push({
+          moduleButtons.push({
             type: key + '-btn',
-            target: 'menu'
+            target: moduleOpts.target,
+            dark: moduleOpts.darkLayout,
+            active: moduleOpts.active,
+            toggleGroup: moduleOpts.toggleGroup
           });
         }
       }
-      return moduleWins;
+      return moduleButtons;
     },
     /**
      * Determines the module toolbar button configuration objects from app-config:
@@ -132,19 +147,21 @@ export default {
     getToolbarButtons () {
       const appConfig = Vue.prototype.$appConfig || {};
       const modulesConfs = appConfig.modules || {};
-      let moduleWins = [];
+      let moduleButtons = [];
 
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
         if (moduleOpts.target === 'toolbar' && !(moduleOpts.mobileTarget === 'menu' && this.smallScreen() === true)) {
-          moduleWins.push({
+          moduleButtons.push({
             type: key + '-btn',
-            target: 'toolbar',
-            dark: moduleOpts.darkLayout
+            target: moduleOpts.target,
+            dark: moduleOpts.darkLayout,
+            active: moduleOpts.active,
+            toggleGroup: moduleOpts.toggleGroup
           });
         }
       }
-      return moduleWins;
+      return moduleButtons;
     }
   }
 }

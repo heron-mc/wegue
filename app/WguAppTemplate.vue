@@ -19,7 +19,22 @@
     <slot name="wgu-before-content" />
 
     <v-content>
-      <wgu-routing-panel />
+      <template v-for="(modulePanel, index) in modulePanels">
+        <component
+          :is="modulePanel.type" :key="index" :ref="modulePanel.type"
+          :color="baseColor"
+          :dark="modulePanel.dark"
+          :active="modulePanel.active"
+          :right="modulePanel.right"
+          :width="modulePanel.width"
+          :height="modulePanel.height"
+          :title="modulePanel.title"
+          :icon="modulePanel.icon"
+          :toggleGroup="modulePanel.toggleGroup"
+          :options="modulePanel.options"
+        />
+      </template>
+
       <v-container id="ol-map-container" fluid fill-height style="padding: 0">
          <wgu-map :color="baseColor" />
          <wgu-mapbox-attribution />
@@ -36,7 +51,7 @@
         :dark="moduleWin.dark"
         :draggable="moduleWin.draggable"
         :initPos="moduleWin.initPos"
-        :initShow="moduleWin.initShow"
+        :active="moduleWin.active"
         :width="moduleWin.width"
         :title="moduleWin.title"
         :icon="moduleWin.icon"
@@ -68,7 +83,7 @@
   import AppFooter from './components/AppFooter'
   import AppLogo from '../src/components/AppLogo'
   import MeasureWin from '../src/components/measuretool/MeasureWin'
-  import LayerListWin from './components/layerlist/LayerListWin'
+  import LayerListPanel from './components/layerlist/LayerListPanel'
   import InfoClickWin from '../src/components/infoclick/InfoClickWin'
   import MapLoadingStatus from '../src/components/progress/MapLoadingStatus'
   import FeatureInfoWindow from '../src/components/FeatureInfoWindow'
@@ -82,10 +97,10 @@
       'wgu-app-footer': AppFooter,
       'wgu-app-logo': AppLogo,
       'wgu-measuretool-win': MeasureWin,
-      'wgu-layerlist-win': LayerListWin,
       'wgu-infoclick-win': InfoClickWin,
       'wgu-maploading-status': MapLoadingStatus,
       'wgu-feature-info-window-win': FeatureInfoWindow,
+      'wgu-layerlist-panel': LayerListPanel,
       'wgu-routing-panel': RoutingPanel,
       'wgu-mapbox-attribution': MapboxAttribution
     },
@@ -93,6 +108,7 @@
       return {
         isEmbedded: false,
         moduleWins: this.getModuleWinData(),
+        modulePanels: this.getModulePanelData(),
         footerTextLeft: Vue.prototype.$appConfig.footerTextLeft,
         footerTextRight: Vue.prototype.$appConfig.footerTextRight,
         showCopyrightYear: Vue.prototype.$appConfig.showCopyrightYear,
@@ -117,6 +133,38 @@
     },
     methods: {
       /**
+       * Determines the module panel configuration objects from app-config:
+       *     modulePanels: [
+       *       {type: 'wgu-layerlist-win'},
+       *       {type: 'wgu-measuretool-win'}
+       *     ]
+       * @return {Array} module panel configuration objects
+       */
+      getModulePanelData () {
+        const appConfig = Vue.prototype.$appConfig || {};
+        const modulesConfs = appConfig.modules || {};
+        let modulePanels = [];
+        for (const key of Object.keys(modulesConfs)) {
+          const moduleOpts = appConfig.modules[key];
+          if (moduleOpts.panel === true) {
+            modulePanels.push({
+              type: key + '-panel',
+              dark: moduleOpts.darkLayout,
+              initPos: moduleOpts.initPos,
+              active: moduleOpts.active,
+              title: moduleOpts.title,
+              right: moduleOpts.right,
+              width: moduleOpts.width,
+              height: moduleOpts.height,
+              icon: moduleOpts.icon,
+              toggleGroup: moduleOpts.toggleGroup,
+              options: moduleOpts.options
+            });
+          }
+        }
+        return modulePanels;
+      },
+      /**
        * Determines the module window configuration objects from app-config:
        *     moduleWins: [
        *       {type: 'wgu-layerlist-win'},
@@ -136,7 +184,7 @@
               dark: moduleOpts.darkLayout,
               draggable: moduleOpts.draggable,
               initPos: moduleOpts.initPos,
-              initShow: moduleOpts.initShow,
+              active: moduleOpts.active,
               title: moduleOpts.title,
               width: moduleOpts.width,
               icon: moduleOpts.icon,

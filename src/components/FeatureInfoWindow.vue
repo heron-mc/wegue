@@ -128,6 +128,7 @@ export default {
   .wgu-feature-infowindow.info-card {
     position: absolute;
     background-color: white;
+    z-index: 100;
   }
 
 </style>

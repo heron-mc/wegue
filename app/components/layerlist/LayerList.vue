@@ -90,7 +90,7 @@ de:
       },
       tabs() {
         return [
-          ...(this.hideTags ? [] : [{title: this.tagsTitle, items: this.tagsTree, loadFunc: this.fetchTagItems, openFunc: this.unfoldTags}]),
+          ...(this.hideTags ? [] : [{title: this.tagsTitle, items: this.tagsTree, loadFunc: this.fetchTagItems, unfolded: this.unfoldTags}]),
           ...(this.hideCategories ? [] : [{title: this.categoriesTitle, items: this.categoriesTree, loadFunc: this.fetchCategoryItems, unfolded: this.unfoldCategories}])
         ];
       }
@@ -230,10 +230,10 @@ de:
 
 <style>
 
-  .wgu-layer-list-card {
-    overflow: auto;
-    max-height: calc(100vh - 200px);
-  }
+  /*.wgu-layer-list-card {*/
+  /*  overflow: auto;*/
+  /*  max-height: calc(100vh - 200px);*/
+  /*}*/
   .wgu-layer-list-tabs {
     min-width: 360px;
     max-width: 420px;
