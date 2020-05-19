@@ -31,7 +31,7 @@ de:
                   :style="{
                     borderTopColor: item.stroke.getColor(),
                     borderTopWidth: 3,
-                    borderTopStyle: item.stroke.getLineDash() ? 'dashed' : 'solid'
+                    borderTopStyle: {'6,12':'dashed', '1,8': 'dotted', null: 'solid'}[item.stroke.getLineDash()] || 'dashed'
                   }"
                   width="30"
                   height="4"
@@ -40,7 +40,8 @@ de:
                 <v-card v-if="item.category === 'area'"
                   :style="{
                     background: item.fill.getColor(),
-                    border: '3px solid',
+                    borderWidth: '3px',
+                    borderStyle: {'6,12':'dashed', '1,8': 'dotted', null: 'solid'}[item.stroke.getLineDash()] || 'dashed',
                     borderColor: item.stroke.getColor()
                   }"
                   width="30"

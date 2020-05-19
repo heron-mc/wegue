@@ -32,27 +32,44 @@ de:
       disable-route-watcher
       absolute
       stateless
+      height="unset"
   >
     <v-card class="pa-2">
       <v-form>
         <v-select
+          v-if="showDirectionsControls"
           :items="transportModes"
           v-model="transportMode"
           :label="$t('Mode')"
           outline
         ></v-select>
-        <DestinationSelector :label="$t('From')" @change="from = $event" :localSuggestions="localSuggestions"/>
-        <DestinationSelector v-for="(waypoint, i) in waypoints" label="via" @change="$set(waypoints, i, $event)" :localSuggestions="localSuggestions" :key="i" />
+        <DestinationSelector
+          v-show="showDirectionsControls"
+          :label="$t('From')"
+          @change="from = $event"
+          :localSuggestions="localSuggestions"/>
+        <DestinationSelector
+          v-for="(waypoint, i) in waypoints"
+          label="via"
+          @change="$set(waypoints, i, $event)"
+          :localSuggestions="localSuggestions"
+          :key="i"
+        />
         <v-btn color="primary" flat small
-          v-if="from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
+          v-if="showDirectionsControls && from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
           {{ $t('Add stop') }}
         </v-btn>
         <v-btn flat small v-if="waypoints.length" @click="waypoints.splice(-1)">{{ $t('Remove stop') }}</v-btn>
-        <DestinationSelector :label="$t('to')" @change="to = $event"  :localSuggestions="localSuggestions"/>
+        <DestinationSelector
+          :label="showDirectionsControls ? $t('to') : $t('Find place')"
+          @change="toChange"
+          :localSuggestions="localSuggestions"/>
+        <v-btn color="primary" flat small v-if="!showDirectionsControls && to" @click="showDirectionsControls=true">Directions</v-btn>
+
         <div v-if="transportMode === 'fastest;publicTransport' && from && to">
           <DateTimePicker @change="timeDate=$event"/>
         </div>
-        <v-container justify-center="true">
+        <v-container v-if="showDirectionsControls" justify-center="true">
           <v-btn class="d-block mx-auto " color="primary" @click="search" v-if="from && to && !(timeDate.time && timeDate.timeIsInvalid)">
             {{ $t('Get directions') }}
           </v-btn>
@@ -112,7 +129,8 @@ export default {
       stopsGeometry: undefined,
       boundingBox: undefined,
       route: undefined,
-      timeDate: {}
+      timeDate: {},
+      showDirectionsControls: false
     }
   },
   async mounted () {
@@ -164,7 +182,7 @@ export default {
       return [this.from && this.from.geometry.coordinates, this.waypoints.map(w => w && w.geometry.coordinates), this.to && this.to.geometry.coordinates, this.routeGeometry];
     },
     responseTransportMode () {
-      if (!this.route.mode || !this.route.mode.transportModes) {
+      if (!this.route || !this.route.mode || !this.route.mode.transportModes) {
         return 'Driving';
       } else {
         return {
@@ -174,6 +192,20 @@ export default {
           'pedestrian': 'Walking'
         }[this.route.mode.transportModes[0]]
       }
+    },
+    boundingBoxForStops () {
+      let bbox;
+      const stops = [this.from && this.from.geometry.coordinates, ...this.waypoints.map(w => w && w.geometry.coordinates), this.to && this.to.geometry.coordinates];
+      for (let stop of stops) {
+        if (stop) {
+          bbox = bbox || [...stop, ...stop];
+          bbox[0] = Math.min(bbox[0], stop[0]);
+          bbox[1] = Math.min(bbox[1], stop[1]);
+          bbox[2] = Math.max(bbox[2], stop[0]);
+          bbox[3] = Math.max(bbox[3], stop[1]);
+        }
+      }
+      return bbox;
     }
   },
   watch: {
@@ -190,7 +222,7 @@ export default {
         waypointsGeometry: featureCollection(this.waypointsGeometry),
         endGeometry: this.to && this.to.geometry.coordinates ? point(this.to.geometry.coordinates) : undefined,
         stopsGeometry: this.stopsGeometry,
-        boundingBox: this.boundingBox
+        boundingBox: this.boundingBox || this.boundingBoxForStops
       });
     },
     route () {
@@ -216,6 +248,12 @@ export default {
         localSuggestions.sort((a, b) => (a.text < b.text ? -1 : 1));
         this.localSuggestions = localSuggestions;
       });
+    },
+    toChange (newTo) {
+      this.to = newTo;
+      if (!newTo && !this.from) {
+        this.showDirectionsControls = false;
+      }
     },
     async search () {
       this.errorMessage = undefined;
@@ -261,6 +299,8 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-
+<style scoped>
+.v-navigation-drawer {
+  max-height:100%;
+}
 </style>
