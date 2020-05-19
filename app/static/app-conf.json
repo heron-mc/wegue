@@ -72,17 +72,6 @@
         "limit": 6
       }
     },
-    "wgu-layerlist": {
-      "target": "toolbar",
-      "darkLayout": false,
-      "win": true,
-      "initShow": true,
-      "draggable": true,
-      "options": {
-        "hideCategories": true,
-        "hideTags": false
-      }
-    },
     "wgu-measuretool": {
       "target": "menu",
       "win": true,
@@ -121,11 +110,32 @@
         }
       ]
     },
-    "wgu-routing": {
-      "transportModes": ["car", "publicTransport"],
-      "panel": true,
+    "wgu-layerlist": {
       "target": "toolbar",
-      "darkLayout": false
+      "darkLayout": false,
+      "panel": true,
+      "active": true,
+      "right": false,
+      "width": 360,
+      "height": "75%",
+      "toggleGroup": "side-panel-active",
+      "options": {
+        "hideCategories": true,
+        "hideTags": false
+      }
+    },
+    "wgu-routing": {
+      "target": "toolbar",
+      "darkLayout": false,
+      "panel": true,
+      "active": false,
+      "right": false,
+      "width": 300,
+      "height": "100%",
+      "toggleGroup": "side-panel-active",
+      "options": {
+        "transportModes": ["car", "publicTransport"]
+      }
     },
     "wgu-language": {
       "languages": ["en", "de"],
