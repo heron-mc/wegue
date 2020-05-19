@@ -107,10 +107,10 @@ export default {
       let moduleWins = [];
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
-        if (moduleOpts.target === 'menu') {
+        if (moduleOpts.target === 'menu' || moduleOpts.mobileTarget === 'menu' && window.innerWidth < 800) {
           moduleWins.push({
             type: key + '-btn',
-            target: moduleOpts.target
+            target: 'menu'
           });
         }
       }
@@ -132,10 +132,10 @@ export default {
 
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
-        if (moduleOpts.target === 'toolbar') {
+        if (moduleOpts.target === 'toolbar' && !(moduleOpts.mobileTarget === 'menu' && window.innerWidth < 800)) {
           moduleWins.push({
             type: key + '-btn',
-            target: moduleOpts.target,
+            target: 'toolbar',
             dark: moduleOpts.darkLayout
           });
         }
