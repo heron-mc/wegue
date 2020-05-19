@@ -168,7 +168,6 @@ de:
 
           // First add to Categories tree
           const categoryNode = getCategoryNode(layerItem.category);
-          console.log(categoryItems, categoryNode, layerItem.category);
           categoryNode.children.push(layerItem);
 
           const tags = layerItem.tags || [this.$t('_untagged')];
