@@ -15,74 +15,43 @@ de:
       :dark="dark"
       :sliderColor="sliderColor"
       grow
-      :class="{'wgu-layer-list-tabs': true, 'wgu-layer-no-header': hideCategories || hideTags}"
+      :class="{'wgu-layer-list-tabs': true, 'wgu-layer-no-header': tabs.length < 2}"
     >
-      <v-tab v-if="!hideCategories && !hideTags" >
-        {{ $t(categoriesTitle) }}
-      </v-tab>
-      <v-tab-item v-if="!hideCategories">
-        <v-list>
-          <v-treeview :items="categoriesTree" :load-children="fetchCategoryItems" :open.sync="unfoldCategories">
-            <template v-slot:prepend="{ item }">
-              <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
-              <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
-              <v-card v-if="item.category === 'route'"
-                                :style="{
-                                  background: item.lineColor,
-                                }"
-                                width="30"
-                                height="4"
-                                class="mr-2"
-                              />
-              <v-card v-if="item.category === 'area'"
-                                :style="{
-                                  background: item.fillColor,
-                                  border: '3px solid',
-                                  borderColor: item.lineColor
-                                }"
-                                width="30"
-                                height="30"
-                                class="mr-2"
-                              />
-            </template>
-          </v-treeview>
-        </v-list>
-      </v-tab-item>
-      <v-tab v-if="!hideCategories && !hideTags">
-        {{ $t(tagsTitle) }}
-      </v-tab>
-      <v-tab-item v-if="!hideTags">
-        <v-list>
-           <v-treeview
-                   :items="tagsTree"
-                   :load-children="fetchTagItems"
-                   :open.sync="unfoldTags"
-                 >
-                   <template v-slot:prepend="{ item }">
-                     <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
-                     <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
-                     <v-card v-if="item.category === 'route'"
-                                       :style="{
-                                         background: item.lineColor,
-                                       }"
-                                       width="30"
-                                       height="4"
-                                       class="mr-2"
-                                     />
-                     <v-card v-if="item.category === 'area'"
-                                       :style="{
-                                         background: item.fillColor,
-                                         border: '3px solid',
-                                         borderColor: item.lineColor
-                                       }"
-                                       width="30"
-                                       height="30"
-                                       class="mr-2"
-                                     />
-                   </template>
-                 </v-treeview>
-         </v-list>
-      </v-tab-item>
+      <template v-for="tab of tabs">
+        <v-tab :key="tab.title">
+          {{ $t(tab.title) }}
+        </v-tab>
+        <v-tab-item :key="tab.title">
+          <v-list>
+            <v-treeview :items="tab.items" :load-children="tab.loadFunc" :open.sync="tab.unfolded">
+              <template v-slot:prepend="{ item }">
+                <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
+                <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
+                <v-card v-if="item.category === 'route'"
+                  :style="{
+                    borderTopColor: item.stroke.getColor(),
+                    borderTopWidth: 3,
+                    borderTopStyle: item.stroke.getLineDash() ? 'dashed' : 'solid'
+                  }"
+                  width="30"
+                  height="4"
+                  class="mr-2"
+                />
+                <v-card v-if="item.category === 'area'"
+                  :style="{
+                    background: item.fill.getColor(),
+                    border: '3px solid',
+                    borderColor: item.stroke.getColor()
+                  }"
+                  width="30"
+                  height="30"
+                  class="mr-2"
+                />
+              </template>
+            </v-treeview>
+          </v-list>
+        </v-tab-item>
+      </template>
     </v-tabs>
   </v-card>
 
@@ -118,6 +87,12 @@ de:
       },
       tagsTree () {
         return this.tagItems
+      },
+      tabs() {
+        return [
+          ...(this.hideTags ? [] : [{title: this.tagsTitle, items: this.tagsTree, loadFunc: this.fetchTagItems, openFunc: this.unfoldTags}]),
+          ...(this.hideCategories ? [] : [{title: this.categoriesTitle, items: this.categoriesTree, loadFunc: this.fetchCategoryItems, unfolded: this.unfoldCategories}])
+        ];
       }
     },
     methods: {
@@ -143,19 +118,13 @@ de:
         const layerId = layer.get('lid');
         const layerCategory = layerId.split('_')[0];
         let layerStyle = layer.getStyle();
-        let icon, lineColor, fillColor;
-        if (layerCategory === 'route') {
-          lineColor = layerStyle.getStroke().getColor();
-        } else if (layerCategory === 'area') {
-          lineColor = layerStyle.getStroke().getColor();
-          fillColor = layerStyle.getFill().getColor();
-        } else if (layerCategory === 'poi') {
+        let icon; // , lineColor, fillColor;
+        if (layerCategory === 'poi') {
           if (Array.isArray(layerStyle)) {
             layerStyle = layerStyle[1];
           }
           icon = layerStyle.getImage().getSrc();
         }
-
         return {
           id: childId,
           name: layer.get('name'),
@@ -163,8 +132,8 @@ de:
           category: layerCategory,
           tags: layer.get('tags'),
           icon: icon,
-          lineColor: lineColor,
-          fillColor: fillColor,
+          stroke: layerStyle.getStroke && layerStyle.getStroke(),
+          fill: layerStyle.getFill && layerStyle.getFill(),
           visible: layer.getVisible()
         };
       },
@@ -182,32 +151,15 @@ de:
         }
 
         // Predefined Categories TODO make smarter
-        let categoryItems = [
-          {
+        const categoryItems = ['POIs', 'Routes', 'Areas']
+          .map(category => ({
             id: nextId(),
-            name: this.$i18n.t('POIs'),
+            name: this.$i18n.t(category),
             lid: undefined,
             visible: false,
-            children: [
-            ]
-          },
-          {
-            id: nextId(),
-            name: this.$i18n.t('Routes'),
-            lid: undefined,
-            visible: false,
-            children: [
-            ]
-          },
-          {
-            id: nextId(),
-            name: this.$i18n.t('Areas'),
-            lid: undefined,
-            visible: false,
-            children: [
-            ]
-          }];
-
+            children: []
+          }));
+        const getCategoryNode = type => categoryItems[{ route: 1, area: 2 }[type] || 0];
         // Tag defs come from the tags added to Layers
         let tagItems = [];
 
@@ -215,13 +167,7 @@ de:
           let layerItem = this.createLayerItem(layer, nextId());
 
           // First add to Categories tree
-          const layerCategory = layerItem.category;
-          let categoryNode = categoryItems[0];
-          if (layerCategory === 'route') {
-            categoryNode = categoryItems[1];
-          } else if (layerCategory === 'area') {
-            categoryNode = categoryItems[2];
-          }
+          const categoryNode = getCategoryNode(layerItem.category);
           categoryNode.children.push(layerItem);
 
           const tags = layerItem.tags || [this.$t('_untagged')];

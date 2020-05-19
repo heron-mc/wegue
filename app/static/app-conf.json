@@ -120,7 +120,7 @@
       "height": "75%",
       "toggleGroup": "side-panel-active",
       "options": {
-        "hideCategories": false,
+        "hideCategories": true,
         "hideTags": false
       }
     },
