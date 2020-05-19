@@ -98,15 +98,19 @@ export default {
   },
   data () {
     return {
-      menuCloseOnContentClick: !this.smallScreen(),
+      menuCloseOnContentClick: this.noSubMenus(),
       title: this.$appConfig.title,
       menuButtons: this.getModuleButtonData() || [],
-      tbButtons: this.getToolbarButtons() || []
+      tbButtons: this.getToolbarButtons() || [],
+      subMenus: false
     }
   },
   methods: {
     smallScreen () {
       return window.innerWidth < 800;
+    },
+    noSubMenus () {
+      return this.subMenus === false;
     },
     /**
      * Determines the module menu button configuration objects from app-config:
@@ -123,6 +127,10 @@ export default {
       let moduleButtons = [];
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
+        // Remember if any of the Butoons has an in-place sub-menu/dropdown.
+        if (moduleOpts.hasSubMenu === true) {
+          this.subMenus = true;
+        }
         if (moduleOpts.target === 'menu' || (moduleOpts.mobileTarget === 'menu' && this.smallScreen() === true)) {
           moduleButtons.push({
             type: key + '-btn',

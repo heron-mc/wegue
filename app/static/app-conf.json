@@ -76,6 +76,7 @@
     "wgu-share": {
       "target": "toolbar",
       "mobileTarget": "menu",
+      "hasSubMenu": true,
       "darkLayout": false
     },
     "wgu-feature-info-window": {
@@ -127,6 +128,7 @@
       "languages": ["en", "de"],
       "target": "toolbar",
       "mobileTarget": "menu",
+      "hasSubMenu": true,
       "darkLayout": false
     },
     "wgu-savepdf": {
