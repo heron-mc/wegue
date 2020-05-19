@@ -57,21 +57,6 @@
   ],
 
   "modules": {
-    "wgu-geocoder": {
-      "target": "toolbar",
-      "darkLayout": false,
-      "minChars": 3,
-      "queryDelay": 200,
-      "selectZoom": 16,
-      "debug": false,
-      "placeHolder": "Suchen",
-      "provider": "osm",
-      "providerOptions": {
-        "lang": "de-DE",
-        "countrycodes": "DE",
-        "limit": 6
-      }
-    },
     "wgu-measuretool": {
       "target": "menu",
       "win": true,

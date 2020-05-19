@@ -22,7 +22,7 @@ export default {
   props: {
     active: {type: Boolean, required: false, default: false},
     dark: {type: Boolean, required: false, default: false},
-    icon: {type: String, required: false, default: 'navigation'},
+    icon: {type: String, required: false, default: 'search'},
     hoverText: {type: String, required: false, default: 'Get directions'},
     toggleGroup: {type: String, required: false, default: undefined}
   },
