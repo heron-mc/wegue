@@ -230,10 +230,10 @@ de:
 
 <style>
 
-  .wgu-layer-list-card {
-    overflow: auto;
-    max-height: calc(100vh - 200px);
-  }
+  /*.wgu-layer-list-card {*/
+  /*  overflow: auto;*/
+  /*  max-height: calc(100vh - 200px);*/
+  /*}*/
   .wgu-layer-list-tabs {
     min-width: 360px;
     max-width: 420px;

@@ -3,7 +3,7 @@ de:
   Layers: Kartenebenen
 </i18n>
 <template>
-  <v-navigation-drawer
+  <v-navigation-drawer class="wgu-layer-list-panel"
       v-model="drawerOpen"
       :value="drawerOpen"
       :dark="dark"
@@ -64,6 +64,10 @@ de:
 </script>
 
 <style>
+  .wgu-layer-list-panel {
+    overflow: auto;
+    /*max-height: calc(100vh - 200px);*/
+  }
 
 /*  .v-card.wgu-layerlist {*/
 /*    position: absolute;*/
