@@ -269,7 +269,7 @@ export default {
     onPointerMove (event) {
       function setCursor() {
         const hit = map.hasFeatureAtPixel(event.pixel, { layerFilter: l => l.get('selectable') });
-        map.getViewport().style.cursor = hit ? 'pointer': '';
+        map.getViewport().style.cursor = hit ? 'pointer' : map.wguDefaultCursor || '';
       }
       const me = this;
       const map = me.map;

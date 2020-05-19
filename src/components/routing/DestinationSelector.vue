@@ -83,12 +83,12 @@ export default {
     changeRouteTarget () {
       console.log(this.target);
       if (this.target && this.target.properties.source === 'custom') {
-        this.$map.getViewport().style.cursor = 'crosshair';
+        this.$map.wguDefaultCursor = 'crosshair';
         this.$map.once('click', e => {
           // just checking we're still in the same state
           if (this.target.properties.source === 'custom') {
             const coords = this.toEpsg4326(e.coordinate);
-            this.$map.getViewport().style.cursor = '';
+            this.$map.wguDefaultCursor = '';
             this.target.geometry.coordinates = coords;
           }
         });
