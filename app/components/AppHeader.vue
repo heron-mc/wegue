@@ -32,7 +32,7 @@
     <!-- slot to inject components after the auto-generated buttons (by config) -->
     <slot name="wgu-tb-after-auto-buttons"></slot>
 
-    <v-menu v-if="menuButtons.length" offset-y>
+    <v-menu v-if="menuButtons.length" offset-y :close-on-content-click="menuCloseOnContentClick">
       <v-btn icon bright slot="activator">
         <v-icon medium>menu</v-icon>
       </v-btn>
@@ -86,12 +86,16 @@ export default {
   },
   data () {
     return {
+      menuCloseOnContentClick: !this.smallScreen(),
       title: this.$appConfig.title,
       menuButtons: this.getModuleButtonData() || [],
       tbButtons: this.getToolbarButtons() || []
     }
   },
   methods: {
+    smallScreen () {
+      return window.innerWidth < 800;
+    },
     /**
      * Determines the module menu button configuration objects from app-config:
      *    menuButtons: [
@@ -107,7 +111,7 @@ export default {
       let moduleWins = [];
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
-        if (moduleOpts.target === 'menu' || moduleOpts.mobileTarget === 'menu' && window.innerWidth < 800) {
+        if (moduleOpts.target === 'menu' || moduleOpts.mobileTarget === 'menu' && this.smallScreen() === true) {
           moduleWins.push({
             type: key + '-btn',
             target: 'menu'
@@ -132,7 +136,7 @@ export default {
 
       for (const key of Object.keys(modulesConfs)) {
         const moduleOpts = appConfig.modules[key];
-        if (moduleOpts.target === 'toolbar' && !(moduleOpts.mobileTarget === 'menu' && window.innerWidth < 800)) {
+        if (moduleOpts.target === 'toolbar' && !(moduleOpts.mobileTarget === 'menu' && this.smallScreen() === true)) {
           moduleWins.push({
             type: key + '-btn',
             target: 'toolbar',
