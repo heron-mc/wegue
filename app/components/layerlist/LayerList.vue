@@ -151,32 +151,15 @@ de:
         }
 
         // Predefined Categories TODO make smarter
-        let categoryItems = [
-          {
+        const categoryItems = ['POIs', 'Routes', 'Areas']
+          .map(category => ({
             id: nextId(),
-            name: this.$i18n.t('POIs'),
+            name: this.$i18n.t(category),
             lid: undefined,
             visible: false,
-            children: [
-            ]
-          },
-          {
-            id: nextId(),
-            name: this.$i18n.t('Routes'),
-            lid: undefined,
-            visible: false,
-            children: [
-            ]
-          },
-          {
-            id: nextId(),
-            name: this.$i18n.t('Areas'),
-            lid: undefined,
-            visible: false,
-            children: [
-            ]
-          }];
-
+            children: []
+          }));
+        const getCategoryNode = type => categoryItems[{ route: 1, area: 2 }[type] || 0];
         // Tag defs come from the tags added to Layers
         let tagItems = [];
 
@@ -184,13 +167,8 @@ de:
           let layerItem = this.createLayerItem(layer, nextId());
 
           // First add to Categories tree
-          const layerCategory = layerItem.category;
-          let categoryNode = categoryItems[0];
-          if (layerCategory === 'route') {
-            categoryNode = categoryItems[1];
-          } else if (layerCategory === 'area') {
-            categoryNode = categoryItems[2];
-          }
+          const categoryNode = getCategoryNode(layerItem.category);
+          console.log(categoryItems, categoryNode, layerItem.category);
           categoryNode.children.push(layerItem);
 
           const tags = layerItem.tags || [this.$t('_untagged')];
