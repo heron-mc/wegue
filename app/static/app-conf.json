@@ -117,7 +117,7 @@
       "active": true,
       "right": false,
       "width": 360,
-      "height": "75%",
+      "height": "100%",
       "toggleGroup": "side-panel-active",
       "options": {
         "hideCategories": true,
