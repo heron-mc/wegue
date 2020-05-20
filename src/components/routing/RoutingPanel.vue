@@ -47,6 +47,7 @@ de:
           v-show="showDirectionsControls"
           :label="$t('From')"
           @change="from = $event"
+          ref="fromSelector"
           :localSuggestions="localSuggestions"/>
         <DestinationSelector
           v-for="(waypoint, i) in waypoints"
@@ -54,6 +55,7 @@ de:
           @change="$set(waypoints, i, $event)"
           :localSuggestions="localSuggestions"
           :key="i"
+          :ref="`way${i}selector`"
         />
         <v-btn color="primary" flat small
           v-if="showDirectionsControls && from && to && (waypoints.length === 0 || waypoints.length <= 8 && waypoints.slice(-1)[0])" @click="waypoints.push(undefined)">
@@ -63,6 +65,7 @@ de:
         <DestinationSelector
           :label="showDirectionsControls ? $t('to') : $t('Find place')"
           @change="toChange"
+          ref="toSelector"
           :localSuggestions="localSuggestions"/>
         <v-btn color="primary" flat small v-if="!showDirectionsControls && to" @click="showDirectionsControls=true">Directions</v-btn>
 
@@ -138,6 +141,14 @@ export default {
     window.RoutingPanel = this;
     WguEventBus.$on('toggle-routing-panel', state => {
       this.drawerOpen = state === undefined ? !this.drawerOpen : state;
+    });
+    WguEventBus.$on('directions-to-feature', feature => {
+      console.log(this, this.$refs);
+      if (this.toggleGroup) {
+        WguEventBus.$emit(this.toggleGroup, { moduleName: this.moduleName });
+      }
+      this.$refs.toSelector.setTargetById(feature.get('id'));
+      this.showDirectionsControls = true;
     });
 
     // When member of toggle group: close if any other panel active
@@ -231,6 +242,13 @@ export default {
       } else {
         this.routeGeometry = undefined;
       }
+    },
+    drawerOpen () {
+      // I'm undecided whether the panel should reset when it opens. There isn't another good way to clear it.
+      // OTOH, it could take a while to set up all the parameters they want for the search, then they lose it all
+      // because they temporarily went to the layers panel.
+      // this.$refs.fromSelector.target = undefined;
+      // this.showDirectionsControls = false;
     }
   },
   methods: {

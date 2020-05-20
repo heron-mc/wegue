@@ -4,9 +4,9 @@ de:
   Point on map: Punkt auf der Karte
 </i18n>
 <template>
-<div class="routing-target">
+<div :class="{ 'routing-target': true, [target && target.properties.source + '-source']: true }">
   <v-autocomplete
-    :items="[customPoint, ...localSuggestions, ...geocodeSuggestions]"
+    :items=items
     v-model="target"
     :label="label"
     solo
@@ -34,7 +34,10 @@ import axios from 'axios';
 import { flip, feature, point } from './routingUtils';
 export default {
   name: 'DestinationSelector',
-  props: ['label', 'localSuggestions'],
+  props: {
+    label: String,
+    localSuggestions: Array
+  },
   data: () => ({
     target: undefined,
     geocodeSuggestions: [],
@@ -66,6 +69,13 @@ export default {
     }
   },
   computed: {
+    items () {
+      return [
+        this.customPoint,
+        ...this.localSuggestions.map(s => { s.value.properties.source = 'local'; return s; }),
+        ...this.geocodeSuggestions.map(s => { s.value.properties.source = 'geocode'; return s })
+      ];
+    },
     choosingPoint () {
       return this.target && this.target.properties.source === 'custom' && this.target.geometry.coordinates === null;
     },
@@ -98,19 +108,28 @@ export default {
       if (this.target.properties.source === 'custom') {
         this.target.geometry.coordinates = null;
       }
+    },
+    setTargetById (id) {
+      this.target = this.localSuggestions.find(s => s.value.properties.id === id).value
     }
   }
 }
 </script>
 
 <style scoped>
-.local {
-  color: rgb(226, 0, 122);
-  font-weight:bold;
+span.local {
+  color: rgb(226, 0, 122) !important;
+  font-weight:bold !important;
 }
 .nav-icon {
   margin-left:-6px;
   margin-right: 10px;
 }
 
+</style>
+<style>
+.local-source input {
+  color: rgb(226, 0, 122) !important;
+  font-weight:bold !important;
+}
 </style>

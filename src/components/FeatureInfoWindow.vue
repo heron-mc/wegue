@@ -1,9 +1,13 @@
+<i18n>
+de:
+  Get directions: Route berechnen
+</i18n>
 <template>
 
     <v-card
       class="wgu-feature-infowindow info-card"
       v-draggable-win="draggable"
-      v-if="this.feature !== null"
+      v-if="feature"
       v-bind:style="{ left: left, top: top, width: width }" >
 
       <v-toolbar :color="color" class="" :dark="dark">
@@ -20,6 +24,7 @@
         <v-card-text v-if="attributes[descProp]" v-html="description" :style="{maxHeight:textHeight, overflowY:'scroll'}"></v-card-text>
         <v-card-actions>
           <v-btn v-if="attributes[infoUrlProp]" flat color="blue" :href="attributes[infoUrlProp]" target="_blank">{{infoUrlText}}</v-btn>
+          <v-btn v-if="feature.getGeometry().getType() === 'Point'" @click="clickDirections">{{ $t('Get directions') }}</v-btn>
         </v-card-actions>
     </v-card>
 
@@ -117,6 +122,9 @@ export default {
     onWinXClose: function () {
       // this.feature.deselected; TODO: how to deselect Feature on Map?
       this.setFeature(null);
+    },
+    clickDirections: function () {
+      WguEventBus.$emit('directions-to-feature', this.feature);
     }
   }
 }
