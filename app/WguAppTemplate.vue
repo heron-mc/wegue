@@ -86,7 +86,7 @@
   import LayerListPanel from './components/layerlist/LayerListPanel'
   import InfoClickWin from '../src/components/infoclick/InfoClickWin'
   import MapLoadingStatus from '../src/components/progress/MapLoadingStatus'
-  import FeatureInfoWindow from '../src/components/FeatureInfoWindow'
+  import FeatureInfoPanel from './components/featureinfo/FeatureInfoPanel'
   import RoutingPanel from '../src/components/routing/RoutingPanel'
   import MapboxAttribution from './components/MapboxAttribution';
   export default {
@@ -99,7 +99,7 @@
       'wgu-measuretool-win': MeasureWin,
       'wgu-infoclick-win': InfoClickWin,
       'wgu-maploading-status': MapLoadingStatus,
-      'wgu-feature-info-window-win': FeatureInfoWindow,
+      'wgu-feature-info-panel': FeatureInfoPanel,
       'wgu-layerlist-panel': LayerListPanel,
       'wgu-routing-panel': RoutingPanel,
       'wgu-mapbox-attribution': MapboxAttribution
