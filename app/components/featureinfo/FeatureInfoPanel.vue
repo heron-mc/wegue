@@ -57,7 +57,7 @@ export default {
     dark: {type: Boolean, required: false, default: false},
     icon: {type: String, required: false, default: 'info'},
     color: {type: String, required: false, default: 'red darken-3'},
-    draggable: {type: Boolean, required: false, default: true},
+    draggable: {type: Boolean, required: false, default: false},
     active: {type: Boolean, required: false, default: false},
     toggleGroup: {type: String, required: false, default: undefined}
   },
