@@ -151,7 +151,7 @@
               type: key + '-panel',
               dark: moduleOpts.darkLayout,
               initPos: moduleOpts.initPos,
-              active: moduleOpts.active,
+              active: moduleOpts.mobileActive !== undefined && window.innerWidth <= 800 ? moduleOpts.mobileActive : moduleOpts.active,
               title: moduleOpts.title,
               right: moduleOpts.right,
               width: moduleOpts.width,

@@ -102,6 +102,7 @@
       "darkLayout": false,
       "panel": true,
       "active": true,
+      "mobileActive": false,
       "right": false,
       "width": 360,
       "height": "100%",
