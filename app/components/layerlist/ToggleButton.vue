@@ -47,7 +47,7 @@ export default {
     // When member of toggle group: close if any other panel active
     if (this.toggleGroup) {
       WguEventBus.$on(this.toggleGroup, ({ moduleName, state }) => {
-        console.log(moduleName, state);
+        // console.log(moduleName, state);
         this.state = moduleName === this.moduleName && state;
       });
     }
