@@ -136,7 +136,7 @@ export default {
             type: key + '-btn',
             target: moduleOpts.target,
             dark: moduleOpts.darkLayout,
-            active: moduleOpts.active,
+            active: moduleOpts.mobileActive !== undefined && window.innerWidth <= 800 ? moduleOpts.mobileActive : moduleOpts.active,
             toggleGroup: moduleOpts.toggleGroup
           });
         }
@@ -164,7 +164,7 @@ export default {
             type: key + '-btn',
             target: moduleOpts.target,
             dark: moduleOpts.darkLayout,
-            active: moduleOpts.active,
+            active: moduleOpts.mobileActive !== undefined && window.innerWidth <= 800 ? moduleOpts.mobileActive : moduleOpts.active,
             toggleGroup: moduleOpts.toggleGroup
           });
         }
