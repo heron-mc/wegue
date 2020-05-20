@@ -143,7 +143,6 @@ export default {
       this.drawerOpen = state === undefined ? !this.drawerOpen : state;
     });
     WguEventBus.$on('directions-to-feature', feature => {
-      console.log(this, this.$refs);
       if (this.toggleGroup) {
         WguEventBus.$emit(this.toggleGroup, { moduleName: this.moduleName });
       }
@@ -153,8 +152,8 @@ export default {
 
     // When member of toggle group: close if any other panel active
     if (this.toggleGroup) {
-      WguEventBus.$on(this.toggleGroup, arg => {
-        this.drawerOpen = arg.moduleName === this.moduleName;
+      WguEventBus.$on(this.toggleGroup, ({ moduleName, state }) => {
+        this.drawerOpen = moduleName === this.moduleName && state;
       });
     }
   },
