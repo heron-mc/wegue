@@ -37,6 +37,8 @@
       "format": "GeoJSON",
       "visible": true,
       "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Vector Layers"],
       "style": {
         "radius": 4,
         "strokeColor": "purple",
@@ -58,6 +60,8 @@
       "loadOnlyVisible": true,
       "visible": false,
       "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Vector Layers"],
       "style": {
         "radius": 6,
         "strokeColor": "blue",
@@ -79,6 +83,8 @@
       "visible": true,
       "attributions": "U.S. Geological Survey",
       "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Vector Layers"],
       "hoverable": true,
       "hoverAttribute": "name",
       "style": {
@@ -102,7 +108,8 @@
       "attribution": "",
       "isBaseLayer": false,
       "visible": false,
-      "displayInLayerList": true
+      "displayInLayerList": true,
+      "tags": ["Raster Layers"]
     },
 
     {
@@ -110,6 +117,8 @@
       "name": "Vector Tile Layer",
       "url": "https://ahocevar.com/geoserver/gwc/service/tms/1.0.0/ne:ne_10m_admin_0_countries@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
       "format": "MVT",
+      "displayInLayerList": true,
+      "tags": ["Base Layers"],
       "visible": false,
       "style": {
         "strokeColor": "gray",
@@ -125,6 +134,7 @@
       "attributions": "Map data: <a href=\"https://openstreetmap.org/copyright\">©OpenStreetMap</a>-contributors, SRTM | Map representation (Kartendarstellung): © <a href=\"http://opentopomap.org/\">OpenTopoMap</a> (<a href=\"https://creativecommons.org/licenses/by-sa/3.0/\">CC-BY-SA</a>)",
       "lid": "opentopomap",
       "displayInLayerList": true,
+      "tags": ["Base Layers"],
       "visible": false
     },
 
@@ -132,6 +142,7 @@
       "type": "OSM",
       "lid": "osm-bg",
       "name": "OSM",
+      "tags": ["Base Layers"],
       "isBaseLayer": false,
       "visible": true,
       "displayInLayerList": true

@@ -118,9 +118,9 @@ de:
       createLayerItem (layer, childId) {
         const layerId = layer.get('lid');
         const layerCategory = layerId.split('_')[0];
-        let layerStyle = layer.getStyle();
+        let layerStyle = layer.getStyle && layer.getStyle();
         let icon; // , lineColor, fillColor;
-        if (layerCategory === 'poi') {
+        if (layerCategory === 'poi' && layerStyle) {
           if (Array.isArray(layerStyle)) {
             layerStyle = layerStyle[1];
           }
@@ -133,8 +133,8 @@ de:
           category: layerCategory,
           tags: layer.get('tags'),
           icon: icon,
-          stroke: layerStyle.getStroke && layerStyle.getStroke(),
-          fill: layerStyle.getFill && layerStyle.getFill(),
+          stroke: layerStyle && layerStyle.getStroke && layerStyle.getStroke(),
+          fill: layerStyle && layerStyle.getFill && layerStyle.getFill(),
           visible: layer.getVisible()
         };
       },
@@ -144,7 +144,7 @@ de:
       createLayerItems () {
         // Get applicable layers: displayInLayerList enabled and Vector Layers
         const layers = this.map.getLayers().getArray().slice(0).reverse().filter(
-          l => l.get('displayInLayerList') !== false && l.getSource().getFeatures);
+          l => l.get('displayInLayerList') === true);
 
         let nodeId = 0;
         function nextId () {

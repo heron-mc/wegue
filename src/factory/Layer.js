@@ -55,7 +55,7 @@ export const LayerFactory = {
    * @param  {Object} lConf  Layer config object
    * @return {ol.layer.Base} OL layer instance
    */
-  async getInstance (lConf, options = {}) {
+  async getInstance (lConf, options = {}, olMap) {
     // apply LID (Layer ID) if not existent
     if (!lConf.lid) {
       // Make a unique layerId from Layer name and URL so contexts
@@ -67,7 +67,7 @@ export const LayerFactory = {
     if (lConf.type === 'WMS') {
       return this.createWmsLayer(lConf);
     } else if (lConf.type === 'WFS') {
-      return this.createWfsLayer(lConf, olMap);
+      return this.createWfsLayer(lConf, options, olMap);
     } else if (lConf.type === 'XYZ') {
       return this.createXyzLayer(lConf);
     } else if (lConf.type === 'OSM') {
@@ -93,6 +93,7 @@ export const LayerFactory = {
     const layer = new TileLayer({
       name: lConf.name,
       lid: lConf.lid,
+      tags: lConf.tags,
       displayInLayerList: lConf.displayInLayerList,
       selectable: lConf.selectable || false,
       extent: lConf.extent,
@@ -119,10 +120,11 @@ export const LayerFactory = {
    * Returns an OpenLayers WFS layer instance due to given config.
    *
    * @param  {Object} lConf  Layer config object
+   * @param  {Objects} options  additional options
    * @param  {ol/Map} olMap  The OpenLayers map we work on
    * @return {ol.layer.Tile} OL WFS layer instance
    */
-  createWfsLayer: function (lConf, olMap) {
+  createWfsLayer: function (lConf, options, olMap) {
     const mapSrs = olMap.getView().getProjection().getCode();
     // set a default projection if not set in config
     if (!lConf.projection) {
@@ -185,6 +187,7 @@ export const LayerFactory = {
     var vector = new VectorLayer({
       name: lConf.name,
       lid: lConf.lid,
+      tags: lConf.tags,
       displayInLayerList: lConf.displayInLayerList,
       extent: lConf.extent,
       visible: lConf.visible,
@@ -206,6 +209,7 @@ export const LayerFactory = {
     const xyzLayer = new TileLayer({
       name: lConf.name,
       lid: lConf.lid,
+      tags: lConf.tags,
       displayInLayerList: lConf.displayInLayerList,
       selectable: lConf.selectable || false,
       visible: lConf.visible,
@@ -232,6 +236,7 @@ export const LayerFactory = {
     const layer = new TileLayer({
       name: lConf.name,
       lid: lConf.lid,
+      tags: lConf.tags,
       displayInLayerList: lConf.displayInLayerList,
       selectable: lConf.selectable || false,
       visible: lConf.visible,
@@ -283,6 +288,7 @@ export const LayerFactory = {
     const vtLayer = new VectorTileLayer({
       name: lConf.name,
       lid: lConf.lid,
+      tags: lConf.tags,
       displayInLayerList: lConf.displayInLayerList,
       selectable: lConf.selectable || false,
       visible: lConf.visible,

@@ -177,7 +177,7 @@ export default {
       await Promise.all(mapLayersConfig.reverse().map(async lConf => {
         // Some Layers may require a TileGrid object
         lConf.tileGrid = lConf.tileGridRef ? this.tileGrids[lConf.tileGridRef] : null;
-        let layersToAdd = await LayerFactory.getInstance(lConf, { locale: this.$i18n.locale });
+        let layersToAdd = await LayerFactory.getInstance(lConf, { locale: this.$i18n.locale }, this.map);
         // One layer definition can lead to several layer instances being created
         if (Array.isArray(layersToAdd)) {
           // Reverse like main config to have Layers added in right stacking order.
