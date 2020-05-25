@@ -1,121 +1,228 @@
+<i18n>
+en:
+  _untagged: Other
+de:
+  POIs: POIs
+  Routes: Strecke
+  Areas: Gebiete
+  Categories: Kategorien
+  Tags: Schlagworte
+  _untagged: Weitere Kartenebenen
+</i18n>
 <template>
-
-  <v-list>
-    <v-list-tile class="wgu-layerlist-item" v-for="layerItem in layerItems" v-bind:key="layerItem.lid" @click="onItemClick($event, layerItem)">
-      <input type="checkbox" :key="layerItem.lid" class="wgu-layer-viz-cb" v-model="layerItem.visible" @change="layerVizChanged">
-      <v-list-tile-content class="black--text">
-          <v-list-tile-title>{{ layerItem.title }}</v-list-tile-title>
-      </v-list-tile-content>
-    </v-list-tile>
-  </v-list>
+  <v-card class="wgu-layer-list-card">
+    <v-tabs
+      :dark="dark"
+      :sliderColor="sliderColor"
+      grow
+      :class="{'wgu-layer-list-tabs': true, 'wgu-layer-no-header': tabs.length < 2}"
+    >
+      <template v-for="tab of tabs">
+        <v-tab :key="tab.title">
+          {{ $t(tab.title) }}
+        </v-tab>
+        <v-tab-item :key="tab.title">
+          <v-list>
+            <v-treeview :items="tab.items" :load-children="tab.loadFunc" :open.sync="tab.unfolded">
+              <template v-slot:prepend="{ item }">
+                <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
+                <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
+                <v-card v-if="item.category === 'route'"
+                  :style="{
+                    borderTopColor: item.stroke.getColor(),
+                    borderTopWidth: 3,
+                    borderTopStyle: {'6,12':'dashed', '1,8': 'dotted', null: 'solid'}[item.stroke.getLineDash()] || 'dashed'
+                  }"
+                  width="30"
+                  height="4"
+                  class="mr-2"
+                />
+                <v-card v-if="item.category === 'area'"
+                  :style="{
+                    background: item.fill.getColor(),
+                    borderWidth: '3px',
+                    borderStyle: {'6,12':'dashed', '1,8': 'dotted', null: 'solid'}[item.stroke.getLineDash()] || 'dashed',
+                    borderColor: item.stroke.getColor()
+                  }"
+                  width="30"
+                  height="30"
+                  class="mr-2"
+                />
+              </template>
+            </v-treeview>
+          </v-list>
+        </v-tab-item>
+      </template>
+    </v-tabs>
+  </v-card>
 
 </template>
 
 <script>
-  import { Mapable } from '../../mixins/Mapable';
-  import LayerUtil from '../../util/Layer';
+  import { Mapable } from '../../../src/mixins/Mapable';
+  import LayerUtil from '../../../src/util/Layer';
+  import {WguEventBus} from '../../../src/WguEventBus';
 
   export default {
     name: 'wgu-layerlist',
     mixins: [Mapable],
     props: {
+      dark: {type: Boolean, required: false, default: false},
+      sliderColor: {type: String, required: false, default: 'grey'},
+      categoriesTitle: {type: String, required: false, default: 'Categories'},
+      tagsTitle: {type: String, required: false, default: 'Tags'},
+      hideCategories: { type: Boolean, required: false, default: false },
+      hideTags: { type: Boolean, required: false, default: false }
     },
     data () {
       return {
-        layerItems: [],
-        changeVisByClickUpdate: false
+        categoryItems: [],
+        tagItems: [],
+        unfoldCategories: [],
+        unfoldTags: []
+      }
+    },
+    computed: {
+      categoriesTree () {
+        return this.categoryItems
+      },
+      tagsTree () {
+        return this.tagItems
+      },
+      tabs() {
+        return [
+          ...(this.hideTags ? [] : [{title: this.tagsTitle, items: this.tagsTree, loadFunc: this.fetchTagItems, unfolded: this.unfoldTags}]),
+          ...(this.hideCategories ? [] : [{title: this.categoriesTitle, items: this.categoriesTree, loadFunc: this.fetchCategoryItems, unfolded: this.unfoldCategories}])
+        ];
       }
     },
     methods: {
       /**
-       * This function is executed, after the map is bound (see mixins/Mapable)
+       * Executed after the map is bound (see mixins/Mapable)
        */
       onMapBound () {
-        var me = this;
-        me.createLayerItems();
+        this.createLayerItems();
 
         // react on added / removed layers
-        me.map.getLayers().on('change:length', function (evt) {
-          me.createLayerItems();
+        this.map.getLayers().on('change:length', (evt) => {
+          this.createLayerItems();
         });
+        WguEventBus.$on('locale-changed', language => {
+          this.$i18n.locale = language;
+          this.createLayerItems();
+        });
+      },
+      /**
+       * Creates single layer (tree) item from an OpenLayers Layer.
+       */
+      createLayerItem (layer, childId) {
+        const layerId = layer.get('lid');
+        const layerCategory = layerId.split('_')[0];
+        let layerStyle = layer.getStyle();
+        let icon; // , lineColor, fillColor;
+        if (layerCategory === 'poi') {
+          if (Array.isArray(layerStyle)) {
+            layerStyle = layerStyle[1];
+          }
+          icon = layerStyle.getImage().getSrc();
+        }
+        return {
+          id: childId,
+          name: layer.get('name'),
+          lid: layerId,
+          category: layerCategory,
+          tags: layer.get('tags'),
+          icon: icon,
+          stroke: layerStyle.getStroke && layerStyle.getStroke(),
+          fill: layerStyle.getFill && layerStyle.getFill(),
+          visible: layer.getVisible()
+        };
       },
       /**
        * Creates the layer items from the OpenLayers map.
        */
       createLayerItems () {
-        const me = this;
-        // go over all layers from the map and list them up
-        var layers = this.map.getLayers();
-        // clone to only reverse the order for the list
-        var layerArrClone = layers.getArray().slice(0);
-        layers = layerArrClone.reverse();
+        // Get applicable layers: displayInLayerList enabled and Vector Layers
+        const layers = this.map.getLayers().getArray().slice(0).reverse().filter(
+          l => l.get('displayInLayerList') !== false && l.getSource().getFeatures);
 
-        var layerItems = [];
-        layers.forEach(function (layer) {
-          // skip if layer should not be listed
-          if (layer.get('displayInLayerList') === false) {
-            return;
-          }
-          layerItems.push({
-            title: layer.get('name'),
-            lid: layer.get('lid'),
-            visible: layer.getVisible()
-          });
+        let nodeId = 0;
+        function nextId () {
+          return ++nodeId;
+        }
 
-          // synchronize visibility with UI when changed programatically
-          layer.on('change:visible', me.onOlLayerVizChange);
-        });
+        // Predefined Categories TODO make smarter
+        const categoryItems = ['POIs', 'Routes', 'Areas']
+          .map(category => ({
+            id: nextId(),
+            name: this.$i18n.t(category),
+            lid: undefined,
+            visible: false,
+            children: []
+          }));
+        const getCategoryNode = type => categoryItems[{ route: 1, area: 2 }[type] || 0];
+        // Tag defs come from the tags added to Layers
+        let tagItems = [];
 
-        me.layerItems = layerItems;
-      },
+        layers.forEach((layer, idx) => {
+          let layerItem = this.createLayerItem(layer, nextId());
 
-      /**
-       * Handles the 'change:visible' event of the layer in order to
-       * apply the current visibility state to the corresponding checkbox in
-       * case the 'change:visible' wasn't triggered by click.
-       *
-       * @param  {ol/Object.ObjectEvent} evt The OL event of 'change:visible'
-       */
-      onOlLayerVizChange (evt) {
-        const me = this;
-        if (!me.changeVisByClickUpdate) {
-          me.layerItems.forEach(function (layerItem, idx) {
-            if (layerItem.lid === evt.target.get('lid')) {
-              // execute click handler to change visibility
-              me.onItemClick(null, layerItem);
+          // First add to Categories tree
+          const categoryNode = getCategoryNode(layerItem.category);
+          categoryNode.children.push(layerItem);
+
+          const tags = layerItem.tags || [this.$t('_untagged')];
+          // One or more Tags avail: add to the Tags tree
+          // Must be existing layer item: reuse for common visibility state
+          tags.forEach((tag, idx) => {
+            const tagNode = tagItems.find(tagItem => tagItem.name === tag);
+            if (!tagNode) {
+              // Create new tag parent node
+              tagItems.push({
+                id: nextId(),
+                name: tag,
+                lid: undefined,
+                visible: false,
+                children: [layerItem]
+              });
+            } else {
+              tagNode.children.push(layerItem)
             }
           });
-        }
+        });
+
+        this.categoryItems = categoryItems;
+        this.tagItems = tagItems;
+        // Unfold the first item folders
+        this.unfoldTags = this.tagItems.length > 0 ? [this.tagItems[0]['id']] : [];
+        this.unfoldCategories = [this.categoryItems[0]['id']];
       },
 
-      /**
-       * Handler for click on item in layer list:
-       * Toggles the corresponding visibility and calls this.layerVizChanged.
-       *
-       * @param  {Object} ect       Original vue click event
-       * @param  {Object} layerItem Layer item data object
-       */
-      onItemClick (evt, layerItem) {
-        const me = this;
-        layerItem.visible = !layerItem.visible;
+      fetchCategoryItems () {
+        return this.categoryItems;
+      },
 
-        me.changeVisByClickUpdate = true;
-        this.layerVizChanged();
-        me.changeVisByClickUpdate = false;
+      fetchTagItems () {
+        return this.tagItems;
       },
 
       /**
        * Handles the 'change' event of the visibility checkboxes in order to
-       * apply the current visibility state in 'data' to the OL layers.
+       * apply the current visibility state in 'data' to the OL layers, recursive.
        */
-      layerVizChanged () {
-        var me = this;
-
-        me.layerItems.forEach(function (layerItem, idx) {
-          const layer = LayerUtil.getLayerByLid(layerItem.lid, me.map);
+      onItemChanged (item) {
+        if (!item.children) {
+          // Child node clicked or changed via parent
+          const layer = LayerUtil.getLayerByLid(item.lid, this.map);
           if (layer) {
-            layer.setVisible(layerItem.visible);
+            layer.setVisible(item.visible);
           }
+          return
+        }
+        // Parent node clicked
+        item.children.forEach((child, idx) => {
+          child.visible = item.visible;
+          this.onItemChanged(child)
         });
       }
     }
@@ -124,8 +231,18 @@
 
 <style>
 
-  .wgu-layer-viz-cb {
-    width: 45px;
+  /*.wgu-layer-list-card {*/
+  /*  overflow: auto;*/
+  /*  max-height: calc(100vh - 200px);*/
+  /*}*/
+  .wgu-layer-list-tabs {
+    min-width: 360px;
+    max-width: 420px;
   }
-
+  .wgu-layer-viz-cb {
+    width: 24px;
+  }
+  .wgu-layer-no-header .v-tabs__bar {
+    display: none;
+  }
 </style>
