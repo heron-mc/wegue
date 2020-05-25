@@ -1,6 +1,6 @@
 <i18n>
 de:
-  Get directions: Route berechnen
+  Get directions: Ort suchen / Route berechnen
 </i18n>
 <template>
   <v-tooltip bottom>
