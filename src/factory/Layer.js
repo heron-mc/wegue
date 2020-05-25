@@ -35,11 +35,12 @@ export const LayerFactory = {
    * @param  {Object} lConf  Layer config object
    * @return {ol.layer.Base} OL layer instance
    */
-  getInstance (lConf) {
+  async getInstance (lConf, options = {}) {
     // apply LID (Layer ID) if not existent
     if (!lConf.lid) {
-      var now = new Date();
-      lConf.lid = now.getTime();
+      // Make a unique layerId from Layer name and URL so contexts
+      // like permalinks can be reapplied.
+      lConf.lid = btoa(lConf.url + lConf.name).substr(0, 6);
     }
 
     // create correct layer type
@@ -53,6 +54,8 @@ export const LayerFactory = {
       return this.createVectorLayer(lConf);
     } else if (lConf.type === 'VECTORTILE') {
       return this.createVectorTileLayer(lConf);
+    } else if (lConf.type === 'LAYERCOLLECTION') {
+      return this.createLayersFromCollection(lConf, options);
     } else {
       return null;
     }
@@ -69,6 +72,7 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       extent: lConf.extent,
       visible: lConf.visible,
       opacity: lConf.opacity,
@@ -81,7 +85,8 @@ export const LayerFactory = {
         serverType: lConf.serverType,
         attributions: lConf.attributions,
         tileGrid: lConf.tileGrid,
-        projection: lConf.projection
+        projection: lConf.projection,
+        crossOrigin: 'Anonymous'
       })
     });
 
@@ -99,10 +104,12 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       visible: lConf.visible,
       opacity: lConf.opacity,
       source: new XyzSource({
         url: lConf.url,
+        crossOrigin: 'Anonymous',
         attributions: lConf.attributions,
         tileGrid: lConf.tileGrid,
         projection: lConf.projection
@@ -123,9 +130,10 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       visible: lConf.visible,
       opacity: lConf.opacity,
-      source: new OsmSource()
+      source: new OsmSource({ crossOrigin: 'Anonymous' })
     });
 
     return layer;
@@ -141,7 +149,10 @@ export const LayerFactory = {
     const vectorLayer = new VectorLayer({
       name: lConf.name,
       lid: lConf.lid,
+      tags: lConf.tags,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
+      routable: lConf.routable || false,
       extent: lConf.extent,
       visible: lConf.visible,
       opacity: lConf.opacity,
@@ -151,6 +162,7 @@ export const LayerFactory = {
         attributions: lConf.attributions
       }),
       style: OlStyleFactory.getInstance(lConf.style),
+      styleSelected: OlStyleFactory.getInstance(lConf.styleSelected),
       hoverable: lConf.hoverable,
       hoverAttribute: lConf.hoverAttribute
     });
@@ -169,6 +181,7 @@ export const LayerFactory = {
       name: lConf.name,
       lid: lConf.lid,
       displayInLayerList: lConf.displayInLayerList,
+      selectable: lConf.selectable || false,
       visible: lConf.visible,
       opacity: lConf.opacity,
       source: new VectorTileSource({
@@ -184,6 +197,19 @@ export const LayerFactory = {
     });
 
     return vtLayer;
-  }
+  },
 
+  /**
+   * Returns an array of Wegue Layer objects from given config.
+   *
+   * @param  {Object} lConf Wegue Layer list config object
+   * @return {Array} array of layer instances
+   */
+  async createLayersFromCollection (lConf, { locale = '' }) {
+    const url = lConf.url.replace(/\{locale\}/, locale);
+    const response = await (await fetch(url)).json();
+    return Promise.all(response.map(async layerDef => {
+      return this.getInstance(layerDef);
+    }));
+  }
 }

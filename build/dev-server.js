@@ -71,6 +71,12 @@ console.log(config.dev.assetsPublicPath);
 var staticPath2 = path.posix.join(config.dev.assetsPublicPath, 'static')
 app.use(staticPath2, express.static('./app/static'))
 
+console.log(config.dev.assetsPublicPath);
+// assetsSubDirectory: 'static',
+// assetsPublicPath: './',
+var staticPath2 = path.posix.join(config.dev.assetsPublicPath, 'app/static')
+app.use(staticPath2, express.static('./app/static'))
+
 var uri = 'http://localhost:' + port
 
 var _resolve

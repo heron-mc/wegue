@@ -1,4 +1,7 @@
 import { Circle as CircleStyle, Icon as IconStyle, Fill, Stroke, Style } from 'ol/style';
+import Point from 'ol/geom/Point';
+import { pinSvg } from './markerPin';
+import { splitLineString } from './splitLineString';
 
 /**
  * Factory, which creates OpenLayers style instances according to a given config
@@ -36,16 +39,32 @@ export const OlStyleFactory = {
    */
   createPointStyle (styleConf) {
     let pointStyle;
-    if (styleConf.iconUrl) {
-      pointStyle = new Style({
+    if (styleConf.iconUrl && styleConf.iconPlacement !== 'line') {
+      // create a customised marker pin with the icon in it.
+      const [anchorX, anchorY] = styleConf.iconAnchor || [0.5, 0.5];
+      const svgImage = new Image();
+      svgImage.src = pinSvg({ strokeColor: styleConf.color || 'blue' });
+      const outer = new Style({
+        image: new IconStyle(({
+          img: svgImage,
+          imgSize: [32, 32],
+          anchor: [anchorX, anchorY - 0.2],
+          anchorXUnits: styleConf.iconAnchorXUnits,
+          anchorYUnits: styleConf.iconAnchorYUnits,
+          crossOrigin: 'Anonymous'
+        }))
+      });
+      const inner = new Style({
         image: new IconStyle(({
           src: styleConf.iconUrl,
           scale: styleConf.scale || 1,
           anchor: styleConf.iconAnchor,
           anchorXUnits: styleConf.iconAnchorXUnits,
-          anchorYUnits: styleConf.iconAnchorYUnits
+          anchorYUnits: styleConf.iconAnchorYUnits,
+          crossOrigin: 'Anonymous'
         }))
-      })
+      });
+      pointStyle = [outer, inner];
     } else {
       pointStyle = new Style({
         image: new CircleStyle({
@@ -66,11 +85,18 @@ export const OlStyleFactory = {
    * @return {Style}             OL style instance
    */
   createLineStyle (styleConf) {
-    const olStyle = new Style({
+    const lineStyle = new Style({
       stroke: OlStyleFactory.createStroke(styleConf)
     });
+    if (styleConf.iconPlacement === 'line' || styleConf.arrowColor /* to be removed */) {
+      const compositeStyle = OlStyleFactory.createLineSymbols(styleConf, lineStyle);
 
-    return olStyle;
+      // we add the getStroke function so that it behaves more like a regular line, for LayerList etc.
+      compositeStyle.getStroke = () => lineStyle.getStroke();
+      return compositeStyle;
+    } else {
+      return lineStyle;
+    }
   },
 
   /**
@@ -80,10 +106,36 @@ export const OlStyleFactory = {
    * @return {Style}             OL style instance
    */
   createPolygonStyle (styleConf) {
-    let olStyle = OlStyleFactory.createLineStyle(styleConf);
+    let olStyle = new Style({ stroke: OlStyleFactory.createStroke(styleConf) }); // OlStyleFactory.createLineStyle(styleConf);
     olStyle.setFill(OlStyleFactory.createFill(styleConf));
 
     return olStyle;
+  },
+
+  createLineSymbols (styleConf = {}, lineStyle) {
+    return function(feature, resolution) {
+      const iconSpacing = styleConf.iconSpacing || 64;
+
+      // can be used to only calculate icons within current area
+      // const mapSize = window.map.getSize();
+      // const extent = window.map.getView().calculateExtent([mapSize[0] + iconSpacing * 2, mapSize[1] + iconSpacing * 2]);
+
+      const splitPoints = splitLineString(feature.getGeometry(), iconSpacing * resolution);
+
+      return [
+        lineStyle,
+        ...splitPoints.map(([x, y, rotation]) => new Style({
+          geometry: new Point([x, y]),
+          image: new IconStyle({
+            src: styleConf.iconUrl || 'static/icon/arrow-up-thin-64.png',
+            scale: styleConf.scale || 0.15,
+            // for some reason opacity has no effect?
+            rotation: styleConf.iconRotate === false ? 0 : rotation,
+            crossOrigin: 'Anonymous'
+          })
+        }))
+      ];
+    }
   },
 
   /**
@@ -93,10 +145,15 @@ export const OlStyleFactory = {
    * @return {Stroke}           OL Stroke instance
    */
   createStroke (styleConf) {
-    return new Stroke({
+    const lineStyle = new Stroke({
       color: styleConf.strokeColor,
-      width: styleConf.strokeWidth
+      width: styleConf.strokeWidth,
+      lineDash: styleConf.strokeLineDash,
+      lineDashOffset: styleConf.strokeLineDashOffset,
+      lineCap: styleConf.strokeLineCap,
+      lineJoin: styleConf.strokeLineJoin
     });
+    return lineStyle;
   },
 
   /**
@@ -112,3 +169,4 @@ export const OlStyleFactory = {
   }
 
 }
+

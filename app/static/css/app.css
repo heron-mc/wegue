@@ -1,0 +1,21 @@
+@font-face {
+  font-family: "ITC Officina Sans";
+  /* 281, 282 regular, 283 small caps, 284-5 italics, 291-2 bold, 293 small caps bold */
+  src:
+  url('../fonts/ITC Officina Sans Book.woff') format('woff'),
+  url('../fonts/IT281___.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "ITC Officina Sans";
+  src:
+    url('../fonts/ITC Officina Sans Bold.woff') format('woff'),
+    url('../fonts/IT291___.ttf');
+  font-weight: bold;
+}
+
+* {
+  font-family: "ITC Officina Sans";
+  /* font-weight:bold; */
+}

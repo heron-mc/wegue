@@ -1,10 +1,17 @@
+<i18n>
+de:
+  Measure areas and distances: Flächen und Entfernungen messen
+</i18n>
 <template>
-
-  <v-btn icon :dark="dark" @click="toggleUi">
-    <v-icon medium>{{icon}}</v-icon>
-    {{text}}
-  </v-btn>
-
+  <v-tooltip bottom>
+    <template v-slot:activator="{ on: tooltip }">
+      <v-btn icon :dark="dark" @click="toggleUi" v-on="tooltip">
+        <v-icon medium>{{icon}}</v-icon>
+        {{ text }}
+      </v-btn>
+    </template>
+    <span>{{ $t('Measure areas and distances') }}</span>
+  </v-tooltip>
 </template>
 
 

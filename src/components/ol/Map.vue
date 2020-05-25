@@ -1,6 +1,12 @@
+<i18n>
+de:
+  Start: Anfang
+  Finish: Ziel
+</i18n>
 <template></template>
 
 <script>
+/* eslint-disable */
 
 import Vue from 'vue';
 import Map from 'ol/Map'
@@ -19,7 +25,17 @@ import Overlay from 'ol/Overlay';
 import { WguEventBus } from '../../WguEventBus.js';
 import { LayerFactory } from '../../factory/Layer.js';
 import ColorUtil from '../../util/Color';
-
+import PermalinkController from './PermalinkController';
+import VectorLayer from 'ol/layer/Vector'
+import VectorSource from 'ol/source/Vector'
+import GeoJSON from 'ol/format/GeoJSON';
+import Feature from 'ol/Feature';
+import LineString from 'ol/geom/LineString';
+import { Style, Stroke, RegularShape, Fill, Text } from 'ol/style';
+import { boundingExtent } from 'ol/extent';
+import { transformExtent } from 'ol/proj';
+import { routingLayers } from '../routing/routingLayers';
+import { geolocationLayers } from '../geolocation/geolocationLayers';
 export default {
   name: 'wgu-map',
   props: {
@@ -31,84 +47,100 @@ export default {
     return {
       zoom: this.$appConfig.mapZoom,
       center: this.$appConfig.mapCenter,
+      initialExtent: this.$appConfig.mapInitialExtent,
       projection: this.$appConfig.mapProjection,
+      projectionObj: null,
       projectionDefs: this.$appConfig.projectionDefs,
       tileGridDefs: this.$appConfig.tileGridDefs || {},
-      tileGrids: {}
+      tileGrids: {},
+      permalink: this.$appConfig.permalink
     }
   },
   mounted () {
-    var me = this;
     // Make the OL map accessible for Mapable mixin even 'ol-map-mounted' has
     // already been fired. Don not use directly in cmps, use Mapable instead.
-    Vue.prototype.$map = me.map;
+    Vue.prototype.$map = this.map;
     // Send the event 'ol-map-mounted' with the OL map as payload
-    WguEventBus.$emit('ol-map-mounted', me.map);
+    WguEventBus.$emit('ol-map-mounted', this.map);
 
-    // resize the map, so it fits to parent
-    window.setTimeout(() => {
-      me.map.setTarget(document.getElementById('ol-map-container'));
-      me.map.updateSize();
+    // resize the map, so it fits to parent, may need to wait
+    // until map container element is ready.
+    const timer = setInterval(() => {
+      const mapTarget = document.getElementById('ol-map-container');
+      if (!mapTarget) {
+        return;
+      }
+      clearInterval(timer);
+      this.map.setTarget(mapTarget);
+      this.map.updateSize();
 
       // adjust the bg color of the OL buttons (like zoom, rotate north, ...)
-      me.setOlButtonColor();
+      this.setOlButtonColor();
 
       // initialize map hover functionality
-      me.setupMapHover();
-    }, 200);
+      this.setupMapHover();
+      this.resetBounds();
+    }, 100);
+    WguEventBus.$on('reset-bounds', () => this.resetBounds());
   },
-  created () {
-    var me = this;
-
+  async created () {
     // make map rotateable according to property
     const interactions = defaultInteractions({
-      altShiftDragRotate: me.rotateableMap,
-      pinchRotate: me.rotateableMap
+      altShiftDragRotate: this.rotateableMap,
+      pinchRotate: this.rotateableMap
     });
     let controls = [
       new Zoom(),
       new Attribution({
-        collapsible: me.collapsibleAttribution
+        collapsible: this.collapsibleAttribution
       })
     ];
     // add a button control to reset rotation to 0, if map is rotateable
-    if (me.rotateableMap) {
+    if (this.rotateableMap) {
       controls.push(new RotateControl());
     }
 
     // Optional projection (EPSG) definitions for Proj4
-    if (me.projectionDefs) {
+    if (this.projectionDefs) {
       // Add all (array of array)
-      proj4.defs(me.projectionDefs);
+      proj4.defs(this.projectionDefs);
       // Register with OpenLayers
       olproj4(proj4);
     }
 
     // Projection for Map, default is Web Mercator
-    if (!me.projection) {
-      me.projection = {code: 'EPSG:3857', units: 'm'}
+    if (!this.projection) {
+      this.projection = {code: 'EPSG:3857', units: 'm'}
     }
-    const projection = new Projection(me.projection);
 
     // Optional TileGrid definitions by name, for ref in Layers
-    Object.keys(me.tileGridDefs).map(name => {
-      me.tileGrids[name] = new TileGrid(me.tileGridDefs[name]);
+    Object.keys(this.tileGridDefs).map(name => {
+      this.tileGrids[name] = new TileGrid(this.tileGridDefs[name]);
     });
 
-    me.map = new Map({
+    this.map = new Map({
       layers: [],
       controls: controls,
       interactions: interactions,
       view: new View({
-        center: me.center || [0, 0],
-        zoom: me.zoom,
-        projection: projection
+        center: this.center,
+        zoom: this.zoom,
+        projection: new Projection(this.projection)
       })
     });
 
     // create layers from config and add them to map
-    const layers = me.createLayers();
-    me.map.getLayers().extend(layers);
+    const layers = await this.createLayers();
+    this.map.getLayers().extend(layers);
+
+    if (this.$appConfig.permalink) {
+      this.permalinkController = this.createPermalinkController();
+      this.map.set('permalinkcontroller', this.permalinkController, true);
+      this.permalinkController.apply();
+      this.permalinkController.setup();
+    }
+    window.map = this.map;
+    this.map.once('rendercomplete', () => WguEventBus.$emit('ol-map-rendered'));
   },
 
   methods: {
@@ -116,40 +148,65 @@ export default {
      * Creates the OL layers due to the "mapLayers" array in app config.
      * @return {ol.layer.Base[]} Array of OL layer instances
      */
-    createLayers () {
-      const me = this;
-      let layers = [];
-      const appConfig = this.$appConfig;
-      const mapLayersConfig = appConfig.mapLayers || [];
-      mapLayersConfig.reverse().forEach(function (lConf) {
-        // Some Layers may require a TileGrid object
-        lConf.tileGrid = lConf.tileGridRef ? me.tileGrids[lConf.tileGridRef] : null;
-
-        let layer = LayerFactory.getInstance(lConf);
-        layers.push(layer);
-
+    async createLayers () {
+      const addInteraction = (layer) => {
         // if layer is selectable register a select interaction
-        if (lConf.selectable) {
-          const selectClick = new SelectInteraction({
-            layers: [layer]
-          });
-          // forward an event if feature selection changes
-          selectClick.on('select', function (evt) {
-            // TODO use identifier for layer (once its implemented)
-            WguEventBus.$emit(
-              'map-selectionchange',
-              layer.get('lid'),
-              evt.selected,
-              evt.deselected
-            );
-          });
-          // register/activate interaction on map
-          me.map.addInteraction(selectClick);
+        if (layer.get('selectable') === false) {
+          return;
         }
-      });
+        const selectClick = new SelectInteraction({
+          layers: [layer],
+          style: layer.get('styleSelected') || undefined
+        });
+        // forward an event if feature selection changes
+        selectClick.on('select', function (evt) {
+          // TODO use identifier for layer (once its implemented)
+          WguEventBus.$emit(
+            'map-selectionchange',
+            layer.get('lid'),
+            evt.selected,
+            evt.deselected
+          );
+        });
+        // register/activate interaction on map
+        this.map.addInteraction(selectClick);
+      };
 
-      return layers;
+      let layers = [];
+      const mapLayersConfig = this.$appConfig.mapLayers;
+      await Promise.all(mapLayersConfig.reverse().map(async lConf => {
+        // Some Layers may require a TileGrid object
+        lConf.tileGrid = lConf.tileGridRef ? this.tileGrids[lConf.tileGridRef] : null;
+        let layersToAdd = await LayerFactory.getInstance(lConf, { locale: this.$i18n.locale });
+        // One layer definition can lead to several layer instances being created
+        if (Array.isArray(layersToAdd)) {
+          // Reverse like main config to have Layers added in right stacking order.
+          layersToAdd = layersToAdd.reverse();
+        } else {
+          layersToAdd = [layersToAdd];
+        }
+        layersToAdd.forEach(layer => addInteraction(layer));
+        layers.push(...layersToAdd);
+      }));
+
+      const routingOptions = this.$appConfig.modules['wgu-routing'];
+      const options = {
+        ...routingOptions,
+        startLabel: this.$t(routingOptions.startLabel || 'Start'),
+        endLabel: this.$t(routingOptions.endLabel || 'Finish'),
+        $t: this.$t.bind(this)
+      }
+      return [...layers, ...routingLayers(options, this.map), ...geolocationLayers(this.$appConfig.geolocation, this.map)];
     },
+    /**
+     * Creates a PermalinkController, override in subclass for specializations.
+     *
+     * @return {PermalinkController} PermalinkController instance.
+     */
+    createPermalinkController () {
+      return new PermalinkController(this.map, this.$appConfig.permalink);
+    },
+
     /**
      * Sets the background color of the OL buttons to the color property.
      */
@@ -189,8 +246,7 @@ export default {
      * 'hoverAttribute' if the layer is configured as 'hoverable'
      */
     setupMapHover () {
-      const me = this;
-      const map = me.map;
+      const map = this.map;
       let overlayEl;
 
       // create a span to show map tooltip
@@ -198,20 +254,20 @@ export default {
       overlayEl.classList.add('wgu-hover-tooltiptext');
       map.getTarget().append(overlayEl);
 
-      me.overlayEl = overlayEl;
+      this.overlayEl = overlayEl;
 
       // wrap the tooltip span in a OL overlay and add it to map
-      me.overlay = new Overlay({
+      this.overlay = new Overlay({
         element: overlayEl,
         autoPan: true,
         autoPanAnimation: {
           duration: 250
         }
       });
-      map.addOverlay(me.overlay);
+      map.addOverlay(this.overlay);
 
       // show tooltip if a hoverable feature gets hit with the mouse
-      map.on('pointermove', me.onPointerMove, me);
+      map.on('pointermove', this.onPointerMove, this);
     },
 
     /**
@@ -221,10 +277,17 @@ export default {
      * @param  {Object} event The OL event for pointermove
      */
     onPointerMove (event) {
+      function setCursor() {
+        const hit = map.hasFeatureAtPixel(event.pixel, { layerFilter: l => l.get('selectable') });
+        map.getViewport().style.cursor = hit ? 'pointer' : map.wguDefaultCursor || '';
+      }
       const me = this;
       const map = me.map;
       const overlayEl = me.overlayEl;
       let hoverAttr;
+      setCursor();
+
+
       const features = map.getFeaturesAtPixel(event.pixel, {layerFilter: (layer) => {
         if (layer.get('hoverable')) {
           hoverAttr = layer.get('hoverAttribute');
@@ -241,9 +304,17 @@ export default {
       var attr = feature.get(hoverAttr);
       overlayEl.innerHTML = attr;
       me.overlay.setPosition(event.coordinate);
+    },
+    resetBounds() {
+      if (this.initialExtent) {
+        const extent3857 = transformExtent(this.initialExtent, 'EPSG:4326', 'EPSG:3857');
+        this.map.getView().fit(boundingExtent([extent3857.slice(0,2), extent3857.slice(2,4)]));
+      } else {
+        this.map.getView().setCenter(this.center);
+        this.map.getView().setZoom(this.zoom);
+      }
     }
-  }
-
+  },
 }
 </script>
 
@@ -254,6 +325,10 @@ export default {
     left: auto;
     bottom: 3em;
     right: 0.5em;
+  }
+
+  .ol-control button {
+      color: hsl(0,0%,30%);
   }
 
   div.ol-attribution.ol-uncollapsible {

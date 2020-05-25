@@ -1,0 +1,5 @@
+// copy or rename this file to routingConfig.js
+export default {
+    hereApiKey: '...'
+  }
+  
