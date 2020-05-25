@@ -129,7 +129,7 @@
     },
     "wgu-language": {
       "languages": ["en", "de"],
-      "target": "toolbar",
+      "target": "menu",
       "mobileTarget": "menu",
       "hasSubMenu": true,
       "darkLayout": false
