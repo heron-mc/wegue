@@ -1,0 +1,149 @@
+{
+
+  "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo' style='margin-bottom:5px;padding-top:5px;height:55px;'></a><a href='https://naturpark-lueneburger-heide.de/aktiv-und-mobil-in-der-heide/heide-shuttle-co/' target='_blank'><img src='./static/media/LogoHeideshuttle.png' alt='Heideshuttle Logo' style='margin-top:5px;margin-left:50px;height:60px;'></a><a href='https://naturpark-lueneburger-heide.de/eu-foerderung-leader' target='_blank'><img src='./static/media/EU-ELER_CMYK.png' alt='EU-ELER Logo' style='margin-top:5px;margin-left:40px;height:60px;'></a><a href='https://naturpark-lueneburger-heide.de/eu-foerderung-leader' target='_blank'><img src='./static/media/Leader_07_13_jpg.jpg' alt='LEADER Logo' style='margin-bottom:5px;margin-left:10px;height:55px;'></a>",
+
+  "baseColor": "rgba(255, 255, 255, 1)",
+
+  "logoText": "",
+
+  "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a> and <a href='https://geolicious.de/' target='_blank'>Geolicious GeoCMS</a>",
+  "footerTextRight": "Geolicious",
+  "showCopyrightYear": true,
+  "mapInitialExtent": [ 9.449917016474577, 52.95211458709528, 10.590470092042459, 53.479931065193284 ],
+  "permalink": {
+    "location": "search",
+    "layers": true,
+    "extent": true,
+    "projection": "EPSG:4326",
+    "paramPrefix": "",
+    "history": false
+  },
+
+  "mapLayers": [
+    {
+      "type": "VECTOR",
+      "lid": "np_lh_border",
+      "name": "Naturpark Grenze",
+      "url": "./static/data/np_lh_border_4326.geojson",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "displayInLayerList": false,
+      "selectable": false,
+      "style": {
+        "strokeColor": "#51a026",
+        "strokeWidth": 3
+      }
+    },
+    {
+      "type": "LAYERCOLLECTION",
+      "url": "http://staging.nplh.geolicious.de/api/layer_list_wegue_format/{locale}/"
+    },
+    {
+      "type": "XYZ",
+      "lid": "mapbox-streets",
+      "name": "Straßen",
+      "format": "image/png",
+      "layers": "default",
+      "url": "https://api.mapbox.com/styles/v1/leak-my-brain/ck5lomntv2i2e1iqikjqwxp1d/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibGVhay1teS1icmFpbiIsImEiOiJsYzNWV1E0In0.R0Y5eCKCP6j7VNaqsYaO8w",
+      "transparent": false,
+      "projection": "EPSG:3857",
+      "attributions": "<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">© Mapbox</a> <a href=\"http://www.openstreetmap.org/copyright\" target=\"_blank\">© OpenStreetMap</a> <a href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a>",
+      "isBaseLayer": true,
+      "visible": true,
+      "displayInLayerList": false
+    }
+  ],
+
+  "modules": {
+    "wgu-measuretool": {
+      "target": "menu",
+      "win": true,
+      "draggable": false,
+      "darkLayout": false,
+      "strokeColor": "#c62828",
+      "fillColor": "rgba(198,40,40,0.2)",
+      "sketchStrokeColor": "rgba(198,40,40,0.8)",
+      "sketchFillColor": "rgba(198,40,40,0.1)",
+      "sketchVertexStrokeColor": "#c62828",
+      "sketchVertexFillColor": "rgba(198,40,40,0.2)"
+    },
+    "wgu-zoomtomaxextent": {
+      "target": "menu",
+      "darkLayout": false
+    },
+    "wgu-share": {
+      "target": "toolbar",
+      "mobileTarget": "menu",
+      "hasSubMenu": true,
+      "darkLayout": false
+    },
+    "wgu-feature-info": {
+      "panel": true,
+      "draggable": true,
+      "darkLayout": false,
+      "height": "100%",
+      "width": 380,
+      "textHeight": 400,
+      "icon": "info",
+      "toggleGroup": "side-panel-active",
+      "layers": [
+        {
+          "layerId": "layer",
+          "title": "Info",
+          "titleProp": "name",
+          "imageProp": "image_url",
+          "descProp": "description",
+          "imageWidth": 360
+        }
+      ]
+    },
+    "wgu-layerlist": {
+      "target": "toolbar",
+      "darkLayout": false,
+      "panel": true,
+      "active": true,
+      "mobileActive": false,
+      "right": false,
+      "width": 360,
+      "height": "100%",
+      "toggleGroup": "side-panel-active",
+      "options": {
+        "hideCategories": true,
+        "hideTags": false
+      }
+    },
+    "wgu-routing": {
+      "target": "toolbar",
+      "darkLayout": false,
+      "panel": true,
+      "active": false,
+      "right": false,
+      "width": 300,
+      "height": "100%",
+      "toggleGroup": "side-panel-active",
+      "options": {
+        "transportModes": ["car", "publicTransport"]
+      }
+    },
+    "wgu-language": {
+      "languages": ["en", "de"],
+      "target": "toolbar",
+      "mobileTarget": "menu",
+      "hasSubMenu": true,
+      "darkLayout": false
+    },
+    "wgu-savepdf": {
+      "target": "menu",
+      "darkLayout": false
+    },
+    "wgu-downloadlayers": {
+      "target": "menu",
+      "darkLayout": false
+    }
+  },
+  "geolocation": {
+    "enabled": true
+  }
+}

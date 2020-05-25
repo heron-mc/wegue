@@ -190,11 +190,14 @@ export default {
       }));
 
       const routingOptions = this.$appConfig.modules['wgu-routing'];
-      const options = {
-        ...routingOptions,
-        startLabel: this.$t(routingOptions.startLabel || 'Start'),
-        endLabel: this.$t(routingOptions.endLabel || 'Finish'),
-        $t: this.$t.bind(this)
+      let options = {};
+      if (routingOptions) {
+        options = {
+          ...routingOptions,
+          startLabel: this.$t(routingOptions.startLabel || 'Start'),
+          endLabel: this.$t(routingOptions.endLabel || 'Finish'),
+          $t: this.$t.bind(this)
+        }
       }
       return [...layers, ...routingLayers(options, this.map), ...geolocationLayers(this.$appConfig.geolocation, this.map)];
     },
