@@ -17,6 +17,7 @@ de:
   Sorry, you can specify a time, or multiple waypoints, but not both.: Leider können Sie eine Zeit oder mehrere Wegpunkte angeben, aber nicht beides.
   Sorry, directions are currently unavailable.: Eine Wegbeschreibung ist derzeit leider nicht verfügbar.
   No route was found.: Es wurde keine Route gefunden.
+  Find place: Ort suchen
 </i18n>
 
 <template>
@@ -67,7 +68,7 @@ de:
           @change="toChange"
           ref="toSelector"
           :localSuggestions="localSuggestions"/>
-        <v-btn color="primary" flat small v-if="!showDirectionsControls && to" @click="showDirectionsControls=true">Directions</v-btn>
+        <v-btn color="primary" flat small v-if="!showDirectionsControls && to" @click="showDirectionsControls=true">{{ $t('Get directions') }}</v-btn>
 
         <div v-if="transportMode === 'fastest;publicTransport' && from && to">
           <DateTimePicker @change="timeDate=$event"/>

@@ -1,9 +1,9 @@
 <i18n>
 de:
-  Share permalink: Teilen Sie Permalink
-  Copy Hyperlink: Hyperlink kopieren
-  Copy HTML Embed Code: Kopieren Sie den HTML-Einbettungscode
-  Email Hyperlink: E-Mail-Hyperlink
+  Share permalink: Link zur Kartenansicht teilen
+  Copy Hyperlink: Link zur Kartenansicht kopieren
+  Copy HTML Embed Code: HTML-Einbettungscode kopieren
+  Email Hyperlink: Link zur Kartenansicht per Email versenden
   An error occurred: Ein Fehler ist aufgetreten
   Copied: Kopiert
 </i18n>
@@ -80,7 +80,7 @@ export default {
     copyUrlText: {type: String, required: false, default: 'Copy Hyperlink'},
     copyEmbedHtmlText: {type: String, required: false, default: 'Copy HTML Embed Code'},
     emailUrlText: {type: String, required: false, default: 'Email Hyperlink'},
-    emailSubjectText: {type: String, required: false, default: 'NPLH Url Share'}
+    emailSubjectText: {type: String, required: false, default: 'Naturpark Lüneburger Heide: Link zur Karte'}
   },
   data () {
     return {
