@@ -316,8 +316,10 @@ export const LayerFactory = {
    */
   async createLayersFromCollection (lConf, { locale = '' }) {
     const url = lConf.url.replace(/\{locale\}/, locale);
+    const displayInLayerList = lConf.displayInLayerList || undefined;
     const response = await (await fetch(url)).json();
     return Promise.all(response.map(async layerDef => {
+      layerDef.displayInLayerList = displayInLayerList !== undefined ? displayInLayerList : layerDef.displayInLayerList;
       return this.getInstance(layerDef);
     }));
   }

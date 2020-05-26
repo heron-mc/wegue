@@ -3,7 +3,7 @@
 
     <slot name="wgu-app-begin" />
 
-    <wgu-app-header :color="baseColor">
+    <wgu-app-header :color="baseColor" :dark="dark">
       <!-- forward the slots of AppHeader -->
       <slot name="wgu-tb-start" slot="wgu-tb-start" />
       <slot name="wgu-tb-after-title" slot="wgu-tb-after-title" />
@@ -63,6 +63,7 @@
 
     <wgu-app-footer
       :color="baseColor"
+      :dark="dark"
       :footerTextLeft="footerTextLeft"
       :footerTextRight="footerTextRight"
       :showCopyrightYear="showCopyrightYear"
@@ -112,7 +113,8 @@
         footerTextLeft: Vue.prototype.$appConfig.footerTextLeft,
         footerTextRight: Vue.prototype.$appConfig.footerTextRight,
         showCopyrightYear: Vue.prototype.$appConfig.showCopyrightYear,
-        baseColor: Vue.prototype.$appConfig.baseColor
+        baseColor: Vue.prototype.$appConfig.baseColor,
+        dark: Vue.prototype.$appConfig.darkLayout
       }
     },
     mounted () {

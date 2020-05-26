@@ -37,7 +37,7 @@ de:
         <v-card-text v-if="attributes[descProp]" v-html="description" :style="{maxHeight:textHeight, overflowY:'scroll'}"></v-card-text>
         <v-card-actions>
           <v-btn v-if="attributes[infoUrlProp]" flat color="blue" :href="attributes[infoUrlProp]" target="_blank">{{infoUrlText}}</v-btn>
-          <v-btn v-if="feature.getGeometry().getType() === 'Point'" @click="clickDirections">{{ $t('Get directions') }}</v-btn>
+          <v-btn v-if="this.enableRouting === true && feature.getGeometry().getType() === 'Point'" @click="clickDirections">{{ $t('Get directions') }}</v-btn>
         </v-card-actions>
     </v-card>
   </v-navigation-drawer>
@@ -59,6 +59,7 @@ export default {
     color: {type: String, required: false, default: 'red darken-3'},
     draggable: {type: Boolean, required: false, default: false},
     active: {type: Boolean, required: false, default: false},
+    enableRouting: {type: Boolean, required: false, default: false},
     toggleGroup: {type: String, required: false, default: undefined}
   },
   data () {

@@ -2,6 +2,7 @@
   <v-toolbar
     class="wgu-app-toolbar white--text"
     :color="color"
+    :dark="dark"
     fixed
     app
     clipped-right
@@ -35,7 +36,7 @@
     <!-- slot to inject components after the auto-generated buttons (by config) -->
     <slot name="wgu-tb-after-auto-buttons"></slot>
 
-    <v-menu v-if="menuButtons.length" offset-y :close-on-content-click="menuCloseOnContentClick">
+    <v-menu v-if="menuButtons.length" offset-y :close-on-content-click="menuCloseOnContentClick" :dark="dark">
       <v-btn icon bright slot="activator">
         <v-icon medium>menu</v-icon>
       </v-btn>
@@ -94,7 +95,8 @@ export default {
     'wgu-downloadlayers-btn': DownloadLayersButton
   },
   props: {
-    color: {type: String, required: false, default: 'red darken-3'}
+    color: {type: String, required: false, default: 'red darken-3'},
+    dark: {type: Boolean, required: false, default: true}
   },
   data () {
     return {

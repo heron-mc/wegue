@@ -3,6 +3,7 @@
   "title": "Vue.js / OpenLayers WebGIS",
 
   "baseColor": "red darken-3",
+  "darkLayout": true,
 
   "logo": "https://dummyimage.com/100x100/aaa/fff&text=Wegue",
   "logoSize": "100",
@@ -19,7 +20,7 @@
   "permalink": {
     "location": "search",
     "layers": true,
-    "extent": true,
+    "extent": false,
     "projection": "EPSG:4326",
     "paramPrefix": "",
     "history": false
@@ -90,6 +91,54 @@
       "style": {
         "iconUrl": "./static/icon/circle.svg",
         "scale": 4,
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
+    {
+      "type": "VECTOR",
+      "lid": "dutch_windmills",
+      "name": "Dutch Windmills",
+      "url": "https://demo.pygeoapi.io/master/collections/dutch_windmills/items",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "displayInLayerList": true,
+      "style": {
+        "iconUrl": "./static/icon/windmill2.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      },
+      "styleSelected": {
+        "iconUrl": "./static/icon/windmill2-select.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
+    {
+      "type": "VECTOR",
+      "lid": "dutch_castles",
+      "name": "Dutch Castles",
+      "url": "https://demo.pygeoapi.io/master/collections/dutch_castles/items",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": false,
+      "selectable": true,
+      "displayInLayerList": true,
+      "style": {
+        "iconUrl": "./static/icon/castle2.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      },
+      "styleSelected": {
+        "iconUrl": "./static/icon/castle2-select.png",
         "anchor": [0.5, 37],
         "anchorXUnits": "fraction",
         "anchorYUnits": "pixels"
@@ -182,15 +231,29 @@
       "textHeight": 400,
       "icon": "info",
       "toggleGroup": "side-panel-active",
+      "enableRouting": false,
       "layers": [
-        {
-          "layerId": "layer",
-          "title": "Info",
-          "titleProp": "name",
-          "imageProp": "image_url",
-          "descProp": "description",
-          "imageWidth": 360
-        }
+          {
+            "layerId": "dutch_windmills",
+            "title": "Dutch Windmills",
+            "titleProp": "NAAM",
+            "imageProp": "FOTO_GROOT",
+            "infoUrlProp": "INFOLINK",
+            "imageWidth": 360
+          },
+          {
+            "layerId": "dutch_castles",
+            "title": "Dutch Castles",
+            "titleProp": "naam",
+            "imageProp": "foto_groot",
+            "infoUrlProp": "info_link"
+          },
+          {
+            "layerId": "Shops",
+            "title": "Shops Dannstadt",
+            "titleProp": "name",
+            "descProp": "shop"
+          }
       ]
     },
     "wgu-layerlist": {
