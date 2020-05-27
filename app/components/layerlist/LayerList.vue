@@ -101,12 +101,17 @@ de:
        * Executed after the map is bound (see mixins/Mapable)
        */
       onMapBound () {
-        this.createLayerItems();
+        // Only render LayerList when Map fully rendered
+        WguEventBus.$on('ol-map-rendered', evt => {
+          this.createLayerItems();
+        });
 
-        // react on added / removed layers
+        // React on added / removed layers
         this.map.getLayers().on('change:length', (evt) => {
           this.createLayerItems();
         });
+
+        // React on changed Locale
         WguEventBus.$on('locale-changed', language => {
           this.$i18n.locale = language;
           this.createLayerItems();
