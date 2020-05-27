@@ -79,7 +79,7 @@ de:
         categoryItems: [],
         tagItems: [],
         unfoldCategories: [],
-        unfoldTags: []
+        unfoldTags: new Set()
       }
     },
     computed: {
@@ -91,8 +91,8 @@ de:
       },
       tabs() {
         return [
-          ...(this.hideTags ? [] : [{title: this.tagsTitle, items: this.tagsTree, loadFunc: this.fetchTagItems, unfolded: this.unfoldTags}]),
-          ...(this.hideCategories ? [] : [{title: this.categoriesTitle, items: this.categoriesTree, loadFunc: this.fetchCategoryItems, unfolded: this.unfoldCategories}])
+          ...(this.hideTags ? [] : [{title: this.tagsTitle, items: this.tagsTree, loadFunc: this.fetchTagItems, unfolded: [...this.unfoldTags]}]),
+          ...(this.hideCategories ? [] : [{title: this.categoriesTitle, items: this.categoriesTree, loadFunc: this.fetchCategoryItems, unfolded: [...this.unfoldCategories]}])
         ];
       }
     },
@@ -104,17 +104,16 @@ de:
         // Only render LayerList when Map fully rendered
         WguEventBus.$on('ol-map-rendered', evt => {
           this.createLayerItems();
-        });
+          // React on added / removed layers
+          this.map.getLayers().on('change:length', (evt) => {
+            this.createLayerItems();
+          });
 
-        // React on added / removed layers
-        this.map.getLayers().on('change:length', (evt) => {
-          this.createLayerItems();
-        });
-
-        // React on changed Locale
-        WguEventBus.$on('locale-changed', language => {
-          this.$i18n.locale = language;
-          this.createLayerItems();
+          // React on changed Locale
+          WguEventBus.$on('locale-changed', language => {
+            this.$i18n.locale = language;
+            this.createLayerItems();
+          });
         });
       },
       /**
@@ -168,39 +167,44 @@ de:
         const getCategoryNode = type => categoryItems[{ route: 1, area: 2 }[type] || 0];
         // Tag defs come from the tags added to Layers
         let tagItems = [];
-
+        this.unfoldTags = new Set();
+        this.unfoldCategories = new Set();
         layers.forEach((layer, idx) => {
-          let layerItem = this.createLayerItem(layer, nextId());
+          const layerItem = this.createLayerItem(layer, nextId());
 
           // First add to Categories tree
           const categoryNode = getCategoryNode(layerItem.category);
           categoryNode.children.push(layerItem);
+          if (layerItem['visible'] === true) {
+            this.unfoldCategories.add(categoryNode['id'])
+          }
 
           const tags = layerItem.tags || [this.$t('_untagged')];
           // One or more Tags avail: add to the Tags tree
           // Must be existing layer item: reuse for common visibility state
           tags.forEach((tag, idx) => {
-            const tagNode = tagItems.find(tagItem => tagItem.name === tag);
+            let tagNode = tagItems.find(tagItem => tagItem.name === tag);
             if (!tagNode) {
-              // Create new tag parent node
-              tagItems.push({
+              // Create new tag parent node and push to tree
+              tagNode = {
                 id: nextId(),
                 name: tag,
                 lid: undefined,
                 visible: false,
-                children: [layerItem]
-              });
-            } else {
-              tagNode.children.push(layerItem)
+                children: []
+              };
+              tagItems.push(tagNode);
+            }
+            // Add LayerItem to TagNode
+            tagNode.children.push(layerItem);
+            if (layerItem['visible'] === true) {
+              this.unfoldTags.add(tagNode['id'])
             }
           });
         });
 
         this.categoryItems = categoryItems;
         this.tagItems = tagItems;
-        // Unfold the first item folders
-        this.unfoldTags = this.tagItems.length > 0 ? [this.tagItems[0]['id']] : [];
-        this.unfoldCategories = [this.categoryItems[0]['id']];
       },
 
       fetchCategoryItems () {
