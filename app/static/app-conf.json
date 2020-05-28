@@ -106,7 +106,7 @@
       "active": true,
       "mobileActive": false,
       "right": false,
-      "width": 360,
+      "width": 384,
       "height": "100%",
       "toggleGroup": "side-panel-active",
       "options": {

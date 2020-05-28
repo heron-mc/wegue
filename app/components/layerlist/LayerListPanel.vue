@@ -17,7 +17,16 @@ de:
       stateless
   >
 
-    <wgu-layerlist v-bind="options" />
+    <v-card class="wgu-layer-list-card">
+      <v-toolbar :color="color" class="" :dark="dark">
+        <v-toolbar-side-icon><v-icon>{{icon}}</v-icon></v-toolbar-side-icon>
+        <v-toolbar-title class="wgu-win-title">{{ $t('Layers') }}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-side-icon @click="closePanel"><v-icon>close</v-icon></v-toolbar-side-icon>
+      </v-toolbar>
+
+      <wgu-layerlist v-bind="options" />
+    </v-card>
 
   </v-navigation-drawer>
 </template>
@@ -36,8 +45,8 @@ de:
       width: {type: Number, required: false, default: 360},
       height: {type: String, required: false, default: '100%'},
       dark: {type: Boolean, required: false, default: false},
+      icon: {type: String, required: false, default: 'layers'},
       color: {type: String, required: false, default: 'red darken-3'},
-      title: {type: String, required: false, default: 'Layers'},
       active: {type: Boolean, required: false, default: false},
       options: { type: Object, required: false, default: {} },
       toggleGroup: {type: String, required: false, default: undefined}
@@ -58,6 +67,18 @@ de:
         WguEventBus.$on(this.toggleGroup, ({ moduleName, state }) => {
           this.drawerOpen = moduleName === this.moduleName && state;
         });
+      }
+    },
+    methods: {
+      closePanel: function () {
+        if (this.drawerOpen === false) {
+          // Already closed
+          return;
+        }
+        this.drawerOpen = false;
+        if (this.toggleGroup) {
+          WguEventBus.$emit(this.toggleGroup, {'moduleName': this.moduleName, 'state': this.drawerOpen});
+        }
       }
     }
   }
