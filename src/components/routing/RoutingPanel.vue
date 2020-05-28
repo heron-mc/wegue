@@ -36,6 +36,13 @@ de:
       height="unset"
   >
     <v-card class="pa-2">
+      <v-toolbar :color="color" class="" :dark="dark">
+        <v-toolbar-title class="wgu-win-title">{{ $t('Get directions') }}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-side-icon @click="closePanel"><v-icon>close</v-icon></v-toolbar-side-icon>
+      </v-toolbar>
+
+
       <v-form>
         <v-select
           v-if="showDirectionsControls"
@@ -106,6 +113,7 @@ export default {
     right: {type: Boolean, required: false, default: false},
     width: {type: Number, required: false, default: 360},
     height: {type: String, required: false, default: '100%'},
+    icon: {type: String, required: false, default: 'search'},
     dark: {type: Boolean, required: false, default: false},
     color: {type: String, required: false, default: 'red darken-3'},
     active: {type: Boolean, required: false, default: false},
@@ -144,8 +152,9 @@ export default {
       this.drawerOpen = state === undefined ? !this.drawerOpen : state;
     });
     WguEventBus.$on('directions-to-feature', feature => {
+      this.drawerOpen = true;
       if (this.toggleGroup) {
-        WguEventBus.$emit(this.toggleGroup, { moduleName: this.moduleName });
+        WguEventBus.$emit(this.toggleGroup, { moduleName: this.moduleName, state: this.drawerOpen });
       }
       this.$refs.toSelector.setTargetById(feature.get('id'));
       this.showDirectionsControls = true;
@@ -310,6 +319,16 @@ export default {
         this.boundingBox = response.boundingBox;
         this.routeGeometry = response.routeGeometry;
         this.stopsGeometry = response.stopsGeometry;
+      }
+    },
+    closePanel: function () {
+      if (this.drawerOpen === false) {
+        // Already closed
+        return;
+      }
+      this.drawerOpen = false;
+      if (this.toggleGroup) {
+        WguEventBus.$emit(this.toggleGroup, {'moduleName': this.moduleName, 'state': this.drawerOpen});
       }
     }
   }
