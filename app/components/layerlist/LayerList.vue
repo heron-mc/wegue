@@ -10,51 +10,49 @@ de:
   _untagged: Weitere Kartenebenen
 </i18n>
 <template>
-  <v-card class="wgu-layer-list-card">
-    <v-tabs
-      :dark="dark"
-      :sliderColor="sliderColor"
-      grow
-      :class="{'wgu-layer-list-tabs': true, 'wgu-layer-no-header': tabs.length < 2}"
-    >
-      <template v-for="tab of tabs">
-        <v-tab :key="tab.title">
-          {{ $t(tab.title) }}
-        </v-tab>
-        <v-tab-item :key="tab.title">
-          <v-list>
-            <v-treeview :items="tab.items" :load-children="tab.loadFunc" :open.sync="tab.unfolded">
-              <template v-slot:prepend="{ item }">
-                <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
-                <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
-                <v-card v-if="item.category === 'route'"
-                  :style="{
-                    borderTopColor: item.stroke.getColor(),
-                    borderTopWidth: 3,
-                    borderTopStyle: {'6,12':'dashed', '1,8': 'dotted', null: 'solid'}[item.stroke.getLineDash()] || 'dashed'
-                  }"
-                  width="30"
-                  height="4"
-                  class="mr-2"
-                />
-                <v-card v-if="item.category === 'area'"
-                  :style="{
-                    background: item.fill.getColor(),
-                    borderWidth: '3px',
-                    borderStyle: {'6,12':'dashed', '1,8': 'dotted', null: 'solid'}[item.stroke.getLineDash()] || 'dashed',
-                    borderColor: item.stroke.getColor()
-                  }"
-                  width="30"
-                  height="30"
-                  class="mr-2"
-                />
-              </template>
-            </v-treeview>
-          </v-list>
-        </v-tab-item>
-      </template>
-    </v-tabs>
-  </v-card>
+  <v-tabs
+    :dark="dark"
+    :sliderColor="sliderColor"
+    grow
+    :class="{'wgu-layer-list-tabs': true, 'wgu-layer-no-header': tabs.length < 2}"
+  >
+    <template v-for="tab of tabs">
+      <v-tab :key="tab.title">
+        {{ $t(tab.title) }}
+      </v-tab>
+      <v-tab-item :key="tab.title">
+        <v-list>
+          <v-treeview :items="tab.items" :load-children="tab.loadFunc" :open.sync="tab.unfolded">
+            <template v-slot:prepend="{ item }">
+              <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
+              <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
+              <v-card v-if="item.category === 'route'"
+                :style="{
+                  borderTopColor: item.stroke.getColor(),
+                  borderTopWidth: 3,
+                  borderTopStyle: {'6,12':'dashed', '1,8': 'dotted', null: 'solid'}[item.stroke.getLineDash()] || 'dashed'
+                }"
+                width="30"
+                height="4"
+                class="mr-2"
+              />
+              <v-card v-if="item.category === 'area'"
+                :style="{
+                  background: item.fill.getColor(),
+                  borderWidth: '3px',
+                  borderStyle: {'6,12':'dashed', '1,8': 'dotted', null: 'solid'}[item.stroke.getLineDash()] || 'dashed',
+                  borderColor: item.stroke.getColor()
+                }"
+                width="30"
+                height="30"
+                class="mr-2"
+              />
+            </template>
+          </v-treeview>
+        </v-list>
+      </v-tab-item>
+    </template>
+  </v-tabs>
 
 </template>
 
