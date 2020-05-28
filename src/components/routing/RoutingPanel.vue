@@ -152,8 +152,9 @@ export default {
       this.drawerOpen = state === undefined ? !this.drawerOpen : state;
     });
     WguEventBus.$on('directions-to-feature', feature => {
+      this.drawerOpen = true;
       if (this.toggleGroup) {
-        WguEventBus.$emit(this.toggleGroup, { moduleName: this.moduleName });
+        WguEventBus.$emit(this.toggleGroup, { moduleName: this.moduleName, state: this.drawerOpen });
       }
       this.$refs.toSelector.setTargetById(feature.get('id'));
       this.showDirectionsControls = true;
