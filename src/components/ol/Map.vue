@@ -35,6 +35,7 @@ import { boundingExtent } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
 import { routingLayers } from '../routing/routingLayers';
 import { geolocationLayers } from '../geolocation/geolocationLayers';
+import { singleClick } from 'ol/events/condition';
 export default {
   name: 'wgu-map',
   props: {
@@ -141,6 +142,7 @@ export default {
      * @return {ol.layer.Base[]} Array of OL layer instances
      */
     async createLayers () {
+      const self = this;
       const addInteraction = (layer) => {
         // if layer is selectable register a select interaction
         if (layer.get('selectable') === false) {
@@ -148,10 +150,11 @@ export default {
         }
         const selectClick = new SelectInteraction({
           layers: [layer],
-          style: layer.get('styleSelected') || undefined
+          style: layer.get('styleSelected') || undefined,
+          condition: e => singleClick(e) && !(self.cmpLookup['wgu-measuretool-win']&& self.cmpLookup['wgu-measuretool-win'].show)
         });
         // forward an event if feature selection changes
-        selectClick.on('select', function (evt) {
+        selectClick.on('select', evt => {
           // TODO use identifier for layer (once its implemented)
           WguEventBus.$emit(
             'map-selectionchange',
@@ -268,7 +271,8 @@ export default {
      */
     onPointerMove (event) {
       function setCursor() {
-        const hit = map.hasFeatureAtPixel(event.pixel, { layerFilter: l => l.get('selectable') });
+        const hit = map.hasFeatureAtPixel(event.pixel, { layerFilter: l => l.get('selectable') })
+          && !(me.cmpLookup['wgu-measuretool-win'] && me.cmpLookup['wgu-measuretool-win'].show);
         map.getViewport().style.cursor = hit ? 'pointer' : map.wguDefaultCursor || '';
       }
       const me = this;
