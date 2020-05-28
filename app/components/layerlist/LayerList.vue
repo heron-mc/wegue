@@ -26,7 +26,7 @@ de:
             <v-treeview :items="tab.items" :load-children="tab.loadFunc" :open.sync="tab.unfolded">
               <template v-slot:prepend="{ item }">
                 <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
-                <img v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
+                <img class="poi-icon" v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
                 <v-card v-if="item.category === 'route'"
                   :style="{
                     borderTopColor: item.stroke.getColor(),
@@ -253,5 +253,13 @@ de:
   }
   .wgu-layer-no-header .v-tabs__bar {
     display: none;
+  }
+</style>
+<style scoped>
+  .poi-icon {
+    margin-left:2px;
+    margin-right:4px;
+    width: 32px;
+    height: 38px;
   }
 </style>
