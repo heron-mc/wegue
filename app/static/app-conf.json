@@ -73,12 +73,6 @@
       "target": "menu",
       "darkLayout": false
     },
-    "wgu-share": {
-      "target": "toolbar",
-      "mobileTarget": "menu",
-      "hasSubMenu": true,
-      "darkLayout": false
-    },
     "wgu-feature-info": {
       "panel": true,
       "draggable": true,
@@ -126,6 +120,12 @@
       "options": {
         "transportModes": ["car", "publicTransport"]
       }
+    },
+    "wgu-share": {
+      "target": "toolbar",
+      "mobileTarget": "menu",
+      "hasSubMenu": true,
+      "darkLayout": false
     },
     "wgu-language": {
       "languages": ["en", "de"],
