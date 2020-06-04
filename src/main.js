@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import Vuetify from 'vuetify';
+import '../node_modules/ol/ol.css';
 import WguApp from '../app/WguApp';
 import UrlUtil from './util/Url';
 import 'vuetify/dist/vuetify.min.css';
@@ -9,8 +10,6 @@ import VueI18n from 'vue-i18n';
 
 Vue.use(Vuetify);
 Vue.use(VueI18n);
-
-require('../node_modules/ol/ol.css');
 
 require('./assets/css/wegue.css');
 
