@@ -3,6 +3,7 @@
   "title": "Wegue - Projected Map",
 
   "baseColor": "orange darken-3",
+  "darkLayout": true,
 
   "logo": "https://dummyimage.com/100x100/aaa/fff&text=Wegue",
   "logoSize": "100",
@@ -51,6 +52,8 @@
       "loadOnlyVisible": true,
       "visible": false,
       "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Nature"],
       "style": {
         "strokeColor": "white",
         "strokeWidth": 2,
@@ -72,7 +75,8 @@
       "attributions": "<a href='https://www.pdok.nl' target='_blank'>PDOK</a> by Dutch Kadaster",
       "isBaseLayer": false,
       "visible": false,
-      "displayInLayerList": true
+      "displayInLayerList": true,
+      "tags": ["Nature"]
     },
     {
       "type": "WMS",
@@ -88,7 +92,8 @@
       "attributions": "<a href='https://www.pdok.nl' target='_blank'>PDOK</a> by Dutch Kadaster",
       "isBaseLayer": true,
       "visible": false,
-      "displayInLayerList": true
+      "displayInLayerList": true,
+      "tags": ["Base Layers"]
     },
     {
       "type": "XYZ",
@@ -99,15 +104,45 @@
       "projection": "EPSG:28992",
       "tileGridRef": "dutch_rd",
       "displayInLayerList": true,
-      "visible": true
+      "visible": true,
+      "tags": ["Base Layers"]
     }
   ],
 
   "modules": {
     "wgu-layerlist": {
-      "target": "menu",
-      "win": true,
-      "draggable": false
+      "target": "toolbar",
+      "darkLayout": true,
+      "panel": true,
+      "active": true,
+      "mobileActive": false,
+      "right": false,
+      "width": 360,
+      "height": "100%",
+      "toggleGroup": "side-panel-active",
+      "options": {
+        "hideCategories": true,
+        "hideTags": false
+      }
+    },
+    "wgu-feature-info": {
+      "panel": true,
+      "draggable": true,
+      "darkLayout": true,
+      "height": "100%",
+      "width": 380,
+      "textHeight": 400,
+      "icon": "info",
+      "toggleGroup": "side-panel-active",
+      "enableRouting": false,
+      "layers": [
+          {
+            "layerId": "dutch-nat-parks",
+            "title": "Dutch National Parks",
+            "titleProp": "naam",
+            "imageWidth": 360
+          }
+      ]
     },
     "wgu-measuretool": {
       "target": "menu",
@@ -154,5 +189,4 @@
       "darkLayout": true
     }
   }
-
 }
