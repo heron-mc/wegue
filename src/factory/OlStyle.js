@@ -120,7 +120,12 @@ export const OlStyleFactory = {
       // const mapSize = window.map.getSize();
       // const extent = window.map.getView().calculateExtent([mapSize[0] + iconSpacing * 2, mapSize[1] + iconSpacing * 2]);
 
-      const splitPoints = splitLineString(feature.getGeometry(), iconSpacing * resolution);
+      const geometry = feature.getGeometry();
+      const lineStrings = geometry.getType() === 'MultiLineString' ? geometry.getLineStrings() : [geometry];
+      const splitPoints = [];
+      for (const lineString of lineStrings) {
+        splitPoints.push(...splitLineString(lineString, iconSpacing * resolution))
+      }
 
       return [
         lineStyle,
