@@ -1,0 +1,294 @@
+{
+
+  "title": "Vue.js / OpenLayers WebGIS",
+
+  "baseColor": "red darken-3",
+  "darkLayout": true,
+
+  "logo": "https://dummyimage.com/100x100/aaa/fff&text=Wegue",
+  "logoSize": "100",
+
+  "logoText": "",
+
+  "footerTextLeft": "Powered by <a href='https://meggsimum.de/wegue/' target='_blank'>Wegue WebGIS</a>",
+  "footerTextRight": "meggsimum",
+  "showCopyrightYear": true,
+
+  "mapZoom": 2,
+  "mapCenter": [0, 0],
+
+  "permalink": {
+    "location": "search",
+    "layers": true,
+    "extent": false,
+    "projection": "EPSG:4326",
+    "paramPrefix": "",
+    "history": false
+  },
+
+  "mapLayers": [
+
+    {
+      "type": "VECTOR",
+      "lid": "Shops",
+      "name": "Shops DaSchau",
+      "url": "./static/data/shops-dannstadt.geojson",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Vector Layers"],
+      "style": {
+        "radius": 4,
+        "strokeColor": "purple",
+        "strokeWidth": 2,
+        "fillColor": "rgba(155,153,51,0.5)"
+      }
+    },
+    {
+      "type": "WFS",
+      "lid": "gas-wfs",
+      "name": "Gas Stations WFS",
+      "url": "https://ows.terrestris.de/geoserver/osm/wfs",
+      "typeName": "osm:osm-fuel",
+      "version": "2.0.0",
+      "maxFeatures": 50,
+      "formatConfig": {
+      },
+      "format": "GML3",
+      "loadOnlyVisible": true,
+      "visible": false,
+      "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Vector Layers"],
+      "style": {
+        "radius": 6,
+        "strokeColor": "blue",
+        "strokeWidth": 2,
+        "fillColor": "rgba(155,153,51,0.5)"
+      },
+      "attributions": "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors."
+    },
+
+    {
+      "type": "VECTOR",
+      "lid": "earthquakes",
+      "name": "Earthquakes 2012 (Mag 5)",
+      "url": "./static/data/2012_Earthquakes_Mag5.kml",
+      "formatConfig": {
+        "extractStyles": false
+      },
+      "format": "KML",
+      "visible": true,
+      "attributions": "U.S. Geological Survey",
+      "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Vector Layers"],
+      "hoverable": true,
+      "hoverAttribute": "name",
+      "style": {
+        "iconUrl": "./static/icon/circle.svg",
+        "scale": 4,
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
+    {
+      "type": "VECTOR",
+      "lid": "dutch_windmills",
+      "name": "Dutch Windmills",
+      "url": "https://demo.pygeoapi.io/master/collections/dutch_windmills/items",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "displayInLayerList": true,
+      "style": {
+        "iconUrl": "./static/icon/windmill2.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      },
+      "styleSelected": {
+        "iconUrl": "./static/icon/windmill2-select.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
+    {
+      "type": "VECTOR",
+      "lid": "dutch_castles",
+      "name": "Dutch Castles",
+      "url": "https://demo.pygeoapi.io/master/collections/dutch_castles/items",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": false,
+      "selectable": true,
+      "displayInLayerList": true,
+      "style": {
+        "iconUrl": "./static/icon/castle2.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      },
+      "styleSelected": {
+        "iconUrl": "./static/icon/castle2-select.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
+    {
+      "type": "WMS",
+      "lid": "ahocevar-wms",
+      "name": "WMS (ahocevar)",
+      "format": "image/png",
+      "layers": "topp:states",
+      "url": "https://ahocevar.com/geoserver/wms",
+      "transparent": true,
+      "singleTile": false,
+      "projection": "EPSG:3857",
+      "attribution": "",
+      "isBaseLayer": false,
+      "visible": false,
+      "displayInLayerList": true,
+      "tags": ["Raster Layers"]
+    },
+
+    {
+      "type": "VECTORTILE",
+      "name": "Vector Tile Layer",
+      "url": "https://ahocevar.com/geoserver/gwc/service/tms/1.0.0/ne:ne_10m_admin_0_countries@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+      "format": "MVT",
+      "displayInLayerList": true,
+      "tags": ["Base Layers"],
+      "visible": false,
+      "style": {
+        "strokeColor": "gray",
+        "strokeWidth": 1,
+        "fillColor": "rgba(20,20,20,0.1)"
+      }
+    },
+
+    {
+      "type": "XYZ",
+      "name": "OpenTopoMap",
+      "url": "https://tile.opentopomap.org/{z}/{x}/{y}.png",
+      "attributions": "Map data: <a href=\"https://openstreetmap.org/copyright\">©OpenStreetMap</a>-contributors, SRTM | Map representation (Kartendarstellung): © <a href=\"http://opentopomap.org/\">OpenTopoMap</a> (<a href=\"https://creativecommons.org/licenses/by-sa/3.0/\">CC-BY-SA</a>)",
+      "lid": "opentopomap",
+      "displayInLayerList": true,
+      "tags": ["Base Layers"],
+      "visible": false
+    },
+
+    {
+      "type": "OSM",
+      "lid": "osm-bg",
+      "name": "OSM",
+      "tags": ["Base Layers"],
+      "isBaseLayer": false,
+      "visible": true,
+      "displayInLayerList": true
+    }
+
+  ],
+
+  "modules": {
+    "wgu-measuretool": {
+      "target": "menu",
+      "win": true,
+      "draggable": false,
+      "darkLayout": true,
+      "strokeColor": "#c62828",
+      "fillColor": "rgba(198,40,40,0.2)",
+      "sketchStrokeColor": "rgba(198,40,40,0.8)",
+      "sketchFillColor": "rgba(198,40,40,0.1)",
+      "sketchVertexStrokeColor": "#c62828",
+      "sketchVertexFillColor": "rgba(198,40,40,0.2)"
+    },
+    "wgu-zoomtomaxextent": {
+      "target": "menu",
+      "darkLayout": true
+    },
+    "wgu-share": {
+      "target": "toolbar",
+      "mobileTarget": "menu",
+      "hasSubMenu": true,
+      "darkLayout": true
+    },
+    "wgu-feature-info": {
+      "panel": true,
+      "draggable": true,
+      "darkLayout": true,
+      "height": "100%",
+      "width": 380,
+      "textHeight": 400,
+      "icon": "info",
+      "toggleGroup": "side-panel-active",
+      "enableRouting": false,
+      "layers": [
+          {
+            "layerId": "dutch_windmills",
+            "title": "Dutch Windmills",
+            "titleProp": "NAAM",
+            "imageProp": "FOTO_GROOT",
+            "infoUrlProp": "INFOLINK",
+            "imageWidth": 360
+          },
+          {
+            "layerId": "dutch_castles",
+            "title": "Dutch Castles",
+            "titleProp": "naam",
+            "imageProp": "foto_groot",
+            "infoUrlProp": "info_link"
+          },
+          {
+            "layerId": "Shops",
+            "title": "Shops Dannstadt",
+            "titleProp": "name",
+            "descProp": "shop"
+          }
+      ]
+    },
+    "wgu-layerlist": {
+      "target": "toolbar",
+      "darkLayout": true,
+      "panel": true,
+      "active": true,
+      "mobileActive": false,
+      "right": false,
+      "width": 360,
+      "height": "100%",
+      "toggleGroup": "side-panel-active",
+      "options": {
+        "hideCategories": true,
+        "hideTags": false
+      }
+    },
+    "wgu-language": {
+      "languages": ["en", "de"],
+      "target": "toolbar",
+      "mobileTarget": "menu",
+      "hasSubMenu": true,
+      "darkLayout": true
+    },
+    "wgu-savepdf": {
+      "target": "menu",
+      "darkLayout": true
+    },
+    "wgu-downloadlayers": {
+      "target": "menu",
+      "darkLayout": true
+    },
+    "wgu-helpwin": {
+      "target": "menu",
+      "darkLayout": true
+    }
+  }
+}
