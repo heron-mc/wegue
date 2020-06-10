@@ -1,0 +1,84 @@
+[
+  {
+    "type": "WFS",
+    "lid": "dutch-nat-parks",
+    "name": "WFS (Dutch National Parks PDOK)",
+    "url": "https://geodata.nationaalgeoregister.nl/nationaleparken/wfs",
+    "typeName": "nationaleparken:nationaleparken",
+    "version": "2.0.0",
+    "maxFeatures": 10,
+    "formatConfig": {
+    },
+    "format": "GeoJSON",
+    "projection": "EPSG:28992",
+    "loadOnlyVisible": true,
+    "visible": false,
+    "selectable": true,
+    "displayInLayerList": true,
+    "tags": ["Nature"],
+    "style": {
+      "strokeColor": "white",
+      "strokeWidth": 2,
+      "fillColor": "rgba(155,153,51,0.5)"
+    },
+    "attributions": "<a href='https://www.pdok.nl' target='_blank'>PDOK</a> by Dutch Kadaster"
+  },
+  {
+    "type": "WMS",
+    "lid": "pdok-natura2000-wms",
+    "name": "WMS - Natura 2000 Areas - PDOK",
+    "format": "image/png",
+    "layers": "natura2000",
+    "url": "https://geodata.nationaalgeoregister.nl/natura2000/wms",
+    "transparent": true,
+    "singleTile": false,
+    "projection": "EPSG:28992",
+    "tileGridRef": "dutch_rd",
+    "attributions": "<a href='https://www.pdok.nl' target='_blank'>PDOK</a> by Dutch Kadaster",
+    "isBaseLayer": false,
+    "visible": false,
+    "displayInLayerList": true,
+    "tags": ["Nature"]
+  },
+  {
+    "type": "WMS",
+    "lid": "pdok-lufo-wms",
+    "name": "WMS - Dutch Arial Map - PDOK",
+    "format": "image/jpeg",
+    "layers": "2018_ortho25",
+    "url": "http://geodata.nationaalgeoregister.nl/luchtfoto/rgb/wms",
+    "transparent": false,
+    "singleTile": false,
+    "projection": "EPSG:28992",
+    "tileGridRef": "dutch_rd",
+    "attributions": "<a href='https://www.pdok.nl' target='_blank'>PDOK</a> by Dutch Kadaster",
+    "isBaseLayer": true,
+    "visible": false,
+    "displayInLayerList": true,
+    "tags": ["Base Layers"]
+  },
+  {
+    "type": "XYZ",
+    "lid": "map5_opentopo",
+    "name": "WMTS - OpenTopo - map5.nl",
+    "url": "https://s.map5.nl/map/map5.demo11/wmts/opentopo/geonovum_grid/{z}/{x}/{y}.jpeg",
+    "attributions": "<a href='https://www.map5.nl' target='_blank'>OpenTopo</a> by JW van Aalst and map5.nl",
+    "projection": "EPSG:28992",
+    "tileGridRef": "dutch_rd",
+    "displayInLayerList": true,
+    "visible": true,
+    "tags": ["Base Layers"]
+  },
+  {
+    "type": "XYZ",
+    "lid": "brtachtergrondkaart",
+    "name": "WMTS - Topo Basemap - PDOK",
+    "url": "https://geodata.nationaalgeoregister.nl/tiles/service/wmts/brtachtergrondkaart/EPSG:28992/{z}/{x}/{y}.png",
+    "attributions": "<a href='https://www.pdok.nl' target='_blank'>PDOK</a> by Dutch Kadaster",
+    "projection": "EPSG:28992",
+    "tileGridRef": "dutch_rd",
+    "displayInLayerList": true,
+    "visible": false,
+    "tags": ["Base Layers"]
+  }
+]
