@@ -38,7 +38,7 @@
     },
     {
       "type": "LAYERCOLLECTION",
-      "url": "https://staging.nplh.geolicious.de/api/layer_list_wegue_format/{locale}/"
+      "url": "https://nplh.geolicious.de/api/layer_list_wegue_format/{locale}/"
     },
     {
       "type": "XYZ",
