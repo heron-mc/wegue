@@ -105,8 +105,9 @@ export default {
         textHeight: `${layer.textHeight || 200}px`
       });
 
+      this.closePanel();
+
       this.setFeature(selected[0]);
-      // WguEventBus.$emit('toggle-layerlist-panel', this.state);
 
       // If part of toggleGroup, let other know we become active/visible
       this.drawerOpen = true;
