@@ -91,7 +91,6 @@ export default {
     // listen to selection events of connected layer and apply attributes
     WguEventBus.$on('map-selectionchange', (layerId, selected, deselected) => {
       if (selected.length === 0) {
-        this.closePanel();
         return;
       }
       const layer = this.findLayer(layerId);
