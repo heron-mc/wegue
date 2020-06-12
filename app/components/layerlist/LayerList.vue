@@ -252,6 +252,12 @@ de:
   .wgu-layer-no-header .v-tabs__bar {
     display: none;
   }
+
+  .v-treeview-node__label {
+    /* There's probably a better solution... */
+    max-width: 260px;
+  }
+
 </style>
 <style scoped>
   .poi-icon {
