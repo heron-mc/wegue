@@ -176,7 +176,7 @@ export default {
         if (Array.isArray(layersToAdd) === false) {
           layersToAdd = [layersToAdd];
         }
-        
+
         // Add interactions for each Layer (but before reversing).
         layersToAdd.forEach(layer => addInteraction(layer));
 

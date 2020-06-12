@@ -86,7 +86,7 @@ de:
 
 <style>
   .wgu-layer-list-panel {
-    overflow: auto;
+    /*overflow: auto;*/
     /*max-height: calc(100vh - 200px);*/
   }
 
