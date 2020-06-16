@@ -42,7 +42,7 @@ de:
         <v-toolbar-side-icon @click="closePanel"><v-icon>close</v-icon></v-toolbar-side-icon>
       </v-toolbar>
 
-
+      <div style="overflow:auto; height: calc(100vh - 160px)">
       <v-form>
         <v-select
           v-if="showDirectionsControls"
@@ -91,6 +91,7 @@ de:
         <DownloadGPX :routeGeometry="routeGeometry" :transportMode="transportMode" />
         <RoutingInstructions v-if="route" :route="route" :dateSpecified="timeDate.isDateSpecified" :transportModeTitle="responseTransportMode"/>
       </v-form>
+      </div>
     </v-card>
   </v-navigation-drawer>
 </template>
