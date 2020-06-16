@@ -17,10 +17,21 @@ de:
   <!-- v8 response -->
   <div v-for="(section, sectionNo) of (route.sections || [])" :key="sectionNo">
     <h2 v-if="sectionNo === 0">{{ $t('Driving directions') }}</h2>
-    <h3>{{ `${$t('Section')} ${sectionNo + 1}` }} ({{ Math.round(section.summary.length/100)/10}} {{ $t('km') }})</h3>
+    <h3 v-if="route.sections.length > 1">{{ `${$t('Section')} ${sectionNo + 1}` }} ({{ Math.round(section.summary.length/100)/10}} {{ $t('km') }})</h3>
+    <table class="route-summary">
+      <tr>
+        <th>{{ $t('Time') }}:</th>
+        <td>{{ routeDuration(sectionNo) }}</td>
+      </tr>
+      <tr>
+        <th>{{ $t('Distance') }}:</th>
+        <td>{{ routeDistance(sectionNo) }}</td>
+      </tr>
+    </table>
     <div class="actions">
       <table>
         <tr v-for="(action, i) of section.actions" :key="i">
+          <td class="time" v-if="action.cumulative"> {{ action.cumulative }} </td>
           <td> {{ action.instruction }}</td>
         </tr>
       </table>
@@ -32,7 +43,7 @@ de:
     <table class="route-summary">
       <tr>
         <th>{{ $t('Time') }}:</th>
-        <td>{{ routeDuration }}</td>
+        <td>{{ routeDuration() }}</td>
       </tr>
       <tr v-if="routeStartTime">
         <th>{{ $t('Start') }}:</th>
@@ -40,7 +51,7 @@ de:
       </tr>
       <tr>
         <th>{{ $t('Distance') }}:</th>
-        <td>{{ routeDistance }}</td>
+        <td>{{ routeDistance() }}</td>
       </tr>
       <tr v-if="route.publicTransportLine">
         <th>{{ $t('Routes') }}:</th>
@@ -74,12 +85,6 @@ export default {
   }),
   name: 'RoutingInstructions',
   computed: {
-    routeDuration () {
-      return this.route && humanizeDuration(this.route.summary.baseTime * 1000, { round: true, units: ['h', 'm'], language: this.$i18n.locale });
-    },
-    routeDistance () {
-      return this.route && `${Math.round(this.route.summary.distance * 10 / 1000) / 10} ${this.$t('km')}`;
-    },
     routeStartDate () {
       if (!this.dateSpecified) {
         return '';
@@ -93,7 +98,6 @@ export default {
     routeStartTime () {
       return this.route && this.route.summary.departure && this.route.summary.departure.slice(11, 19);
     },
-
     routeLegs () {
       return this.route && this.route.leg;
     },
@@ -103,8 +107,25 @@ export default {
     isScheduled () {
       return this.route.mode && this.route.mode.transportModes[0] === 'publicTransportTimeTable';
     }
+  },
+  methods: {
+    routeDuration (sectionNo) {
+      return this.route && humanizeDuration(this.routeSummary(sectionNo).baseTime * 1000, { round: true, units: ['h', 'm'], language: this.$i18n.locale });
+    },
+    routeDistance (sectionNo) {
+      return this.route && `${Math.round(this.routeSummary(sectionNo).distance * 10 / 1000) / 10} ${this.$t('km')}`;
+    },
+    routeSummary (sectionNo) {
+      if (this.route && this.route.summary) {
+        return this.route.summary;
+      } else {
+        return {
+          baseTime: this.route.sections[sectionNo].summary.duration,
+          distance: this.route.sections[sectionNo].summary.length
+        }
+      }
+    }
   }
-
 }
 </script>
 

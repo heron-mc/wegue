@@ -1,6 +1,6 @@
 {
 
-  "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank'><img src='./static/media/nplh-logo@2.jpg' alt='NPLH Logo' style='margin-bottom:5px;padding-top:5px;height:55px;'></a><a href='https://naturpark-lueneburger-heide.de/aktiv-und-mobil-in-der-heide/heide-shuttle-co/' target='_blank'><img src='./static/media/LogoHeideshuttle.png' alt='Heideshuttle Logo' style='margin-top:5px;margin-left:50px;height:60px;'></a><a href='https://naturpark-lueneburger-heide.de/eu-foerderung-leader' target='_blank'><img src='./static/media/EU-ELER_CMYK.png' alt='EU-ELER Logo' style='margin-top:5px;margin-left:40px;height:60px;'></a><a href='https://naturpark-lueneburger-heide.de/eu-foerderung-leader' target='_blank'><img src='./static/media/Leader_07_13_jpg.jpg' alt='LEADER Logo' style='margin-bottom:5px;margin-left:10px;height:55px;'></a>",
+  "title": "<a href='https://naturpark-lueneburger-heide.de/' target='_blank'><img src='./static/media/nplh-logo@2.jpg' class='logo' alt='NPLH Logo' style='margin-bottom:5px;padding-top:5px;height:55px;'></a><a href='https://naturpark-lueneburger-heide.de/aktiv-und-mobil-in-der-heide/heide-shuttle-co/' target='_blank'><img src='./static/media/LogoHeideshuttle.png' class='logo' alt='Heideshuttle Logo' style='margin-top:5px;margin-left:50px;height:60px;'></a><a href='https://naturpark-lueneburger-heide.de/eu-foerderung-leader' target='_blank'><img src='./static/media/EU-ELER_CMYK.png' class='logo' alt='EU-ELER Logo' style='margin-top:5px;margin-left:40px;height:60px;'></a><a href='https://naturpark-lueneburger-heide.de/eu-foerderung-leader' target='_blank'><img src='./static/media/Leader_07_13_jpg.jpg' class='logo' alt='LEADER Logo' style='margin-bottom:5px;margin-left:10px;height:55px;'></a>",
 
   "baseColor": "rgba(255, 255, 255, 1)",
   "darkLayout": false,
@@ -39,7 +39,7 @@
     },
     {
       "type": "LAYERCOLLECTION",
-      "url": "https://staging.nplh.geolicious.de/api/layer_list_wegue_format/{locale}/",
+      "url": "https://nplh.geolicious.de/api/layer_list_wegue_format/{locale}/",
       "displayInLayerList": true
     },
     {

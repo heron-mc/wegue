@@ -24,8 +24,9 @@ de:
         <v-spacer></v-spacer>
         <v-toolbar-side-icon @click="closePanel"><v-icon>close</v-icon></v-toolbar-side-icon>
       </v-toolbar>
-
-      <wgu-layerlist v-bind="options" />
+      <div style="overflow:auto; height: calc(100vh - 160px)">
+        <wgu-layerlist v-bind="options" />
+      </div>
     </v-card>
 
   </v-navigation-drawer>
@@ -86,7 +87,7 @@ de:
 
 <style>
   .wgu-layer-list-panel {
-    overflow: auto;
+    /*overflow: auto;*/
     /*max-height: calc(100vh - 200px);*/
   }
 

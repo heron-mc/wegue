@@ -159,7 +159,8 @@ export default {
         const selectClick = new SelectInteraction({
           layers: [layer],
           style: layer.get('styleSelected') || undefined,
-          condition: e => singleClick(e) && !(self.cmpLookup['wgu-measuretool-win']&& self.cmpLookup['wgu-measuretool-win'].show)
+          condition: e => singleClick(e) && !(self.cmpLookup['wgu-measuretool-win']&& self.cmpLookup['wgu-measuretool-win'].show),
+          multi: false
         });
         // forward an event if feature selection changes
         selectClick.on('select', evt => {
@@ -182,13 +183,15 @@ export default {
         lConf.tileGrid = lConf.tileGridRef ? this.tileGrids[lConf.tileGridRef] : null;
         let layersToAdd = await LayerFactory.getInstance(lConf, { locale: this.$i18n.locale }, this.map);
         // One layer definition can lead to several layer instances being created
-        if (Array.isArray(layersToAdd)) {
-          // Reverse like main config to have Layers added in right stacking order.
-          layersToAdd = layersToAdd.reverse();
-        } else {
+        if (Array.isArray(layersToAdd) === false) {
           layersToAdd = [layersToAdd];
         }
+
+        // Add interactions for each Layer (but before reversing).
         layersToAdd.forEach(layer => addInteraction(layer));
+
+        // Reverse like main config to have Layers added in right stacking order.
+        layersToAdd = layersToAdd.reverse();
         layers.push(...layersToAdd);
       }));
 

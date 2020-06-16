@@ -22,7 +22,7 @@ de:
       </v-tab>
       <v-tab-item :key="tab.title">
         <v-list>
-          <v-treeview :items="tab.items" :load-children="tab.loadFunc" :open.sync="tab.unfolded">
+          <v-treeview :items="tab.items" :load-children="tab.loadFunc" :open.sync="tab.unfolded" class="wgu-layer-treeview ">
             <template v-slot:prepend="{ item }">
               <input type="checkbox" :key="item.lid" class="wgu-layer-viz-cb" v-model="item.visible" @change="onItemChanged(item)">
                 <img class="poi-icon" v-if="item.category === 'poi'" v-bind:src="item.icon" alt="POI Icon">
@@ -252,6 +252,12 @@ de:
   .wgu-layer-no-header .v-tabs__bar {
     display: none;
   }
+
+  .wgu-layer-treeview .v-treeview-node__label {
+    /* There's probably a better solution... */
+    max-width: 220px;
+  }
+
 </style>
 <style scoped>
   .poi-icon {
