@@ -68,9 +68,13 @@ function createOutputCanvas(width, height) {
 function savePdf(map, resolution, doneCb) {
   // code adapted from here: https://openlayers.org/en/latest/examples/export-pdf.html
   map.once('rendercomplete', function() {
-    const outputCanvas = createOutputCanvas(...dimensionsPixels);
+    const outputCanvas = createOutputCanvas(...pageDimensionsPixels);
     const pdf = new jsPDF('landscape', undefined, 'a4');
-    pdf.addImage(outputCanvas.toDataURL('image/jpeg'), 'JPEG', 0, 0, ...dimensionsMM);
+    pdf.addImage(outputCanvas.toDataURL('image/jpeg'), 'JPEG', 0, headerBarMM, ...pageDimensionsMM);
+    [...document.getElementsByClassName('logo')].forEach((logoElement, i) => {
+      const scale = logoElement.clientWidth / logoElement.clientHeight;
+      pdf.addImage(logoElement, 'JPEG', i * headerBarMM * 2 + 2, 2, headerBarMM * scale * 0.9, headerBarMM * 0.9);
+    });
     pdf.save('map.pdf');
 
     // Reset original map size
@@ -79,15 +83,18 @@ function savePdf(map, resolution, doneCb) {
     doneCb();
   });
 
-  const dimensionsMM = [297, 210]; // A4
-  const dimensionsPixels = dimensionsMM.map(d => Math.round(d * resolution / 25.5));
+  const pageDimensionsMM = [297, 210]; // A4
+  const pageDimensionsPixels = pageDimensionsMM.map(d => Math.round(d * resolution / 25.5));
+  const headerBarMM = 30;
+  const mapDimensionsMM = [pageDimensionsMM[0], pageDimensionsMM[1] - headerBarMM];
+  const mapDimensionsPixels = mapDimensionsMM.map(d => Math.round(d * resolution / 25.5));
   const origSize = map.getSize();
   const origResolution = map.getView().getResolution();
-  const scaling = Math.min(dimensionsPixels[0] / origSize[0], dimensionsPixels[1] / origSize[1]);
+  const mapScaling = Math.min(mapDimensionsPixels[0] / origSize[0], mapDimensionsPixels[1] / origSize[1]);
 
   // Resize map, triggering the handler above.
-  map.setSize(dimensionsPixels);
-  map.getView().setResolution(origResolution / scaling);
+  map.setSize(mapDimensionsPixels);
+  map.getView().setResolution(origResolution / mapScaling);
 }
 
 </script>
