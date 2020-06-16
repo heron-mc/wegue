@@ -127,6 +127,14 @@ export async function getRouteV8 ({
   transportMode,
   locale
 }) {
+  function addCumulativeTimes (section) {
+    let total = 0;
+    for (const action of section.actions) {
+      action.cumulative = `${pad2(Math.floor(total / 3600))}:${pad2(Math.floor(total / 60) % 60)}`;
+      total += (action.duration || 0);
+    }
+  }
+
   // https://developer.here.com/documentation/routing-api/api-reference-swagger.html
   // https://developer.here.com/documentation/routing/dev_guide/topics/resource-calculate-route.html
 
@@ -157,6 +165,7 @@ export async function getRouteV8 ({
         }).join('&')
   });
   const route = result.data.routes[0]
+  route.sections.forEach(addCumulativeTimes);
   return {
     route,
     routeGeometry: {

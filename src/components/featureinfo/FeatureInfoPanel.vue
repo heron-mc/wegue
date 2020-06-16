@@ -92,7 +92,6 @@ export default {
     // listen to selection events of connected layer and apply attributes
     WguEventBus.$on('map-selectionchange', (layerId, selected, deselected) => {
       if (selected.length === 0) {
-        this.closePanel();
         return;
       }
       const layer = this.findLayer(layerId);
@@ -106,8 +105,9 @@ export default {
         textHeight: `${layer.textHeight || 200}px`
       });
 
+      this.closePanel();
+
       this.setFeature(selected[0]);
-      // WguEventBus.$emit('toggle-layerlist-panel', this.state);
 
       // If part of toggleGroup, let other know we become active/visible
       this.drawerOpen = true;
