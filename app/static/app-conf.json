@@ -12,8 +12,8 @@
   "footerTextRight": "meggsimum",
   "showCopyrightYear": true,
 
-  "mapZoom": 3,
-  "mapCenter": [155000,463000],
+  "mapZoom": 6,
+  "mapCenter": [119000,468800],
   "mapProjection":
     {
     "code": "EPSG:28992",
@@ -36,11 +36,72 @@
     }
   },
 
+  "permalink": {
+    "location": "search",
+    "layers": true,
+    "extent": true,
+    "projection": "EPSG:28992",
+    "paramPrefix": "",
+    "history": false
+  },
+
   "mapLayers": [
+    {
+      "type": "VECTOR",
+      "lid": "dutch_windmills",
+      "name": "Dutch Windmills",
+      "url": "https://demo.pygeoapi.io/master/collections/dutch_windmills/items?f=json&limit=320",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": true,
+      "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Culture"],
+      "attributions": "<a href='https://www.cultureelerfgoed.nl/' target='_blank'>Rijksdienst Cultureel Erfgoed</a>",
+      "style": {
+        "iconUrl": "./static/icon/windmill2.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      },
+      "styleSelected": {
+        "iconUrl": "./static/icon/windmill2-select.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
+    {
+      "type": "VECTOR",
+      "lid": "dutch_castles",
+      "name": "Dutch Castles",
+      "url": "https://demo.pygeoapi.io/master/collections/dutch_castles/items?f=json&limit=320",
+      "formatConfig": {
+      },
+      "format": "GeoJSON",
+      "visible": false,
+      "selectable": true,
+      "displayInLayerList": true,
+      "tags": ["Culture"],
+      "attributions": "<a href='https://www.cultureelerfgoed.nl/' target='_blank'>Rijksdienst Cultureel Erfgoed</a>",
+      "style": {
+        "iconUrl": "./static/icon/castle2.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      },
+      "styleSelected": {
+        "iconUrl": "./static/icon/castle2-select.png",
+        "anchor": [0.5, 37],
+        "anchorXUnits": "fraction",
+        "anchorYUnits": "pixels"
+      }
+    },
     {
       "type": "WFS",
       "lid": "dutch-nat-parks",
-      "name": "WFS (Dutch National Parks PDOK)",
+      "name": "Dutch National Parks",
       "url": "https://geodata.nationaalgeoregister.nl/nationaleparken/wfs",
       "typeName": "nationaleparken:nationaleparken",
       "version": "2.0.0",
@@ -64,7 +125,7 @@
     {
       "type": "WMS",
       "lid": "pdok-natura2000-wms",
-      "name": "WMS - Natura 2000 Areas - PDOK",
+      "name": "Natura 2000 Areas",
       "format": "image/png",
       "layers": "natura2000",
       "url": "https://geodata.nationaalgeoregister.nl/natura2000/wms",
@@ -80,25 +141,59 @@
     },
     {
       "type": "WMS",
-      "lid": "pdok-lufo-wms",
-      "name": "WMS - Dutch Arial Map - PDOK",
-      "format": "image/jpeg",
-      "layers": "2018_ortho25",
-      "url": "http://geodata.nationaalgeoregister.nl/luchtfoto/rgb/wms",
-      "transparent": false,
+      "lid": "pdok-wandel-local-wms",
+      "name": "Hiking - Local Routes",
+      "format": "image/png",
+      "layers": "streekpaden",
+      "url": "http://geodata.nationaalgeoregister.nl/landelijke-wandelroutes/wms",
+      "transparent": true,
       "singleTile": false,
       "projection": "EPSG:28992",
       "tileGridRef": "dutch_rd",
-      "attributions": "<a href='https://www.pdok.nl' target='_blank'>PDOK</a> by Dutch Kadaster",
-      "isBaseLayer": true,
+      "attributions": "<a href='https://www.wandelnet.nl' target='_blank'>Wandelnet</a>",
+      "isBaseLayer": false,
       "visible": false,
       "displayInLayerList": true,
-      "tags": ["Base Layers"]
+      "tags": ["Hiking"]
+    },
+    {
+      "type": "WMS",
+      "lid": "pdok-wandel-law-wms",
+      "name": "Hiking - Long Distance Routes (LAW)",
+      "format": "image/png",
+      "layers": "landelijke-wandelroutes",
+      "url": "http://geodata.nationaalgeoregister.nl/landelijke-wandelroutes/wms",
+      "transparent": true,
+      "singleTile": false,
+      "projection": "EPSG:28992",
+      "tileGridRef": "dutch_rd",
+      "attributions": "<a href='https://www.wandelnet.nl' target='_blank'>Wandelnet</a>",
+      "isBaseLayer": false,
+      "visible": false,
+      "displayInLayerList": true,
+      "tags": ["Hiking"]
+    },
+    {
+      "type": "WMS",
+      "lid": "pdok-wandel-ns-wms",
+      "name": "Hiking - NS Routes",
+      "format": "image/png",
+      "layers": "ns-wandelingen",
+      "url": "http://geodata.nationaalgeoregister.nl/landelijke-wandelroutes/wms",
+      "transparent": true,
+      "singleTile": false,
+      "projection": "EPSG:28992",
+      "tileGridRef": "dutch_rd",
+      "attributions": "<a href='https://www.wandelnet.nl' target='_blank'>Wandelnet</a>",
+      "isBaseLayer": false,
+      "visible": false,
+      "displayInLayerList": true,
+      "tags": ["Hiking"]
     },
     {
       "type": "XYZ",
       "lid": "map5_bonne_1900",
-      "name": "WMTS - Historic 1925 - map5.nl",
+      "name": "Historic 1925 - map5.nl",
       "url": "https://s.map5.nl/map/map5.demo11/wmts/bonne_1925/geonovum_grid/{z}/{x}/{y}.png",
       "attributions": "<a href='https://www.map5.nl' target='_blank'>map5.nl</a>",
       "projection": "EPSG:28992",
@@ -110,7 +205,7 @@
     {
       "type": "XYZ",
       "lid": "map5_opentopo",
-      "name": "WMTS - OpenTopo - map5.nl",
+      "name": "OpenTopo - map5.nl",
       "url": "https://s.map5.nl/map/map5.demo11/wmts/opentopo/geonovum_grid/{z}/{x}/{y}.jpeg",
       "attributions": "<a href='https://www.map5.nl' target='_blank'>OpenTopo</a> by JW van Aalst and map5.nl",
       "projection": "EPSG:28992",
@@ -121,8 +216,20 @@
     },
     {
       "type": "XYZ",
+      "lid": "map5_lufo",
+      "name": "OpenLufo - map5.nl",
+      "url": "https://s.map5.nl/map/map5.demo11/wmts/openlufo/geonovum_grid/{z}/{x}/{y}.jpeg",
+      "attributions": "<a href='https://www.map5.nl' target='_blank'>OpenLufo</a> by JW van Aalst, PDOK and map5.nl",
+      "projection": "EPSG:28992",
+      "tileGridRef": "dutch_rd",
+      "displayInLayerList": true,
+      "visible": false,
+      "tags": ["Base Layers"]
+    },
+    {
+      "type": "XYZ",
       "lid": "brtachtergrondkaart",
-      "name": "WMTS - Topo Basemap - PDOK",
+      "name": "BRT Basemap - PDOK",
       "url": "https://geodata.nationaalgeoregister.nl/tiles/service/wmts/brtachtergrondkaart/EPSG:28992/{z}/{x}/{y}.png",
       "attributions": "<a href='https://www.pdok.nl' target='_blank'>PDOK</a> by Dutch Kadaster",
       "projection": "EPSG:28992",
@@ -160,12 +267,32 @@
       "toggleGroup": "side-panel-active",
       "enableRouting": false,
       "layers": [
-          {
-            "layerId": "dutch-nat-parks",
-            "title": "Dutch National Parks",
-            "titleProp": "naam",
-            "imageWidth": 360
-          }
+        {
+          "layerId": "dutch_windmills",
+          "title": "Dutch Windmills",
+          "titleProp": "NAAM",
+          "descProp": "TYPE",
+          "imageProp": "THUMBNAIL",
+          "imageWidth": 360,
+          "infoUrlProp": "INFOLINK",
+          "infoUrlText": "More info..."
+        },
+        {
+          "layerId": "dutch_castles",
+          "title": "Dutch Castles",
+          "titleProp": "naam",
+          "descProp": "bijschrift",
+          "imageProp": "foto_thumb",
+          "imageWidth": 360,
+          "infoUrlProp": "info_link",
+          "infoUrlText": "More info..."
+        },
+        {
+          "layerId": "dutch-nat-parks",
+          "title": "Dutch National Parks",
+          "titleProp": "naam",
+          "descProp": "bron"
+        }
       ]
     },
     "wgu-measuretool": {
