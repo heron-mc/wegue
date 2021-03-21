@@ -1,0 +1,24 @@
+{
+  "type": "WFS",
+  "lid": "dutch-windmills",
+  "name": "WFS (Dutch Windmills RCE)",
+  "url": "https://services.rce.geovoorziening.nl/landschapsatlas/wfs",
+  "typeName": "landschapsatlas:Molens",
+  "version": "2.0.0",
+  "maxFeatures": 100,
+  "formatConfig": {
+  },
+  "format": "GeoJSON",
+  "projection": "EPSG:28992",
+  "loadOnlyVisible": true,
+  "visible": false,
+  "selectable": true,
+  "displayInLayerList": true,
+  "tags": ["Culture"],
+  "style": {
+    "strokeColor": "white",
+    "strokeWidth": 2,
+    "fillColor": "rgba(155,153,51,0.5)"
+  },
+  "attributions": "<a href='https://www.cultureelerfgoed.nl/' target='_blank'>Rijksdienst Cultureel Erfgoed</a>"
+}

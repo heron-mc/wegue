@@ -39,7 +39,7 @@
   "permalink": {
     "location": "search",
     "layers": true,
-    "extent": true,
+    "extent": false,
     "projection": "EPSG:28992",
     "paramPrefix": "",
     "history": false
@@ -256,6 +256,12 @@
         "hideTags": false
       }
     },
+    "wgu-share": {
+      "target": "toolbar",
+      "mobileTarget": "menu",
+      "hasSubMenu": true,
+      "darkLayout": false
+    },
     "wgu-feature-info": {
       "panel": true,
       "draggable": true,
@@ -334,12 +340,6 @@
     "wgu-zoomtomaxextent": {
       "target": "menu",
       "darkLayout": true
-    },
-    "wgu-share": {
-      "target": "menu",
-      "mobileTarget": "menu",
-      "hasSubMenu": true,
-      "darkLayout": false
     },
     "wgu-language": {
       "languages": ["en", "de"],
